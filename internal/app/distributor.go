@@ -31,58 +31,6 @@ type distributorsQ interface {
 	Transaction(fn func(ctx context.Context) error) error
 }
 
-func (a App) CreateDistributor(ctx context.Context, initiatorID uuid.UUID, name string) (models.Distributor, error) {
-	_, err := a.employee.New().
-		FilterUserID(initiatorID).
-		Get(ctx)
-	if err == nil || errors.Is(err, sql.ErrNoRows) {
-		return models.Distributor{}, errx.RaiseEmployeeAlreadyExists(ctx, err, initiatorID)
-	} else if err != nil {
-		return models.Distributor{}, errx.RaiseInternal(ctx, err)
-	}
-
-	distributor := dbx.Distributor{
-		ID:        uuid.New(),
-		Icon:      "",
-		Name:      name,
-		Status:    enum.DistributorStatusActive,
-		UpdatedAt: time.Now().UTC(),
-		CreatedAt: time.Now().UTC(),
-	}
-
-	trErr := a.distributor.Transaction(func(ctx context.Context) error {
-		err = a.distributor.New().Insert(ctx, distributor)
-		if err != nil {
-			return errx.RaiseInternal(ctx, err)
-		}
-
-		err = a.employee.New().Insert(ctx, dbx.Employee{
-			UserID:        initiatorID,
-			DistributorID: distributor.ID,
-			Role:          enum.EmployeeRoleAdmin,
-			UpdatedAt:     time.Now().UTC(),
-			CreatedAt:     time.Now().UTC(),
-		})
-		if err != nil {
-			return errx.RaiseInternal(ctx, err)
-		}
-
-		return nil
-	})
-	if trErr != nil {
-		return models.Distributor{}, trErr
-	}
-
-	return models.Distributor{
-		ID:        distributor.ID,
-		Name:      distributor.Name,
-		Icon:      distributor.Icon,
-		Status:    distributor.Status,
-		UpdatedAt: distributor.UpdatedAt,
-		CreatedAt: distributor.CreatedAt,
-	}, nil
-}
-
 func (a App) GetDistributor(ctx context.Context, ID uuid.UUID) (models.Distributor, error) {
 	distributor, err := a.distributor.New().FilterID(ID).Get(ctx)
 	if err != nil {
@@ -104,7 +52,64 @@ func (a App) GetDistributor(ctx context.Context, ID uuid.UUID) (models.Distribut
 	}, nil
 }
 
-func (a App) UpdateDistributorName(ctx context.Context, initiatorID, distributorID uuid.UUID, name string) (models.Distributor, error) {
+func (a App) CreateDistributor(
+	ctx context.Context,
+	initiatorID uuid.UUID,
+	name string,
+) (models.Distributor, error) {
+	distributor := dbx.Distributor{
+		ID:        uuid.New(),
+		Icon:      "",
+		Name:      name,
+		Status:    enum.DistributorStatusActive,
+		UpdatedAt: time.Now().UTC(),
+		CreatedAt: time.Now().UTC(),
+	}
+
+	trErr := a.distributor.Transaction(func(ctx context.Context) error {
+		err := a.distributor.New().Insert(ctx, distributor)
+		if err != nil {
+			//don't need to check for sql.ErrNoRows here, because Insert will not return it
+			return errx.RaiseInternal(ctx, err)
+		}
+
+		err = a.employee.New().Insert(ctx, dbx.Employee{
+			UserID:        initiatorID,
+			DistributorID: distributor.ID,
+			Role:          enum.EmployeeRoleAdmin,
+			UpdatedAt:     time.Now().UTC(),
+			CreatedAt:     time.Now().UTC(),
+		})
+		if err != nil {
+			switch {
+			case errors.Is(err, sql.ErrNoRows):
+				return errx.RaiseEmployeCantCreateDisrtibutor(ctx, err, initiatorID)
+			default:
+				return errx.RaiseInternal(ctx, err)
+			}
+		}
+
+		return nil
+	})
+	if trErr != nil {
+		return models.Distributor{}, trErr
+	}
+
+	return models.Distributor{
+		ID:        distributor.ID,
+		Name:      distributor.Name,
+		Icon:      distributor.Icon,
+		Status:    distributor.Status,
+		UpdatedAt: distributor.UpdatedAt,
+		CreatedAt: distributor.CreatedAt,
+	}, nil
+}
+
+func (a App) UpdateDistributorName(ctx context.Context,
+	initiatorID uuid.UUID,
+	distributorID uuid.UUID,
+	name string,
+) (models.Distributor, error) {
 	_, err := a.CompareEmployeesRole(ctx, initiatorID, distributorID, enum.EmployeeRoleAdmin)
 	if err != nil {
 		return models.Distributor{}, err
@@ -145,7 +150,11 @@ func (a App) UpdateDistributorName(ctx context.Context, initiatorID, distributor
 	}, nil
 }
 
-func (a App) UpdateDistributorIcon(ctx context.Context, initiatorID, distributorID uuid.UUID, icon string) (models.Distributor, error) {
+func (a App) UpdateDistributorIcon(ctx context.Context,
+	initiatorID uuid.UUID,
+	distributorID uuid.UUID,
+	icon string,
+) (models.Distributor, error) {
 	_, err := a.CompareEmployeesRole(ctx, initiatorID, distributorID, enum.EmployeeRoleAdmin)
 	if err != nil {
 		return models.Distributor{}, err
@@ -158,12 +167,22 @@ func (a App) UpdateDistributorIcon(ctx context.Context, initiatorID, distributor
 		"updated_at": time.Now().UTC(),
 	})
 	if err != nil {
-		return models.Distributor{}, err
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return models.Distributor{}, errx.RaiseDistributorNotFound(ctx, err, distributorID)
+		default:
+			return models.Distributor{}, errx.RaiseInternal(ctx, err)
+		}
 	}
 
 	distributor, err := distributorQ.Get(ctx)
 	if err != nil {
-		return models.Distributor{}, err
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return models.Distributor{}, errx.RaiseDistributorNotFound(ctx, err, distributorID)
+		default:
+			return models.Distributor{}, errx.RaiseInternal(ctx, err)
+		}
 	}
 
 	return models.Distributor{
@@ -176,7 +195,11 @@ func (a App) UpdateDistributorIcon(ctx context.Context, initiatorID, distributor
 	}, nil
 }
 
-func (a App) SetDistributorStatusInactive(ctx context.Context, initiatorID, distributorID uuid.UUID) (models.Distributor, error) {
+func (a App) SetDistributorStatusInactive(
+	ctx context.Context,
+	initiatorID uuid.UUID,
+	distributorID uuid.UUID,
+) (models.Distributor, error) {
 	_, err := a.CompareEmployeesRole(ctx, initiatorID, distributorID, enum.EmployeeRoleAdmin)
 	if err != nil {
 		return models.Distributor{}, err
@@ -189,12 +212,22 @@ func (a App) SetDistributorStatusInactive(ctx context.Context, initiatorID, dist
 		"updated_at": time.Now().UTC(),
 	})
 	if err != nil {
-		return models.Distributor{}, err
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return models.Distributor{}, errx.RaiseDistributorNotFound(ctx, err, distributorID)
+		default:
+			return models.Distributor{}, errx.RaiseInternal(ctx, err)
+		}
 	}
 
 	distributor, err := distributorQ.Get(ctx)
 	if err != nil {
-		return models.Distributor{}, err
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return models.Distributor{}, errx.RaiseDistributorNotFound(ctx, err, distributorID)
+		default:
+			return models.Distributor{}, errx.RaiseInternal(ctx, err)
+		}
 	}
 
 	return models.Distributor{
@@ -207,7 +240,11 @@ func (a App) SetDistributorStatusInactive(ctx context.Context, initiatorID, dist
 	}, nil
 }
 
-func (a App) SetDistributorStatusActive(ctx context.Context, initiatorID, distributorID uuid.UUID) (models.Distributor, error) {
+func (a App) SetDistributorStatusActive(
+	ctx context.Context,
+	initiatorID uuid.UUID,
+	distributorID uuid.UUID,
+) (models.Distributor, error) {
 	_, err := a.CompareEmployeesRole(ctx, initiatorID, distributorID, enum.EmployeeRoleAdmin)
 	if err != nil {
 		return models.Distributor{}, err
@@ -220,12 +257,22 @@ func (a App) SetDistributorStatusActive(ctx context.Context, initiatorID, distri
 		"updated_at": time.Now().UTC(),
 	})
 	if err != nil {
-		return models.Distributor{}, err
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return models.Distributor{}, errx.RaiseDistributorNotFound(ctx, err, distributorID)
+		default:
+			return models.Distributor{}, errx.RaiseInternal(ctx, err)
+		}
 	}
 
 	distributor, err := distributorQ.Get(ctx)
 	if err != nil {
-		return models.Distributor{}, err
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return models.Distributor{}, errx.RaiseDistributorNotFound(ctx, err, distributorID)
+		default:
+			return models.Distributor{}, errx.RaiseInternal(ctx, err)
+		}
 	}
 
 	return models.Distributor{
@@ -239,20 +286,35 @@ func (a App) SetDistributorStatusActive(ctx context.Context, initiatorID, distri
 }
 
 // SetDistributorStatusSuspend allows a system admin to suspend a distributor.
-func (a App) SetDistributorStatusSuspend(ctx context.Context, distributorID uuid.UUID, reason string) (models.Distributor, error) {
+func (a App) SetDistributorStatusSuspend(
+	ctx context.Context,
+	distributorID uuid.UUID,
+	reason string,
+) (models.Distributor, error) {
 	distributorQ := a.distributor.New().FilterID(distributorID)
 
 	err := distributorQ.Update(ctx, map[string]any{
 		"status":     enum.DistributorStatusSuspend,
+		"reason":     reason,
 		"updated_at": time.Now().UTC(),
 	})
 	if err != nil {
-		return models.Distributor{}, err
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return models.Distributor{}, errx.RaiseDistributorNotFound(ctx, err, distributorID)
+		default:
+			return models.Distributor{}, errx.RaiseInternal(ctx, err)
+		}
 	}
 
 	distributor, err := distributorQ.Get(ctx)
 	if err != nil {
-		return models.Distributor{}, err
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return models.Distributor{}, errx.RaiseDistributorNotFound(ctx, err, distributorID)
+		default:
+			return models.Distributor{}, errx.RaiseInternal(ctx, err)
+		}
 	}
 
 	//TODO: Implement logic to send email to admin about suspension with reason
@@ -272,16 +334,26 @@ func (a App) DeleteDistributorStatusSuspend(ctx context.Context, distributorID u
 	distributorQ := a.distributor.New().FilterID(distributorID)
 
 	err := distributorQ.Update(ctx, map[string]any{
-		"status":     enum.DistributorStatusActive,
+		"status":     enum.DistributorStatusInactive,
 		"updated_at": time.Now().UTC(),
 	})
 	if err != nil {
-		return models.Distributor{}, err
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return models.Distributor{}, errx.RaiseDistributorNotFound(ctx, err, distributorID)
+		default:
+			return models.Distributor{}, errx.RaiseInternal(ctx, err)
+		}
 	}
 
 	distributor, err := distributorQ.Get(ctx)
 	if err != nil {
-		return models.Distributor{}, err
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return models.Distributor{}, errx.RaiseDistributorNotFound(ctx, err, distributorID)
+		default:
+			return models.Distributor{}, errx.RaiseInternal(ctx, err)
+		}
 	}
 
 	return models.Distributor{

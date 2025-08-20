@@ -11,7 +11,7 @@ CREATE TABLE suspended_distributors (
     distributor_id uuid NOT NULL REFERENCES distributors(id) ON DELETE CASCADE,
     initiator_id   uuid NOT NULL,
     reason         varchar(8192) NOT NULL,
-    status         suspended_distributor_status NOT NULL DEFAULT,
+    status         suspended_distributor_status NOT NULL DEFAULT 'active',
     suspended_at   timestamp NOT NULL DEFAULT now(),
     cancelled_at   timestamp,
     created_at     timestamp NOT NULL DEFAULT now()

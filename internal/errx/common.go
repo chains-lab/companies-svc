@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/chains-lab/distributors-svc/internal/config/constant"
 	"github.com/chains-lab/svc-errors/ape"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
@@ -25,9 +26,6 @@ func RaiseInternal(ctx context.Context, cause error) error {
 				"timestamp": nowRFC3339Nano(),
 			},
 		},
-		&errdetails.RequestInfo{
-			RequestId: meta.RequestID(ctx),
-		},
 	)
 
 	return ErrorInternal.Raise(
@@ -47,9 +45,6 @@ func RaiseNoPermissions(ctx context.Context, cause error) error {
 				"timestamp": nowRFC3339Nano(),
 			},
 		},
-		&errdetails.RequestInfo{
-			RequestId: meta.RequestID(ctx),
-		},
 	)
 
 	return ErrorNoPermissions.Raise(
@@ -68,9 +63,6 @@ func RaiseUnauthenticated(ctx context.Context, cause error) error {
 			Metadata: map[string]string{
 				"timestamp": nowRFC3339Nano(),
 			},
-		},
-		&errdetails.RequestInfo{
-			RequestId: meta.RequestID(ctx),
 		},
 	)
 

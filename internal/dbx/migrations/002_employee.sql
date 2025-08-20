@@ -16,7 +16,8 @@ CREATE TABLE "employees" (
 
 CREATE Type "invite_status" AS ENUM (
     'sent',
-    'suspended',
+    'recalled'
+    'accepted',
     'rejected'
 );
 

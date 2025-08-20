@@ -41,7 +41,12 @@ func (a App) GetEmployee(ctx context.Context, userID uuid.UUID) (models.Employee
 		FilterUserID(userID).
 		Get(ctx)
 	if err != nil {
-		return models.Employee{}, err
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return models.Employee{}, errx.RaiseEmployeeNotFound(ctx, err, userID)
+		default:
+			return models.Employee{}, errx.RaiseInternal(ctx, err)
+		}
 	}
 
 	return models.Employee{
@@ -59,7 +64,12 @@ func (a App) GetDistributorEmployee(ctx context.Context, userID, distributorID u
 		FilterDistributorID(distributorID).
 		Get(ctx)
 	if err != nil {
-		return models.Employee{}, err
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return models.Employee{}, errx.RaiseEmployeeNotFound(ctx, err, userID)
+		default:
+			return models.Employee{}, errx.RaiseInternal(ctx, err)
+		}
 	}
 
 	return models.Employee{
@@ -75,11 +85,8 @@ func (a App) CompareEmployeesRole(
 	ctx context.Context,
 	initiatorID uuid.UUID,
 	distributorID uuid.UUID,
-	role string) (
-	// returns:
-	models.Employee,
-	error,
-) {
+	role string,
+) (models.Employee, error) {
 	employee, err := a.employee.New().
 		FilterUserID(initiatorID).
 		FilterDistributorID(distributorID).
@@ -120,7 +127,6 @@ func (a App) AllowedToInteractWithEmployee(
 	initiatorID uuid.UUID,
 	userID uuid.UUID,
 	distributorID uuid.UUID,
-	// returns:
 ) (int, error) {
 	initiator, err := a.GetDistributorEmployee(ctx, initiatorID, distributorID)
 	if err != nil {
@@ -136,7 +142,7 @@ func (a App) AllowedToInteractWithEmployee(
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
-			return -1, errx.RaiseEmployeeNotFound(ctx, err, userID, distributorID)
+			return -1, errx.RaiseEmployeeNotFound(ctx, err, userID)
 		default:
 			return -1, errx.RaiseInternal(ctx, err)
 		}
@@ -153,13 +159,8 @@ func (a App) AllowedToInteractWithEmployee(
 func (a App) GetEmployees(
 	ctx context.Context,
 	filters map[string]any,
-	pag pagination.Request) (
-	// returns:
-	[]models.Employee,
-	pagination.Response,
-	error,
-) {
-
+	pag pagination.Request,
+) ([]models.Employee, pagination.Response, error) {
 	query := a.employee.New()
 	if distributorID, ok := filters["distributor_id"].(uuid.UUID); ok {
 		query = query.FilterDistributorID(distributorID)
@@ -175,11 +176,22 @@ func (a App) GetEmployees(
 
 	employees, err := query.Page(limit, offset).Select(ctx)
 	if err != nil {
-		return nil, pagination.Response{}, err
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return nil, pagination.Response{}, nil // No employees found
+		default:
+			return nil, pagination.Response{}, errx.RaiseInternal(ctx, err)
+		}
 	}
+
 	total, err := query.Count(ctx)
 	if err != nil {
-		return nil, pagination.Response{}, errx.RaiseInternal(ctx, err)
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return nil, pagination.Response{}, nil // No employees found
+		default:
+			return nil, pagination.Response{}, errx.RaiseInternal(ctx, err)
+		}
 	}
 
 	var result []models.Employee
@@ -205,11 +217,8 @@ func (a App) UpdateEmployeeRole(
 	initiatorID uuid.UUID,
 	userID uuid.UUID,
 	distributorID uuid.UUID,
-	newRole string) (
-	//returns:
-	models.Employee,
-	error,
-) {
+	newRole string,
+) (models.Employee, error) {
 	initiator, err := a.CompareEmployeesRole(ctx, initiatorID, distributorID, enum.EmployeeRoleAdmin)
 	if err != nil {
 		return models.Employee{}, err
@@ -219,6 +228,7 @@ func (a App) UpdateEmployeeRole(
 	if err != nil {
 		return models.Employee{}, err
 	}
+
 	if allowed != 1 {
 		return models.Employee{}, errx.RaiseInitiatorEmployeeHaveNotEnoughPermissions(
 			ctx,
@@ -246,7 +256,12 @@ func (a App) UpdateEmployeeRole(
 		"updated_at": time.Now().UTC(),
 	})
 	if err != nil {
-		return models.Employee{}, err
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return models.Employee{}, errx.RaiseEmployeeNotFound(ctx, err, userID)
+		default:
+			return models.Employee{}, errx.RaiseInternal(ctx, err)
+		}
 	}
 
 	return models.Employee{
@@ -274,7 +289,12 @@ func (a App) DeleteEmployee(ctx context.Context, initiatorID, userID, distributo
 
 	err = a.employee.New().FilterUserID(userID).FilterDistributorID(distributorID).Delete(ctx)
 	if err != nil {
-		return err
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return errx.RaiseEmployeeNotFound(ctx, err, userID)
+		default:
+			return errx.RaiseInternal(ctx, err)
+		}
 	}
 
 	return nil

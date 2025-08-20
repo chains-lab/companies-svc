@@ -4,12 +4,14 @@ import "fmt"
 
 const (
 	InviteStatusSent     = "sent"     // Invite is sent
+	InviteStatusRecalled = "recalled" // Invite is recalled
 	InviteStatusAccepted = "accepted" // Invite is accepted
 	InviteStatusRejected = "rejected" // Invite is rejected
 )
 
 var InviteStatuses = []string{
 	InviteStatusSent,
+	InviteStatusRecalled,
 	InviteStatusAccepted,
 	InviteStatusRejected,
 }

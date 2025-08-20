@@ -17,7 +17,7 @@ type SuspendedDistributor struct {
 	DistributorID uuid.UUID  `db:"distributor_id"`
 	InitiatorID   uuid.UUID  `db:"initiator_id"`
 	Reason        string     `db:"reason"`
-	Active        bool       `db:"active"`
+	Status        string     `db:"status"`
 	SuspendedAt   time.Time  `db:"suspended_at"`
 	CanceledAt    *time.Time `db:"canceled_at"`
 	CreatedAt     time.Time  `db:"created_at"`
@@ -61,7 +61,7 @@ func scanSuspended(scanner interface{ Scan(dest ...any) error }) (SuspendedDistr
 		&s.DistributorID,
 		&s.InitiatorID,
 		&s.Reason,
-		&s.Active,
+		&s.Status,
 		&s.SuspendedAt,
 		&nt, // сканим сюда
 		&s.CreatedAt,
@@ -87,7 +87,7 @@ func (q SuspendedQ) Insert(ctx context.Context, input SuspendedDistributor) erro
 		"distributor_id": input.DistributorID,
 		"initiator_id":   input.InitiatorID,
 		"reason":         input.Reason,
-		"active":         input.Active,
+		"status":         input.Status,
 		"suspended_at":   input.SuspendedAt,
 		//"canceled_at":    input.CanceledAt, defaults to NULL if not set
 		"created_at": input.CreatedAt,
@@ -204,8 +204,8 @@ func (q SuspendedQ) FilterInitiatorID(initiatorID uuid.UUID) SuspendedQ {
 	return q.applyConditions(sq.Eq{"initiator_id": initiatorID})
 }
 
-func (q SuspendedQ) FilterActive(active bool) SuspendedQ {
-	return q.applyConditions(sq.Eq{"active": active})
+func (q SuspendedQ) FilterStatus(status string) SuspendedQ {
+	return q.applyConditions(sq.Eq{"status": status})
 }
 
 func (q SuspendedQ) OrderBySuspendedAt(ascending bool) SuspendedQ {

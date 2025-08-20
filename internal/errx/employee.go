@@ -2,7 +2,9 @@ package errx
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/chains-lab/distributors-svc/internal/config/constant"
 	"github.com/chains-lab/svc-errors/ape"
 	"github.com/google/uuid"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
@@ -12,12 +14,12 @@ import (
 
 var ErrorEmployeeNotFound = ape.Declare("EMPLOYEE_NOT_FOUND")
 
-func RaiseEmployeeNotFound(ctx context.Context, cause error, userID, distributorID uuid.UUID) error {
-	st := status.New(codes.NotFound, "employee not found")
+func RaiseEmployeeNotFound(ctx context.Context, cause error, userID uuid.UUID) error {
+	st := status.New(codes.NotFound, fmt.Sprintf("employee not found: %s", userID))
 	st, _ = st.WithDetails(
 		&errdetails.ErrorInfo{
 			Reason: ErrorEmployeeNotFound.Error(),
-			Domain: "city-petitions-svc",
+			Domain: constant.ServiceName,
 			Metadata: map[string]string{
 				"timestamp": nowRFC3339Nano(),
 			},
@@ -30,11 +32,11 @@ func RaiseEmployeeNotFound(ctx context.Context, cause error, userID, distributor
 var ErrorEmployeeAlreadyExists = ape.Declare("EMPLOYEE_ALREADY_EXISTS")
 
 func RaiseEmployeeAlreadyExists(ctx context.Context, cause error, userID uuid.UUID) error {
-	st := status.New(codes.AlreadyExists, "employee already exists")
+	st := status.New(codes.AlreadyExists, fmt.Sprintf("employee already exists: %s", userID))
 	st, _ = st.WithDetails(
 		&errdetails.ErrorInfo{
 			Reason: ErrorEmployeeAlreadyExists.Error(),
-			Domain: "city-petitions-svc",
+			Domain: constant.ServiceName,
 			Metadata: map[string]string{
 				"timestamp": nowRFC3339Nano(),
 			},
@@ -47,11 +49,14 @@ func RaiseEmployeeAlreadyExists(ctx context.Context, cause error, userID uuid.UU
 var ErrorInitiatorNotEmployee = ape.Declare("INITIATOR_NOT_EMPLOYEE")
 
 func RaiseInitiatorNotEmployee(ctx context.Context, cause error, userID, distributorID uuid.UUID) error {
-	st := status.New(codes.FailedPrecondition, "initiator is not an employee")
+	st := status.New(
+		codes.FailedPrecondition,
+		fmt.Sprintf("user %s is not employee in distributor %s", userID, distributorID),
+	)
 	st, _ = st.WithDetails(
 		&errdetails.ErrorInfo{
 			Reason: ErrorInitiatorNotEmployee.Error(),
-			Domain: "city-petitions-svc",
+			Domain: constant.ServiceName,
 			Metadata: map[string]string{
 				"timestamp": nowRFC3339Nano(),
 			},
@@ -64,11 +69,14 @@ func RaiseInitiatorNotEmployee(ctx context.Context, cause error, userID, distrib
 var ErrorInitiatorEmployeeHaveNotEnoughPermissions = ape.Declare("INITIATOR_EMPLOYEE_HAVE_NOT_ENOUGH_PERMISSIONS")
 
 func RaiseInitiatorEmployeeHaveNotEnoughPermissions(ctx context.Context, cause error, userID, distributorID uuid.UUID) error {
-	st := status.New(codes.PermissionDenied, "initiator employee have not enough permissions")
+	st := status.New(
+		codes.PermissionDenied,
+		fmt.Sprintf("employee %s have not eniugh right in distributor %s", userID, distributorID),
+	)
 	st, _ = st.WithDetails(
 		&errdetails.ErrorInfo{
 			Reason: ErrorInitiatorEmployeeHaveNotEnoughPermissions.Error(),
-			Domain: "city-petitions-svc",
+			Domain: constant.ServiceName,
 			Metadata: map[string]string{
 				"timestamp": nowRFC3339Nano(),
 			},

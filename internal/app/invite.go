@@ -40,10 +40,12 @@ type inviteQ interface {
 func (a App) GetInvite(ctx context.Context, id uuid.UUID) (models.Invite, error) {
 	invite, err := a.invite.New().FilterID(id).Get(ctx)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
 			return models.Invite{}, errx.RaiseInviteNotFound(ctx, fmt.Errorf("invite not found: %w", err), id)
+		default:
+			return models.Invite{}, errx.RaiseInternal(ctx, fmt.Errorf("getting invite: %w", err))
 		}
-		return models.Invite{}, errx.RaiseInternal(ctx, err)
 	}
 
 	return models.Invite{
@@ -59,10 +61,16 @@ func (a App) GetInvite(ctx context.Context, id uuid.UUID) (models.Invite, error)
 	}, nil
 }
 
-func (a App) SendInvite(ctx context.Context, initiatorID, userID, cityID uuid.UUID, role string) (models.Invite, error) {
+func (a App) SendInvite(
+	ctx context.Context,
+	initiatorID uuid.UUID,
+	userID uuid.UUID,
+	cityID uuid.UUID,
+	role string,
+) (models.Invite, error) {
 	_, err := a.employee.New().FilterUserID(userID).Get(ctx)
 	if err == nil || errors.Is(err, sql.ErrNoRows) {
-		return models.Invite{}, errx.UserAlreadyEmployee(
+		return models.Invite{}, errx.RaiseEmployeeAlreadyExists(
 			ctx,
 			fmt.Errorf("user already has an employee record: %s", userID),
 			userID,
@@ -102,18 +110,17 @@ func (a App) SendInvite(ctx context.Context, initiatorID, userID, cityID uuid.UU
 
 	err = a.invite.New().Insert(ctx, invite)
 	if err != nil {
-		switch {
-		case errors.Is(err, sql.ErrNoRows):
-			return models.Invite{}, err // TODO user already have invite
-		default:
-			return models.Invite{}, errx.RaiseInternal(ctx, err)
-		}
+		return models.Invite{}, errx.RaiseInternal(ctx, err)
 	}
 
 	return models.Invite{}, nil
 }
 
-func (a App) GetInvites(ctx context.Context, filters map[string]any, pag pagination.Request) ([]models.Invite, pagination.Response, error) {
+func (a App) GetInvites(
+	ctx context.Context,
+	filters map[string]any,
+	pag pagination.Request,
+) ([]models.Invite, pagination.Response, error) {
 	query := a.invite.New()
 
 	if id, ok := filters["id"].(uuid.UUID); ok {
@@ -139,12 +146,22 @@ func (a App) GetInvites(ctx context.Context, filters map[string]any, pag paginat
 
 	invites, err := query.Page(limit, offset).Select(ctx)
 	if err != nil {
-		return nil, pagination.Response{}, errx.RaiseInternal(ctx, err)
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return nil, pagination.Response{}, errx.RaiseInviteNotFound(ctx, fmt.Errorf("no invites found: %w", err), uuid.Nil)
+		default:
+			return nil, pagination.Response{}, errx.RaiseInternal(ctx, fmt.Errorf("selecting invites: %w", err))
+		}
 	}
 
 	count, err := query.Count(ctx)
 	if err != nil {
-		return nil, pagination.Response{}, errx.RaiseInternal(ctx, err)
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return nil, pagination.Response{}, errx.RaiseInviteNotFound(ctx, fmt.Errorf("no invites found: %w", err), uuid.Nil)
+		default:
+			return nil, pagination.Response{}, errx.RaiseInternal(ctx, fmt.Errorf("counting invites: %w", err))
+		}
 	}
 
 	res := make([]models.Invite, 0, len(invites))
@@ -173,7 +190,44 @@ func (a App) GetInvites(ctx context.Context, filters map[string]any, pag paginat
 	}, nil
 }
 
-func (a App) AcceptInvite(ctx context.Context, inviteID uuid.UUID) error {
+func (a App) RecallInvite(
+	ctx context.Context,
+	initiatorID uuid.UUID,
+	distributorID uuid.UUID,
+	inviteID uuid.UUID,
+) error {
+	_, err := a.CompareEmployeesRole(ctx, initiatorID, distributorID, enum.EmployeeRoleAdmin)
+	if err != nil {
+		return err
+	}
+
+	invite, err := a.invite.New().FilterID(inviteID).Get(ctx)
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return errx.RaiseInviteNotFound(ctx, fmt.Errorf("invite not found: %w", err), inviteID)
+		default:
+			return errx.RaiseInternal(ctx, fmt.Errorf("getting invite: %w", err))
+		}
+	}
+
+	if invite.Status != enum.InviteStatusSent {
+		return errx.RaiseInviteIsNotActive(ctx, fmt.Errorf("invite already answered: %s", inviteID), inviteID)
+	}
+
+	err = a.invite.New().Delete(ctx)
+	if err != nil {
+		return errx.RaiseInternal(ctx, fmt.Errorf("deleting invite: %w", err))
+	}
+
+	return nil
+}
+
+func (a App) AcceptInvite(
+	ctx context.Context,
+	initiatorID uuid.UUID,
+	inviteID uuid.UUID,
+) error {
 	invite, err := a.invite.New().FilterID(inviteID).Get(ctx)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -183,12 +237,20 @@ func (a App) AcceptInvite(ctx context.Context, inviteID uuid.UUID) error {
 	}
 
 	if invite.Status != enum.InviteStatusSent {
-		return errx.RaiseInviteAlreadyAccepted(ctx, fmt.Errorf("invite already answered: %s", inviteID))
+		return errx.RaiseInviteIsNotActive(ctx, fmt.Errorf("invite already answered: %s", inviteID), inviteID)
+	}
+
+	if initiatorID != invite.DistributorID {
+		return errx.RaiseInternal(ctx, fmt.Errorf("invite is not a distributor ID: %s", inviteID))
 	}
 
 	_, err = a.employee.New().FilterUserID(invite.UserID).Get(ctx)
 	if err == nil || errors.Is(err, sql.ErrNoRows) {
-		return errx.RaiseInviteAlreadyAccepted(ctx, fmt.Errorf("user already has an employee record: %s", invite.UserID))
+		return errx.RaiseInviteAlreadyAnswered(
+			ctx,
+			fmt.Errorf("user already has an employee record: %s", inviteID),
+			inviteID,
+		)
 	} else if err != nil {
 		return errx.RaiseInternal(ctx, err)
 	}
@@ -202,7 +264,12 @@ func (a App) AcceptInvite(ctx context.Context, inviteID uuid.UUID) error {
 			"expires_at": invite.ExpiresAt,
 		})
 		if err != nil {
-			return errx.RaiseInternal(ctx, fmt.Errorf("updating invite: %w", err))
+			switch {
+			case errors.Is(err, sql.ErrNoRows):
+				return errx.RaiseInviteNotFound(ctx, fmt.Errorf("invite not found: %w", err), inviteID)
+			default:
+				return errx.RaiseInternal(ctx, fmt.Errorf("updating invite: %w", err))
+			}
 		}
 
 		err = a.employee.New().Insert(ctx, dbx.Employee{
@@ -213,7 +280,12 @@ func (a App) AcceptInvite(ctx context.Context, inviteID uuid.UUID) error {
 			CreatedAt:     time.Now().UTC(),
 		})
 		if err != nil {
-			return errx.RaiseInternal(ctx, fmt.Errorf("inserting employee record: %w", err))
+			switch {
+			case errors.Is(err, sql.ErrNoRows):
+				return errx.RaiseInviteNotFound(ctx, fmt.Errorf("invite not found: %w", err), inviteID)
+			default:
+				return errx.RaiseInternal(ctx, fmt.Errorf("inserting employee: %w", err))
+			}
 		}
 
 		return nil
@@ -222,7 +294,11 @@ func (a App) AcceptInvite(ctx context.Context, inviteID uuid.UUID) error {
 	return nil
 }
 
-func (a App) RejectInvite(ctx context.Context, inviteID uuid.UUID) error {
+func (a App) RejectInvite(
+	ctx context.Context,
+	initiatorID uuid.UUID,
+	inviteID uuid.UUID,
+) error {
 	invite, err := a.invite.New().FilterID(inviteID).Get(ctx)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -232,7 +308,11 @@ func (a App) RejectInvite(ctx context.Context, inviteID uuid.UUID) error {
 	}
 
 	if invite.Status != enum.InviteStatusSent {
-		return errx.RaiseInviteAlreadyAccepted(ctx, fmt.Errorf("invite already answered: %s", inviteID))
+		return errx.RaiseInviteIsNotActive(ctx, fmt.Errorf("invite already answered: %s", inviteID), inviteID)
+	}
+
+	if initiatorID != invite.DistributorID {
+		return errx.RaiseInternal(ctx, fmt.Errorf("invite is not a distributor ID: %s", inviteID))
 	}
 
 	invite.Status = enum.InviteStatusRejected
