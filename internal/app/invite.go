@@ -126,6 +126,7 @@ func (a App) SendInvite(
 func (a App) SelectInvites(
 	ctx context.Context,
 	filters map[string]any,
+	ascend bool,
 	pag pagination.Request,
 ) ([]models.Invite, pagination.Response, error) {
 	query := a.invite.New()
@@ -153,7 +154,7 @@ func (a App) SelectInvites(
 		return nil, pagination.Response{}, errx.RaiseInternal(ctx, fmt.Errorf("counting invites: %w", err))
 	}
 
-	invites, err := query.Page(limit, offset).Select(ctx)
+	invites, err := query.Page(limit, offset).OrderByCreatedAt(ascend).Select(ctx)
 	if err != nil {
 		return nil, pagination.Response{}, errx.RaiseInternal(ctx, fmt.Errorf("selecting invites: %w", err))
 	}
@@ -187,55 +188,63 @@ func (a App) WithdrawInvite(
 	ctx context.Context,
 	initiatorID uuid.UUID,
 	inviteID uuid.UUID,
-) error {
+) (models.Invite, error) {
 	invite, err := a.invite.New().FilterID(inviteID).Get(ctx)
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
-			return errx.RaiseInviteNotFound(ctx, fmt.Errorf("invite not found: %w", err), inviteID)
+			return models.Invite{}, errx.RaiseInviteNotFound(ctx, fmt.Errorf("invite not found: %w", err), inviteID)
 		default:
-			return errx.RaiseInternal(ctx, fmt.Errorf("getting invite: %w", err))
+			return models.Invite{}, errx.RaiseInternal(ctx, fmt.Errorf("getting invite: %w", err))
 		}
 	}
 
 	_, err = a.CompareEmployeesRole(ctx, initiatorID, invite.DistributorID, enum.EmployeeRoleAdmin)
 	if err != nil {
-		return err
+		return models.Invite{}, err
 	}
 
 	if invite.Status != enum.InviteStatusSent {
-		return errx.RaiseInviteIsNotActive(ctx, fmt.Errorf("invite already answered: %s", inviteID), inviteID)
+		return models.Invite{}, errx.RaiseInviteIsNotActive(ctx, fmt.Errorf("invite already answered: %s", inviteID), inviteID)
 	}
 
 	err = a.invite.New().FilterID(inviteID).Update(ctx, map[string]interface{}{
 		"status": enum.InviteStatusWithdrawn,
 	})
 	if err != nil {
-		return errx.RaiseInternal(ctx, fmt.Errorf("updating invite: %w", err))
+		return models.Invite{}, errx.RaiseInternal(ctx, fmt.Errorf("updating invite: %w", err))
 	}
 
-	return nil
+	return models.Invite{
+		ID:            invite.ID,
+		DistributorID: invite.DistributorID,
+		UserID:        invite.UserID,
+		InvitedBy:     invite.InvitedBy,
+		Role:          invite.Role,
+		Status:        enum.InviteStatusWithdrawn,
+		CreatedAt:     invite.CreatedAt,
+	}, nil
 }
 
 func (a App) AcceptInvite(
 	ctx context.Context,
 	initiatorID uuid.UUID,
 	inviteID uuid.UUID,
-) error {
+) (models.Invite, error) {
 	invite, err := a.invite.New().FilterID(inviteID).Get(ctx)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return errx.RaiseInviteNotFound(ctx, fmt.Errorf("invite not found: %w", err), inviteID)
+			return models.Invite{}, errx.RaiseInviteNotFound(ctx, fmt.Errorf("invite not found: %w", err), inviteID)
 		}
-		return errx.RaiseInternal(ctx, err)
+		return models.Invite{}, errx.RaiseInternal(ctx, err)
 	}
 
 	if invite.Status != enum.InviteStatusSent {
-		return errx.RaiseInviteIsNotActive(ctx, fmt.Errorf("invite already answered: %s", inviteID), inviteID)
+		return models.Invite{}, errx.RaiseInviteIsNotActive(ctx, fmt.Errorf("invite already answered: %s", inviteID), inviteID)
 	}
 
 	if initiatorID != invite.UserID {
-		return errx.RaiseInviteIsNotForInitiator(
+		return models.Invite{}, errx.RaiseInviteIsNotForInitiator(
 			ctx,
 			fmt.Errorf("invite is not for initiator: %s", inviteID),
 			inviteID,
@@ -244,10 +253,10 @@ func (a App) AcceptInvite(
 
 	_, err = a.employee.New().FilterUserID(invite.UserID).Get(ctx)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		return errx.RaiseInternal(ctx, err)
+		return models.Invite{}, errx.RaiseInternal(ctx, err)
 	}
 	if err == nil {
-		return errx.RaiseInitiatorIsAlreadyEmployee(
+		return models.Invite{}, errx.RaiseInitiatorIsAlreadyEmployee(
 			ctx,
 			fmt.Errorf("initiator is already an employee: %s", initiatorID),
 			initiatorID,
@@ -256,9 +265,12 @@ func (a App) AcceptInvite(
 
 	invite.Status = enum.InviteStatusAccepted
 
-	err = a.employee.Transaction(func(ctx context.Context) error {
+	now := time.Now().UTC()
+
+	trErr := a.employee.Transaction(func(ctx context.Context) error {
 		err = a.invite.New().Update(ctx, map[string]any{
-			"status": invite.Status,
+			"status":      invite.Status,
+			"answered_at": now,
 		})
 		if err != nil {
 			switch {
@@ -273,8 +285,8 @@ func (a App) AcceptInvite(
 			DistributorID: invite.DistributorID,
 			UserID:        invite.UserID,
 			Role:          invite.Role,
-			UpdatedAt:     time.Now().UTC(),
-			CreatedAt:     time.Now().UTC(),
+			UpdatedAt:     now,
+			CreatedAt:     now,
 		})
 		if err != nil {
 			switch {
@@ -287,39 +299,61 @@ func (a App) AcceptInvite(
 
 		return nil
 	})
+	if trErr != nil {
+		return models.Invite{}, trErr
+	}
 
-	return nil
+	return models.Invite{
+		ID:            invite.ID,
+		DistributorID: invite.DistributorID,
+		UserID:        invite.UserID,
+		InvitedBy:     invite.InvitedBy,
+		Role:          invite.Role,
+		Status:        invite.Status,
+		CreatedAt:     invite.CreatedAt,
+		AnsweredAt:    &now,
+	}, nil
 }
 
 func (a App) RejectInvite(
 	ctx context.Context,
 	initiatorID uuid.UUID,
 	inviteID uuid.UUID,
-) error {
+) (models.Invite, error) {
 	invite, err := a.invite.New().FilterID(inviteID).Get(ctx)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return errx.RaiseInviteNotFound(ctx, fmt.Errorf("invite not found: %w", err), inviteID)
+			return models.Invite{}, errx.RaiseInviteNotFound(ctx, fmt.Errorf("invite not found: %w", err), inviteID)
 		}
-		return errx.RaiseInternal(ctx, err)
+		return models.Invite{}, errx.RaiseInternal(ctx, err)
 	}
 
 	if invite.Status != enum.InviteStatusSent {
-		return errx.RaiseInviteIsNotActive(ctx, fmt.Errorf("invite already answered: %s", inviteID), inviteID)
+		return models.Invite{}, errx.RaiseInviteIsNotActive(ctx, fmt.Errorf("invite already answered: %s", inviteID), inviteID)
 	}
 
 	if initiatorID != invite.UserID {
-		return errx.RaiseInviteIsNotForInitiator(ctx, fmt.Errorf("invite is not for initiator: %s", inviteID), inviteID)
+		return models.Invite{}, errx.RaiseInviteIsNotForInitiator(ctx, fmt.Errorf("invite is not for initiator: %s", inviteID), inviteID)
 	}
 
-	invite.Status = enum.InviteStatusRejected
+	now := time.Now().UTC()
 
 	err = a.invite.New().Update(ctx, map[string]any{
-		"status": invite.Status,
+		"status":      enum.InviteStatusRejected,
+		"answered_at": now,
 	})
 	if err != nil {
-		return errx.RaiseInternal(ctx, fmt.Errorf("updating invite: %w", err))
+		return models.Invite{}, errx.RaiseInternal(ctx, fmt.Errorf("updating invite: %w", err))
 	}
 
-	return nil
+	return models.Invite{
+		ID:            invite.ID,
+		DistributorID: invite.DistributorID,
+		UserID:        invite.UserID,
+		InvitedBy:     invite.InvitedBy,
+		Role:          invite.Role,
+		Status:        enum.InviteStatusRejected,
+		CreatedAt:     invite.CreatedAt,
+		AnsweredAt:    &now,
+	}, nil
 }

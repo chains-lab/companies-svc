@@ -6,6 +6,12 @@ github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 h1:JYp7IbQjafo
 github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/units v0.0.0-20240927000941-0f3dac36c52b h1:mimo19zliBX/vSQ6PWWSL9lK8qwHozUj03+zLoEB8O0=
 github.com/alecthomas/units v0.0.0-20240927000941-0f3dac36c52b/go.mod h1:fvzegU4vN3H1qMT+8wDmzjAcDONcgo2/SZ/TyfdUOFs=
+github.com/chains-lab/distributors-proto v0.1.0 h1:ETupFPRC5+isVsn8ur7elxCFsS5nDKs3ip5+f+MgmwU=
+github.com/chains-lab/distributors-proto v0.1.0/go.mod h1:3hsQF5B2L/gsnYndr0bqxyPzmGCYBb/L7GipPs/xiCU=
+github.com/chains-lab/distributors-proto v0.1.1 h1:g9zCvqDt3CZXfJiEi5t3TZnJvoF2yz9//1o0TrECBx4=
+github.com/chains-lab/distributors-proto v0.1.1/go.mod h1:3hsQF5B2L/gsnYndr0bqxyPzmGCYBb/L7GipPs/xiCU=
+github.com/chains-lab/distributors-proto v0.1.2 h1:rV3fBlPKO5FeJ5LQxOHfRyJuJ4FbG5sDCs2r9+IlIy0=
+github.com/chains-lab/distributors-proto v0.1.2/go.mod h1:3hsQF5B2L/gsnYndr0bqxyPzmGCYBb/L7GipPs/xiCU=
 github.com/chains-lab/gatekit v0.2.0 h1:h0VmrUqOrR/P1ioRhUq/Co794ig9zMVNGtLCvUXPN9s=
 github.com/chains-lab/gatekit v0.2.0/go.mod h1:4Bm8BXPMR+HTnMg7uEPGA4nCLMA8xD+fYifuKkn766Q=
 github.com/chains-lab/svc-errors v0.2.2 h1:70aJpuCHhptxOXQTIntfSwG8xi0WmthSPUpj3o2F0ds=

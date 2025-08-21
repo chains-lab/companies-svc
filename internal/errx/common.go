@@ -71,3 +71,25 @@ func RaiseUnauthenticated(ctx context.Context, cause error) error {
 		res,
 	)
 }
+
+var ErrorInvalidArgument = ape.Declare("INVALID_ARGUMENT")
+
+func RaiseInvalidArgument(ctx context.Context, cause error, details ...*errdetails.BadRequest_FieldViolation) error {
+	res, _ := status.New(codes.InvalidArgument, cause.Error()).WithDetails(
+		&errdetails.ErrorInfo{
+			Reason: ErrorInvalidArgument.Error(),
+			Domain: constant.ServiceName,
+			Metadata: map[string]string{
+				"timestamp": nowRFC3339Nano(),
+			},
+		},
+		&errdetails.BadRequest{
+			FieldViolations: details,
+		},
+	)
+
+	return ErrorInvalidArgument.Raise(
+		cause,
+		res,
+	)
+}

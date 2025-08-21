@@ -12,21 +12,6 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func RaiseEmployerCantCreateDistributor(ctx context.Context, cause error, userID uuid.UUID) error {
-	st := status.New(codes.PermissionDenied, fmt.Sprintf("user %s can't create distributor", userID))
-	st, _ = st.WithDetails(
-		&errdetails.ErrorInfo{
-			Reason: ErrorDistributorNotFound.Error(),
-			Domain: constant.ServiceName,
-			Metadata: map[string]string{
-				"timestamp": nowRFC3339Nano(),
-			},
-		},
-	)
-
-	return ErrorDistributorNotFound.Raise(cause, st)
-}
-
 var ErrorBlockNotFound = ape.Declare("LOCKOUT_NOT_FOUND")
 
 func RaiseBlockNotFound(ctx context.Context, cause error, ID uuid.UUID) error {

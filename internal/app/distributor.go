@@ -99,7 +99,7 @@ func (a App) GetDistributor(ctx context.Context, ID uuid.UUID) (models.Distribut
 	}, nil
 }
 
-func (a App) SelectedDistributors(
+func (a App) SelectDistributors(
 	ctx context.Context,
 	filters map[string]interface{},
 	pag pagination.Request,

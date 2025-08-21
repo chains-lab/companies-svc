@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/chains-lab/distributors-svc/internal/api/grpc/problems"
 	"github.com/chains-lab/distributors-svc/internal/config/constant"
+	"github.com/chains-lab/distributors-svc/internal/errx"
 	"github.com/chains-lab/gatekit/auth"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -27,17 +27,17 @@ func ServiceJwtAuth(skService string) grpc.UnaryServerInterceptor {
 
 		md, ok := metadata.FromIncomingContext(ctx)
 		if !ok {
-			return nil, problems.UnauthenticatedError(ctx, "no metadata found in incoming context")
+			return nil, errx.RaiseUnauthenticated(ctx, fmt.Errorf("no metadata found in incoming context"))
 		}
 
 		token := md["x-service-token"]
 		if len(token) == 0 {
-			return nil, problems.UnauthenticatedError(ctx, fmt.Sprintf("service token not supplied"))
+			return nil, errx.RaiseUnauthenticated(ctx, fmt.Errorf("service token not supplied"))
 		}
 
 		data, err := auth.VerifyServiceJWT(ctx, token[0], skService)
 		if err != nil {
-			return nil, problems.UnauthenticatedError(ctx, "failed to verify service token")
+			return nil, errx.RaiseUnauthenticated(ctx, fmt.Errorf("failed to verify service token"))
 		}
 
 		ThisSvcInAudience := false

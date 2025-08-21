@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/chains-lab/distributors-svc/internal/api/grpc/handlers"
 	"github.com/chains-lab/distributors-svc/internal/api/grpc/interceptors"
 	"github.com/chains-lab/distributors-svc/internal/app"
 	"github.com/chains-lab/distributors-svc/internal/config"
@@ -16,22 +17,22 @@ import (
 )
 
 func Run(ctx context.Context, cfg config.Config, log logger.Logger, app *app.App) error {
-	logInt := logger.UnaryLogInterceptor(log)
 	requestId := interceptors.RequestID()
 	userAuth := interceptors.UserJwtAuth(cfg.JWT.User.AccessToken.SecretKey)
 	serviceAuth := interceptors.ServiceJwtAuth(cfg.JWT.Service.SecretKey)
 
 	grpcServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
-			logInt,
 			requestId,
 			serviceAuth,
 			userAuth,
 		),
 	)
 
-	disProto.RegisterDistributorServiceServer(grpcServer, NewDistributorService(cfg, app))
-	empProto.RegisterEmployeeServiceServer(grpcServer, NewEmployeeService(cfg, app))
+	service := handlers.NewService(app, cfg, log)
+
+	disProto.RegisterDistributorServiceServer(grpcServer, service)
+	empProto.RegisterEmployeeServiceServer(grpcServer, service)
 
 	lis, err := net.Listen("tcp", cfg.Server.Port)
 	if err != nil {

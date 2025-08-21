@@ -32,7 +32,7 @@ type InviteQ struct {
 	counter  sq.SelectBuilder
 }
 
-func NewEmployeeInviteQ(db *sql.DB) InviteQ {
+func NewInvitesQ(db *sql.DB) InviteQ {
 	builder := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 	return InviteQ{
 		db:       db,
@@ -45,7 +45,7 @@ func NewEmployeeInviteQ(db *sql.DB) InviteQ {
 }
 
 func (q InviteQ) New() InviteQ {
-	return NewEmployeeInviteQ(q.db)
+	return NewInvitesQ(q.db)
 }
 
 func (q InviteQ) applyConditions(conds ...sq.Sqlizer) InviteQ {

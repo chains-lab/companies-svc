@@ -1,14 +1,12 @@
 package logger
 
 import (
-	"context"
 	"errors"
 	"strings"
 
 	"github.com/chains-lab/distributors-svc/internal/config"
 	"github.com/chains-lab/svc-errors/ape"
 	"github.com/sirupsen/logrus"
-	"google.golang.org/grpc"
 )
 
 func NewLogger(cfg config.Config) *logrus.Logger {
@@ -35,45 +33,21 @@ func NewLogger(cfg config.Config) *logrus.Logger {
 	return log
 }
 
-func UnaryLogInterceptor(log Logger, ctxKey int) grpc.UnaryServerInterceptor {
-	return func(
-		ctx context.Context,
-		req interface{},
-		info *grpc.UnaryServerInfo,
-		handler grpc.UnaryHandler,
-	) (interface{}, error) {
-		// Вместо context.Background() используем входящий ctx,
-		// чтобы не потерять таймауты и другую информацию.
-		ctxWithLog := context.WithValue(
-			ctx,
-			ctxKey,
-			log, // ваш интерфейс Logger
-		)
-
-		// Далее передаём новый контекст в реальный хэндлер
-		return handler(ctxWithLog, req)
-	}
-}
-
-// Logger — это ваш интерфейс: все методы FieldLogger + специальный WithError.
 type Logger interface {
 	WithError(err error) *logrus.Entry
 
-	logrus.FieldLogger // сюда входят Debug, Info, WithField, WithError и т.д.
+	logrus.FieldLogger
 }
 
-// logger — реальный тип, который реализует Logger.
 type logger struct {
-	*logrus.Entry // за счёт встраивания мы уже наследуем все методы FieldLogger
+	*logrus.Entry
 }
 
-// WithError — ваш особый метод.
 func (l *logger) WithError(err error) *logrus.Entry {
 	var ae *ape.Error
 	if errors.As(err, &ae) {
 		return l.Entry.WithError(ae.Unwrap())
 	}
-	// для “обычных” ошибок просто стандартный путь
 	return l.Entry.WithError(err)
 }
 
