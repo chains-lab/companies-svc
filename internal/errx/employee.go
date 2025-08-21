@@ -46,10 +46,10 @@ func RaiseEmployeeNotFoundByDistributorID(ctx context.Context, cause error, user
 
 var ErrorInitiatorNotEmployee = ape.Declare("INITIATOR_NOT_EMPLOYEE")
 
-func RaiseInitiatorNotEmployee(ctx context.Context, cause error, userID, distributorID uuid.UUID) error {
+func RaiseInitiatorNotEmployee(ctx context.Context, cause error, userID uuid.UUID) error {
 	st := status.New(
 		codes.FailedPrecondition,
-		fmt.Sprintf("user %s is not employee in distributor %s", userID, distributorID),
+		fmt.Sprintf("user %s is not employee in distributor", userID),
 	)
 	st, _ = st.WithDetails(
 		&errdetails.ErrorInfo{
@@ -90,6 +90,28 @@ func RaiseInitiatorEmployeeHaveNotEnoughPermissions(ctx context.Context, cause e
 	st := status.New(
 		codes.PermissionDenied,
 		fmt.Sprintf("employee %s have not eniugh right in distributor %s", userID, distributorID),
+	)
+	st, _ = st.WithDetails(
+		&errdetails.ErrorInfo{
+			Reason: ErrorInitiatorEmployeeHaveNotEnoughPermissions.Error(),
+			Domain: constant.ServiceName,
+			Metadata: map[string]string{
+				"timestamp": nowRFC3339Nano(),
+			},
+		},
+	)
+
+	return ErrorInitiatorEmployeeHaveNotEnoughPermissions.Raise(cause, st)
+}
+
+func RaiseInitiatorAndChosenEmployeeHaveDifferentDistributors(
+	ctx context.Context,
+	cause error,
+	initiatorID, userID uuid.UUID,
+) error {
+	st := status.New(
+		codes.PermissionDenied,
+		fmt.Sprintf("initiator %s and chosen employee %s have different distributors", initiatorID, userID),
 	)
 	st, _ = st.WithDetails(
 		&errdetails.ErrorInfo{

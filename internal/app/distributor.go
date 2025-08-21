@@ -33,6 +33,47 @@ type distributorsQ interface {
 	Transaction(fn func(ctx context.Context) error) error
 }
 
+func (a App) CreateDistributor(
+	ctx context.Context,
+	initiatorID uuid.UUID,
+	name string,
+) (models.Distributor, error) {
+	_, err := a.employee.New().FilterUserID(initiatorID).Get(ctx)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return models.Distributor{}, errx.RaiseInternal(ctx, fmt.Errorf("getting employee: %w", err))
+	}
+	if err == nil {
+		return models.Distributor{}, errx.RaiseCurrentEmployeeCanNotCreateDistributor(
+			ctx,
+			fmt.Errorf("employee with userID %s already exists", initiatorID),
+			initiatorID,
+		)
+	}
+
+	stmt := dbx.Distributor{
+		ID:        uuid.New(),
+		Name:      name,
+		Icon:      "",
+		Status:    enum.DistributorStatusActive,
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+	}
+
+	err = a.distributor.New().Insert(ctx, stmt)
+	if err != nil {
+		return models.Distributor{}, errx.RaiseInternal(ctx, fmt.Errorf("inserting distributor: %w", err))
+	}
+
+	return models.Distributor{
+		ID:        stmt.ID,
+		Name:      stmt.Name,
+		Icon:      stmt.Icon,
+		Status:    stmt.Status,
+		CreatedAt: stmt.CreatedAt,
+		UpdatedAt: stmt.UpdatedAt,
+	}, err
+}
+
 func (a App) GetDistributor(ctx context.Context, ID uuid.UUID) (models.Distributor, error) {
 	distributor, err := a.distributor.New().FilterID(ID).Get(ctx)
 	if err != nil {
@@ -55,6 +96,52 @@ func (a App) GetDistributor(ctx context.Context, ID uuid.UUID) (models.Distribut
 		Status:    distributor.Status,
 		UpdatedAt: distributor.UpdatedAt,
 		CreatedAt: distributor.CreatedAt,
+	}, nil
+}
+
+func (a App) SelectedDistributors(
+	ctx context.Context,
+	filters map[string]interface{},
+	pag pagination.Request,
+) ([]models.Distributor, pagination.Response, error) {
+	query := a.distributor.New()
+	if status, ok := filters["status"]; ok {
+		query = query.FilterStatus(status.(string))
+	}
+	if name, ok := filters["name"]; ok {
+		query = query.LikeName(name.(string))
+	}
+
+	limit, offset := pagination.CalculateLimitOffset(pag)
+
+	query = query.Page(limit, offset)
+
+	count, err := query.Count(ctx)
+	if err != nil {
+		return nil, pagination.Response{}, errx.RaiseInternal(ctx, fmt.Errorf("counting distributors: %w", err))
+	}
+
+	distributors, err := query.Select(ctx)
+	if err != nil {
+		return nil, pagination.Response{}, errx.RaiseInternal(ctx, fmt.Errorf("selecting distributors: %w", err))
+	}
+
+	var result []models.Distributor
+	for _, d := range distributors {
+		result = append(result, models.Distributor{
+			ID:        d.ID,
+			Icon:      d.Icon,
+			Name:      d.Name,
+			Status:    d.Status,
+			UpdatedAt: d.UpdatedAt,
+			CreatedAt: d.CreatedAt,
+		})
+	}
+
+	return result, pagination.Response{
+		Page:  pag.Page,
+		Size:  pag.Size,
+		Total: count,
 	}, nil
 }
 
@@ -232,54 +319,5 @@ func (a App) SetDistributorStatusActive(
 		Status:    distributor.Status,
 		UpdatedAt: distributor.UpdatedAt,
 		CreatedAt: distributor.CreatedAt,
-	}, nil
-}
-
-func (a App) SelectedDistributors(
-	ctx context.Context,
-	filters map[string]interface{},
-	pag pagination.Request,
-) ([]models.Distributor, pagination.Response, error) {
-	query := a.distributor.New()
-	if id, ok := filters["id"]; ok {
-		query = query.FilterID(id.(uuid.UUID))
-	}
-	if status, ok := filters["status"]; ok {
-		query = query.FilterStatus(status.(string))
-	}
-	if name, ok := filters["name"]; ok {
-		query = query.LikeName(name.(string))
-	}
-
-	limit, offset := pagination.CalculateLimitOffset(pag)
-
-	query = query.Page(limit, offset)
-
-	count, err := query.Count(ctx)
-	if err != nil {
-		return nil, pagination.Response{}, errx.RaiseInternal(ctx, fmt.Errorf("counting distributors: %w", err))
-	}
-
-	distributors, err := query.Select(ctx)
-	if err != nil {
-		return nil, pagination.Response{}, errx.RaiseInternal(ctx, fmt.Errorf("selecting distributors: %w", err))
-	}
-
-	var result []models.Distributor
-	for _, d := range distributors {
-		result = append(result, models.Distributor{
-			ID:        d.ID,
-			Icon:      d.Icon,
-			Name:      d.Name,
-			Status:    d.Status,
-			UpdatedAt: d.UpdatedAt,
-			CreatedAt: d.CreatedAt,
-		})
-	}
-
-	return result, pagination.Response{
-		Page:  pag.Page,
-		Size:  pag.Size,
-		Total: count,
 	}, nil
 }

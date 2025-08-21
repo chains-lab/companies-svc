@@ -36,6 +36,35 @@ type employeesQ interface {
 	Transaction(fn func(ctx context.Context) error) error
 }
 
+func (a App) GetInitiatorEmployee(
+	ctx context.Context,
+	initiatorID uuid.UUID,
+) (models.Employee, error) {
+	employee, err := a.employee.New().
+		FilterUserID(initiatorID).
+		Get(ctx)
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return models.Employee{}, errx.RaiseInitiatorNotEmployee(
+				ctx,
+				fmt.Errorf("initiator with userID %s not found: %w", initiatorID, err),
+				initiatorID,
+			)
+		default:
+			return models.Employee{}, errx.RaiseInternal(ctx, fmt.Errorf("getting employee with userID %s: %w", initiatorID, err))
+		}
+	}
+
+	return models.Employee{
+		UserID:        employee.UserID,
+		DistributorID: employee.DistributorID,
+		Role:          employee.Role,
+		UpdatedAt:     employee.UpdatedAt,
+		CreatedAt:     employee.CreatedAt,
+	}, nil
+}
+
 func (a App) GetEmployee(ctx context.Context, userID uuid.UUID) (models.Employee, error) {
 	employee, err := a.employee.New().
 		FilterUserID(userID).
@@ -107,7 +136,6 @@ func (a App) CompareEmployeesRole(
 				ctx,
 				fmt.Errorf("initiator with userID %s not found in distributor %s: %w", initiatorID, distributorID, err),
 				initiatorID,
-				distributorID,
 			)
 		default:
 			return models.Employee{},
@@ -144,16 +172,24 @@ func (a App) AllowedToInteractWithEmployee(
 	ctx context.Context,
 	initiatorID uuid.UUID,
 	userID uuid.UUID,
-	distributorID uuid.UUID,
 ) (int, error) {
-	initiator, err := a.GetDistributorEmployee(ctx, initiatorID, distributorID)
+	initiator, err := a.GetEmployee(ctx, initiatorID)
 	if err != nil {
 		return -1, err
 	}
 
-	user, err := a.GetDistributorEmployee(ctx, userID, distributorID)
+	user, err := a.GetEmployee(ctx, userID)
 	if err != nil {
 		return -1, err
+	}
+
+	if initiator.DistributorID != user.DistributorID {
+		return -1, errx.RaiseInitiatorAndChosenEmployeeHaveDifferentDistributors(
+			ctx,
+			fmt.Errorf("initiator %s and chosen employee %s have different distributors", initiatorID, userID),
+			initiatorID,
+			userID,
+		)
 	}
 
 	access, err := enum.ComparisonEmployeeRoles(initiator.Role, user.Role)
@@ -173,9 +209,6 @@ func (a App) SelectEmployees(
 	query := a.employee.New()
 	if distributorID, ok := filters["distributor_id"].(uuid.UUID); ok {
 		query = query.FilterDistributorID(distributorID)
-	}
-	if userID, ok := filters["user_id"].(uuid.UUID); ok {
-		query = query.FilterUserID(userID)
 	}
 	if role, ok := filters["role"].(string); ok {
 		query = query.FilterRole(role)
@@ -223,7 +256,7 @@ func (a App) UpdateEmployeeRole(
 		return models.Employee{}, err
 	}
 
-	allowed, err := a.AllowedToInteractWithEmployee(ctx, initiatorID, userID, distributorID)
+	allowed, err := a.AllowedToInteractWithEmployee(ctx, initiatorID, userID)
 	if err != nil {
 		return models.Employee{}, err
 	}
@@ -280,7 +313,7 @@ func (a App) UpdateEmployeeRole(
 }
 
 func (a App) DeleteEmployee(ctx context.Context, initiatorID, userID, distributorID uuid.UUID) error {
-	allowed, err := a.AllowedToInteractWithEmployee(ctx, initiatorID, userID, distributorID)
+	allowed, err := a.AllowedToInteractWithEmployee(ctx, initiatorID, userID)
 	if err != nil {
 		return err
 	}

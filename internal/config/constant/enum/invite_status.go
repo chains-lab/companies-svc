@@ -3,15 +3,15 @@ package enum
 import "fmt"
 
 const (
-	InviteStatusSent     = "sent"     // Invite is sent
-	InviteStatusRecalled = "recalled" // Invite is recalled
-	InviteStatusAccepted = "accepted" // Invite is accepted
-	InviteStatusRejected = "rejected" // Invite is rejected
+	InviteStatusSent      = "sent"      // Invite is sent
+	InviteStatusWithdrawn = "withdrawn" // Invite is withdrawn
+	InviteStatusAccepted  = "accepted"  // Invite is accepted
+	InviteStatusRejected  = "rejected"  // Invite is rejected
 )
 
 var InviteStatuses = []string{
 	InviteStatusSent,
-	InviteStatusRecalled,
+	InviteStatusWithdrawn,
 	InviteStatusAccepted,
 	InviteStatusRejected,
 }

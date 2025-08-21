@@ -20,7 +20,6 @@ type Invite struct {
 	Role          string     `db:"role"` // enum employee_roles
 	Status        string     `db:"status"`
 	AnsweredAt    *time.Time `db:"answered_at"`
-	ExpiresAt     time.Time  `db:"expires_at"`
 	CreatedAt     time.Time  `db:"created_at"`
 }
 
@@ -69,7 +68,6 @@ func scanInvitation(scanner interface{ Scan(dest ...any) error }) (Invite, error
 		&inv.Role,
 		&inv.Status,
 		&nt,
-		&inv.ExpiresAt,
 		&inv.CreatedAt,
 	)
 	if err != nil {
@@ -91,7 +89,6 @@ func (q InviteQ) Insert(ctx context.Context, input Invite) error {
 		"role":           input.Role,
 		"status":         input.Status,
 		"answered_at":    input.AnsweredAt,
-		"expires_at":     input.ExpiresAt,
 		"created_at":     input.CreatedAt,
 	}
 
@@ -206,15 +203,6 @@ func (q InviteQ) FilterRole(role string) InviteQ {
 
 func (q InviteQ) FilterStatus(status string) InviteQ {
 	return q.applyConditions(sq.Eq{"status": status})
-}
-
-func (q InviteQ) OrderByExpiresAt(asc bool) InviteQ {
-	if asc {
-		q.selector = q.selector.OrderBy("expires_at ASC")
-	} else {
-		q.selector = q.selector.OrderBy("expires_at DESC")
-	}
-	return q
 }
 
 func (q InviteQ) OrderByCreatedAt(asc bool) InviteQ {

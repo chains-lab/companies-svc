@@ -6,7 +6,7 @@ CREATE TYPE blocked_distributor_status AS ENUM (
     'cancelled' -- suspension has been cancelled
 );
 
-CREATE TABLE blocked_distributors (
+CREATE TABLE distributor_blockages (
     id             uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     distributor_id uuid NOT NULL REFERENCES distributors(id) ON DELETE CASCADE,
     initiator_id   uuid NOT NULL,
@@ -14,14 +14,13 @@ CREATE TABLE blocked_distributors (
     status         locked_distributor_status NOT NULL DEFAULT 'active',
     blocked_at     timestamp NOT NULL DEFAULT now(),
     cancelled_at   timestamp,
-    created_at     timestamp NOT NULL DEFAULT now()
 );
 
 CREATE UNIQUE INDEX blocked_distributors_one_active_per_dist
-    ON blocked_distributors(distributor_id)
+    ON distributor_blockages(distributor_id)
     WHERE status = 'active';
 
 -- +migrate Down
-DROP TABLE IF EXISTS "blocked_distributors" CASCADE;
+DROP TABLE IF EXISTS "distributor_blockages" CASCADE;
 DROP EXTENSION IF EXISTS "uuid-ossp" CASCADE;
 DROP INDEX IF EXISTS blocked_distributors_one_active_per_dist;

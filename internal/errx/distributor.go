@@ -29,7 +29,7 @@ func RaiseDistributorNotFound(ctx context.Context, cause error, distributorID uu
 	return ErrorDistributorNotFound.Raise(cause, st)
 }
 
-var ErrorDistributorStatusBlocked = ape.Declare("DISTRIBUTOR_STATUS_LOCKOUTED")
+var ErrorDistributorStatusBlocked = ape.Declare("DISTRIBUTOR_STATUS_BLOCKED")
 
 func RaiseDistributorStatusBlocked(ctx context.Context, cause error, distributorID uuid.UUID) error {
 	st := status.New(codes.FailedPrecondition, fmt.Sprintf("distributor %s is blocked", distributorID))
@@ -44,4 +44,21 @@ func RaiseDistributorStatusBlocked(ctx context.Context, cause error, distributor
 	)
 
 	return ErrorDistributorStatusBlocked.Raise(cause, st)
+}
+
+var ErrorCurrentEmployeeCanNotCreateDistributor = ape.Declare("CURRENT_EMPLOYEE_CAN_NOT_CREATE_DISTRIBUTOR")
+
+func RaiseCurrentEmployeeCanNotCreateDistributor(ctx context.Context, cause error, userID uuid.UUID) error {
+	st := status.New(codes.FailedPrecondition, fmt.Sprintf("current employee %s can not create distributor", userID))
+	st, _ = st.WithDetails(
+		&errdetails.ErrorInfo{
+			Reason: ErrorCurrentEmployeeCanNotCreateDistributor.Error(),
+			Domain: constant.ServiceName,
+			Metadata: map[string]string{
+				"timestamp": nowRFC3339Nano(),
+			},
+		},
+	)
+
+	return ErrorCurrentEmployeeCanNotCreateDistributor.Raise(cause, st)
 }

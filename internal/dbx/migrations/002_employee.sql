@@ -16,7 +16,7 @@ CREATE TABLE "employees" (
 
 CREATE Type "invite_status" AS ENUM (
     'sent',
-    'recalled',
+    'withdrawn',
     'accepted',
     'rejected'
 );
@@ -29,7 +29,6 @@ CREATE TABLE "employee_invites" (
     "role"            employee_roles NOT NULL,
     "status"          invite_status  NOT NULL DEFAULT 'sent',
     "answered_at"     TIMESTAMP      NULL,
-    "expires_at"      TIMESTAMP      NOT NULL,
     "created_at"      TIMESTAMP      NOT NULL
 
     CHECK (

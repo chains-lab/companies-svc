@@ -34,7 +34,7 @@ type blockagesQ interface {
 	Page(limit, offset uint64) dbx.BlockQ
 }
 
-func (a App) CreateDistributorBlock(
+func (a App) BlockDistributor(
 	ctx context.Context,
 	initiatorID uuid.UUID,
 	distributorID uuid.UUID,
@@ -48,7 +48,6 @@ func (a App) CreateDistributorBlock(
 		Reason:        reason,
 		Status:        enum.BlockStatusActive,
 		BlockedAt:     time.Now().UTC(),
-		CreatedAt:     time.Now().UTC(),
 	}
 
 	_, err := a.block.New().FilterDistributorID(distributorID).FilterStatus(enum.BlockStatusActive).Get(ctx)
@@ -101,11 +100,10 @@ func (a App) CreateDistributorBlock(
 		InitiatorID:   blockages.InitiatorID,
 		Reason:        blockages.Reason,
 		BlockedAt:     blockages.BlockedAt,
-		CreatedAt:     blockages.CreatedAt,
 	}, nil
 }
 
-func (a App) CancelBlockForDistributor(
+func (a App) UnblockForDistributor(
 	ctx context.Context,
 	distributorID uuid.UUID,
 ) (models.Block, error) {
@@ -173,7 +171,6 @@ func (a App) CancelBlockForDistributor(
 		Status:        res.Status,
 		BlockedAt:     res.BlockedAt,
 		CanceledAt:    res.CanceledAt,
-		CreatedAt:     res.CreatedAt,
 	}, nil
 }
 
@@ -203,7 +200,6 @@ func (a App) GetBlock(
 		Status:        block.Status,
 		BlockedAt:     block.BlockedAt,
 		CanceledAt:    block.CanceledAt,
-		CreatedAt:     block.CreatedAt,
 	}, nil
 }
 
@@ -214,9 +210,6 @@ func (a App) SelectBlockages(
 ) ([]models.Block, pagination.Response, error) {
 	query := a.block.New()
 
-	if id, ok := filters["id"].(uuid.UUID); ok {
-		query = query.FilterID(id)
-	}
 	if distributorID, ok := filters["distributor_id"].(uuid.UUID); ok {
 		query = query.FilterDistributorID(distributorID)
 	}
@@ -248,7 +241,6 @@ func (a App) SelectBlockages(
 			Reason:        s.Reason,
 			Status:        s.Status,
 			BlockedAt:     s.BlockedAt,
-			CreatedAt:     s.CreatedAt,
 		}
 		if s.CanceledAt != nil {
 			canceledAt := *s.CanceledAt

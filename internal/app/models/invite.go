@@ -14,6 +14,5 @@ type Invite struct {
 	Role          string     `json:"role"` // enum employee_roles
 	Status        string     `json:"status"`
 	AnsweredAt    *time.Time `json:"answered_at"`
-	ExpiresAt     time.Time  `json:"expires_at"`
 	CreatedAt     time.Time  `json:"created_at"`
 }

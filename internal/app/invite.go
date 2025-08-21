@@ -31,7 +31,7 @@ type inviteQ interface {
 	FilterRole(role string) dbx.InviteQ
 	FilterStatus(status string) dbx.InviteQ
 
-	OrderByExpiresAt(asc bool) dbx.InviteQ
+	OrderByCreatedAt(asc bool) dbx.InviteQ
 
 	Count(ctx context.Context) (uint64, error)
 	Page(limit, offset uint64) dbx.InviteQ
@@ -55,7 +55,6 @@ func (a App) GetInvite(ctx context.Context, id uuid.UUID) (models.Invite, error)
 		InvitedBy:     invite.InvitedBy,
 		Role:          invite.Role,
 		Status:        invite.Status,
-		ExpiresAt:     invite.ExpiresAt,
 		CreatedAt:     invite.CreatedAt,
 		AnsweredAt:    invite.AnsweredAt,
 	}, nil
@@ -104,7 +103,6 @@ func (a App) SendInvite(
 		InvitedBy:     initiatorID,
 		Role:          role,
 		Status:        enum.InviteStatusSent,
-		ExpiresAt:     time.Now().UTC().Add(24 * time.Hour), // 24 hours expiration
 		CreatedAt:     time.Now().UTC(),
 	}
 
@@ -132,9 +130,6 @@ func (a App) SelectInvites(
 ) ([]models.Invite, pagination.Response, error) {
 	query := a.invite.New()
 
-	if id, ok := filters["id"].(uuid.UUID); ok {
-		query = query.FilterID(id)
-	}
 	if distributorID, ok := filters["distributor_id"].(uuid.UUID); ok {
 		query = query.FilterDistributorID(distributorID)
 	}
@@ -173,7 +168,6 @@ func (a App) SelectInvites(
 			InvitedBy:     i.InvitedBy,
 			Role:          i.Role,
 			Status:        i.Status,
-			ExpiresAt:     i.ExpiresAt,
 			CreatedAt:     i.CreatedAt,
 		}
 		if i.AnsweredAt != nil {
@@ -189,17 +183,11 @@ func (a App) SelectInvites(
 	}, nil
 }
 
-func (a App) RecallInvite(
+func (a App) WithdrawInvite(
 	ctx context.Context,
 	initiatorID uuid.UUID,
-	distributorID uuid.UUID,
 	inviteID uuid.UUID,
 ) error {
-	_, err := a.CompareEmployeesRole(ctx, initiatorID, distributorID, enum.EmployeeRoleAdmin)
-	if err != nil {
-		return err
-	}
-
 	invite, err := a.invite.New().FilterID(inviteID).Get(ctx)
 	if err != nil {
 		switch {
@@ -210,13 +198,20 @@ func (a App) RecallInvite(
 		}
 	}
 
+	_, err = a.CompareEmployeesRole(ctx, initiatorID, invite.DistributorID, enum.EmployeeRoleAdmin)
+	if err != nil {
+		return err
+	}
+
 	if invite.Status != enum.InviteStatusSent {
 		return errx.RaiseInviteIsNotActive(ctx, fmt.Errorf("invite already answered: %s", inviteID), inviteID)
 	}
 
-	err = a.invite.New().Delete(ctx)
+	err = a.invite.New().FilterID(inviteID).Update(ctx, map[string]interface{}{
+		"status": enum.InviteStatusWithdrawn,
+	})
 	if err != nil {
-		return errx.RaiseInternal(ctx, fmt.Errorf("deleting invite: %w", err))
+		return errx.RaiseInternal(ctx, fmt.Errorf("updating invite: %w", err))
 	}
 
 	return nil
@@ -260,12 +255,10 @@ func (a App) AcceptInvite(
 	}
 
 	invite.Status = enum.InviteStatusAccepted
-	invite.ExpiresAt = time.Time{} // Clear expiration date
 
 	err = a.employee.Transaction(func(ctx context.Context) error {
 		err = a.invite.New().Update(ctx, map[string]any{
-			"status":     invite.Status,
-			"expires_at": invite.ExpiresAt,
+			"status": invite.Status,
 		})
 		if err != nil {
 			switch {
@@ -320,11 +313,9 @@ func (a App) RejectInvite(
 	}
 
 	invite.Status = enum.InviteStatusRejected
-	invite.ExpiresAt = time.Time{} // Clear expiration date
 
 	err = a.invite.New().Update(ctx, map[string]any{
-		"status":     invite.Status,
-		"expires_at": invite.ExpiresAt,
+		"status": invite.Status,
 	})
 	if err != nil {
 		return errx.RaiseInternal(ctx, fmt.Errorf("updating invite: %w", err))

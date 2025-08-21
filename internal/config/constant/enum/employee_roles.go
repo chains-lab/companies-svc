@@ -46,12 +46,12 @@ var AllEmployeeRoles = map[string]uint8{
 func ComparisonEmployeeRoles(role1, role2 string) (int, error) {
 	r1, err := ParseEmployeeRole(role1)
 	if err != nil {
-		return 0, fmt.Errorf("parsing role1: %w", err)
+		return -1, fmt.Errorf("parsing role1: %w", err)
 	}
 
 	r2, err := ParseEmployeeRole(role2)
 	if err != nil {
-		return 0, fmt.Errorf("parsing role2: %w", err)
+		return -1, fmt.Errorf("parsing role2: %w", err)
 	}
 
 	if AllEmployeeRoles[r1] > AllEmployeeRoles[r2] {

@@ -14,5 +14,4 @@ type Block struct {
 	Status        string     `json:"status"` // e.g., "active", "canceled"
 	BlockedAt     time.Time  `json:"blocked_at"`
 	CanceledAt    *time.Time `json:"canceled_at"`
-	CreatedAt     time.Time  `json:"created_at"`
 }

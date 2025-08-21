@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-const blockedTable = "blocked_distributors"
+const blockedTable = "distributor_blockages"
 
 type Blockages struct {
 	ID            uuid.UUID  `db:"id"`
@@ -20,7 +20,6 @@ type Blockages struct {
 	Status        string     `db:"status"`
 	BlockedAt     time.Time  `db:"blocked_at"`
 	CanceledAt    *time.Time `db:"canceled_at"`
-	CreatedAt     time.Time  `db:"created_at"`
 }
 
 type BlockQ struct {
@@ -64,7 +63,6 @@ func scanBlock(scanner interface{ Scan(dest ...any) error }) (Blockages, error) 
 		&s.Status,
 		&s.BlockedAt,
 		&nt, // сканим сюда
-		&s.CreatedAt,
 	); err != nil {
 		return s, err
 	}
@@ -90,7 +88,6 @@ func (q BlockQ) Insert(ctx context.Context, input Blockages) error {
 		"status":         input.Status,
 		"blocked_at":     input.BlockedAt,
 		//"canceled_at":    input.CanceledAt, defaults to NULL if not set
-		"created_at": input.CreatedAt,
 	}
 
 	query, args, err := q.inserter.SetMap(values).ToSql()
