@@ -4,6 +4,7 @@ go 1.24.5
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
+	github.com/alecthomas/kingpin v2.2.6+incompatible
 	github.com/chains-lab/gatekit v0.2.0
 	github.com/chains-lab/svc-errors v0.2.2
 	github.com/google/uuid v1.6.0
@@ -12,12 +13,14 @@ require (
 	github.com/rubenv/sql-migrate v1.8.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/viper v1.20.1
+	golang.org/x/sync v0.15.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250707201910-8d1bb00bc6a7
 	google.golang.org/grpc v1.75.0
 )
 
 require (
-	github.com/chains-lab/distributors-proto v0.0.1 // indirect
+	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 // indirect
+	github.com/alecthomas/units v0.0.0-20240927000941-0f3dac36c52b // indirect
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/go-gorp/gorp/v3 v3.1.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect

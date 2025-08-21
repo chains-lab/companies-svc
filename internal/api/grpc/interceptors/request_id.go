@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/chains-lab/distributors-svc/internal/api/grpc/meta"
+	"github.com/chains-lab/distributors-svc/internal/api/grpc/problems"
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
