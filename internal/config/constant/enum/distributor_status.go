@@ -5,13 +5,13 @@ import "fmt"
 const (
 	DistributorStatusActive   = "active"
 	DistributorStatusInactive = "inactive"
-	DistributorStatusSuspend  = "suspend"
+	DistributorStatusBlocked  = "blocked"
 )
 
 var distributorStatuses = []string{
 	DistributorStatusActive,
 	DistributorStatusInactive,
-	DistributorStatusSuspend,
+	DistributorStatusBlocked,
 }
 
 var ErrorDistributorStatusNotSupported = fmt.Errorf("distributor status not supported mus be one of: %v", GetAllDistributorStatuses())

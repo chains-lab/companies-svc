@@ -28,3 +28,20 @@ func RaiseDistributorNotFound(ctx context.Context, cause error, distributorID uu
 
 	return ErrorDistributorNotFound.Raise(cause, st)
 }
+
+var ErrorDistributorStatusBlocked = ape.Declare("DISTRIBUTOR_STATUS_LOCKOUTED")
+
+func RaiseDistributorStatusBlocked(ctx context.Context, cause error, distributorID uuid.UUID) error {
+	st := status.New(codes.FailedPrecondition, fmt.Sprintf("distributor %s is blocked", distributorID))
+	st, _ = st.WithDetails(
+		&errdetails.ErrorInfo{
+			Reason: ErrorDistributorStatusBlocked.Error(),
+			Domain: constant.ServiceName,
+			Metadata: map[string]string{
+				"timestamp": nowRFC3339Nano(),
+			},
+		},
+	)
+
+	return ErrorDistributorStatusBlocked.Raise(cause, st)
+}

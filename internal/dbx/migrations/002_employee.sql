@@ -16,7 +16,7 @@ CREATE TABLE "employees" (
 
 CREATE Type "invite_status" AS ENUM (
     'sent',
-    'recalled'
+    'recalled',
     'accepted',
     'rejected'
 );
@@ -34,7 +34,7 @@ CREATE TABLE "employee_invites" (
 
     CHECK (
         (status = 'sent'  AND answered_at IS NULL) OR
-        (status IN ('accepted','rejected') AND answered_at IS NOT NULL) OR
+        (status IN ('accepted','rejected') AND answered_at IS NOT NULL)
     ),
     CHECK (expires_at > created_at)
 );

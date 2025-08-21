@@ -29,13 +29,11 @@ func RaiseEmployeeNotFound(ctx context.Context, cause error, userID uuid.UUID) e
 	return ErrorEmployeeNotFound.Raise(cause, st)
 }
 
-var ErrorEmployeeAlreadyExists = ape.Declare("EMPLOYEE_ALREADY_EXISTS")
-
-func RaiseEmployeeAlreadyExists(ctx context.Context, cause error, userID uuid.UUID) error {
-	st := status.New(codes.AlreadyExists, fmt.Sprintf("employee already exists: %s", userID))
+func RaiseEmployeeNotFoundByDistributorID(ctx context.Context, cause error, userID, distributorID uuid.UUID) error {
+	st := status.New(codes.NotFound, fmt.Sprintf("employee %s not found for distributor %s", userID, distributorID))
 	st, _ = st.WithDetails(
 		&errdetails.ErrorInfo{
-			Reason: ErrorEmployeeAlreadyExists.Error(),
+			Reason: ErrorEmployeeNotFound.Error(),
 			Domain: constant.ServiceName,
 			Metadata: map[string]string{
 				"timestamp": nowRFC3339Nano(),
@@ -43,7 +41,7 @@ func RaiseEmployeeAlreadyExists(ctx context.Context, cause error, userID uuid.UU
 		},
 	)
 
-	return ErrorEmployeeAlreadyExists.Raise(cause, st)
+	return ErrorEmployeeNotFound.Raise(cause, st)
 }
 
 var ErrorInitiatorNotEmployee = ape.Declare("INITIATOR_NOT_EMPLOYEE")
@@ -64,6 +62,26 @@ func RaiseInitiatorNotEmployee(ctx context.Context, cause error, userID, distrib
 	)
 
 	return ErrorInitiatorNotEmployee.Raise(cause, st)
+}
+
+var InitiatorIsAlreadyEmployee = ape.Declare("INITIATOR_IS_ALREADY_EMPLOYEE")
+
+func RaiseInitiatorIsAlreadyEmployee(ctx context.Context, cause error, userID uuid.UUID) error {
+	st := status.New(
+		codes.FailedPrecondition,
+		fmt.Sprintf("user %s is already employee", userID),
+	)
+	st, _ = st.WithDetails(
+		&errdetails.ErrorInfo{
+			Reason: InitiatorIsAlreadyEmployee.Error(),
+			Domain: constant.ServiceName,
+			Metadata: map[string]string{
+				"timestamp": nowRFC3339Nano(),
+			},
+		},
+	)
+
+	return InitiatorIsAlreadyEmployee.Raise(cause, st)
 }
 
 var ErrorInitiatorEmployeeHaveNotEnoughPermissions = ape.Declare("INITIATOR_EMPLOYEE_HAVE_NOT_ENOUGH_PERMISSIONS")

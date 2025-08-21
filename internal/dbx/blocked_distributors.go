@@ -10,20 +10,20 @@ import (
 	"github.com/google/uuid"
 )
 
-const suspendedDistributorsTable = "suspended_distributors"
+const blockedTable = "blocked_distributors"
 
-type SuspendedDistributor struct {
+type Blockages struct {
 	ID            uuid.UUID  `db:"id"`
 	DistributorID uuid.UUID  `db:"distributor_id"`
 	InitiatorID   uuid.UUID  `db:"initiator_id"`
 	Reason        string     `db:"reason"`
 	Status        string     `db:"status"`
-	SuspendedAt   time.Time  `db:"suspended_at"`
+	BlockedAt     time.Time  `db:"blocked_at"`
 	CanceledAt    *time.Time `db:"canceled_at"`
 	CreatedAt     time.Time  `db:"created_at"`
 }
 
-type SuspendedQ struct {
+type BlockQ struct {
 	db       *sql.DB
 	selector sq.SelectBuilder
 	updater  sq.UpdateBuilder
@@ -32,19 +32,19 @@ type SuspendedQ struct {
 	counter  sq.SelectBuilder
 }
 
-func NewSuspendedDistributorsQ(db *sql.DB) SuspendedQ {
+func NewBlockagesQ(db *sql.DB) BlockQ {
 	builder := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
-	return SuspendedQ{
+	return BlockQ{
 		db:       db,
-		selector: builder.Select("*").From(suspendedDistributorsTable),
-		updater:  builder.Update(suspendedDistributorsTable),
-		inserter: builder.Insert(suspendedDistributorsTable),
-		deleter:  builder.Delete(suspendedDistributorsTable),
-		counter:  builder.Select("COUNT(*) AS count").From(suspendedDistributorsTable),
+		selector: builder.Select("*").From(blockedTable),
+		updater:  builder.Update(blockedTable),
+		inserter: builder.Insert(blockedTable),
+		deleter:  builder.Delete(blockedTable),
+		counter:  builder.Select("COUNT(*) AS count").From(blockedTable),
 	}
 }
 
-func (q SuspendedQ) applyConditions(conditions ...sq.Sqlizer) SuspendedQ {
+func (q BlockQ) applyConditions(conditions ...sq.Sqlizer) BlockQ {
 	q.selector = q.selector.Where(conditions)
 	q.counter = q.counter.Where(conditions)
 	q.updater = q.updater.Where(conditions)
@@ -53,8 +53,8 @@ func (q SuspendedQ) applyConditions(conditions ...sq.Sqlizer) SuspendedQ {
 	return q
 }
 
-func scanSuspended(scanner interface{ Scan(dest ...any) error }) (SuspendedDistributor, error) {
-	var s SuspendedDistributor
+func scanBlock(scanner interface{ Scan(dest ...any) error }) (Blockages, error) {
+	var s Blockages
 	var nt sql.NullTime
 	if err := scanner.Scan(
 		&s.ID,
@@ -62,7 +62,7 @@ func scanSuspended(scanner interface{ Scan(dest ...any) error }) (SuspendedDistr
 		&s.InitiatorID,
 		&s.Reason,
 		&s.Status,
-		&s.SuspendedAt,
+		&s.BlockedAt,
 		&nt, // сканим сюда
 		&s.CreatedAt,
 	); err != nil {
@@ -77,25 +77,25 @@ func scanSuspended(scanner interface{ Scan(dest ...any) error }) (SuspendedDistr
 	return s, nil
 }
 
-func (q SuspendedQ) New() SuspendedQ {
-	return NewSuspendedDistributorsQ(q.db)
+func (q BlockQ) New() BlockQ {
+	return NewBlockagesQ(q.db)
 }
 
-func (q SuspendedQ) Insert(ctx context.Context, input SuspendedDistributor) error {
+func (q BlockQ) Insert(ctx context.Context, input Blockages) error {
 	values := map[string]interface{}{
 		"id":             input.ID,
 		"distributor_id": input.DistributorID,
 		"initiator_id":   input.InitiatorID,
 		"reason":         input.Reason,
 		"status":         input.Status,
-		"suspended_at":   input.SuspendedAt,
+		"blocked_at":     input.BlockedAt,
 		//"canceled_at":    input.CanceledAt, defaults to NULL if not set
 		"created_at": input.CreatedAt,
 	}
 
 	query, args, err := q.inserter.SetMap(values).ToSql()
 	if err != nil {
-		return fmt.Errorf("building inserter query for table: %s input: %w", suspendedDistributorsTable, err)
+		return fmt.Errorf("building inserter query for table: %s input: %w", blockedTable, err)
 	}
 
 	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
@@ -107,10 +107,10 @@ func (q SuspendedQ) Insert(ctx context.Context, input SuspendedDistributor) erro
 	return err
 }
 
-func (q SuspendedQ) Get(ctx context.Context) (SuspendedDistributor, error) {
+func (q BlockQ) Get(ctx context.Context) (Blockages, error) {
 	query, args, err := q.selector.Limit(1).ToSql()
 	if err != nil {
-		return SuspendedDistributor{}, fmt.Errorf("building selector query for table %s: %w", suspendedDistributorsTable, err)
+		return Blockages{}, fmt.Errorf("building selector query for table %s: %w", blockedTable, err)
 	}
 
 	var row *sql.Row
@@ -120,17 +120,17 @@ func (q SuspendedQ) Get(ctx context.Context) (SuspendedDistributor, error) {
 		row = q.db.QueryRowContext(ctx, query, args...)
 	}
 
-	s, err := scanSuspended(row)
+	s, err := scanBlock(row)
 	if err != nil {
-		return SuspendedDistributor{}, fmt.Errorf("scanning row for table %s: %w", suspendedDistributorsTable, err)
+		return Blockages{}, fmt.Errorf("scanning row for table %s: %w", blockedTable, err)
 	}
 	return s, nil
 }
 
-func (q SuspendedQ) Select(ctx context.Context) ([]SuspendedDistributor, error) {
+func (q BlockQ) Select(ctx context.Context) ([]Blockages, error) {
 	query, args, err := q.selector.ToSql()
 	if err != nil {
-		return nil, fmt.Errorf("building selector query for table %s: %w", suspendedDistributorsTable, err)
+		return nil, fmt.Errorf("building selector query for table %s: %w", blockedTable, err)
 	}
 
 	var rows *sql.Rows
@@ -140,22 +140,22 @@ func (q SuspendedQ) Select(ctx context.Context) ([]SuspendedDistributor, error) 
 		rows, err = q.db.QueryContext(ctx, query, args...)
 	}
 	if err != nil {
-		return nil, fmt.Errorf("executing query for table %s: %w", suspendedDistributorsTable, err)
+		return nil, fmt.Errorf("executing query for table %s: %w", blockedTable, err)
 	}
 	defer rows.Close()
 
-	var res []SuspendedDistributor
+	var res []Blockages
 	for rows.Next() {
-		s, err := scanSuspended(rows)
+		s, err := scanBlock(rows)
 		if err != nil {
-			return nil, fmt.Errorf("scanning row for table %s: %w", suspendedDistributorsTable, err)
+			return nil, fmt.Errorf("scanning row for table %s: %w", blockedTable, err)
 		}
 		res = append(res, s)
 	}
 	return res, nil
 }
 
-func (q SuspendedQ) Update(ctx context.Context, input map[string]any) error {
+func (q BlockQ) Update(ctx context.Context, input map[string]any) error {
 	values := map[string]any{}
 
 	if active, ok := input["active"]; ok {
@@ -164,7 +164,7 @@ func (q SuspendedQ) Update(ctx context.Context, input map[string]any) error {
 
 	query, args, err := q.updater.SetMap(values).ToSql()
 	if err != nil {
-		return fmt.Errorf("building updater query for table: %s: %w", suspendedDistributorsTable, err)
+		return fmt.Errorf("building updater query for table: %s: %w", blockedTable, err)
 	}
 
 	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
@@ -177,10 +177,10 @@ func (q SuspendedQ) Update(ctx context.Context, input map[string]any) error {
 
 }
 
-func (q SuspendedQ) Delete(ctx context.Context) error {
+func (q BlockQ) Delete(ctx context.Context) error {
 	query, args, err := q.deleter.ToSql()
 	if err != nil {
-		return fmt.Errorf("building deleter query for table: %s: %w", suspendedDistributorsTable, err)
+		return fmt.Errorf("building deleter query for table: %s: %w", blockedTable, err)
 	}
 
 	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
@@ -192,42 +192,42 @@ func (q SuspendedQ) Delete(ctx context.Context) error {
 	return err
 }
 
-func (q SuspendedQ) FilterID(id uuid.UUID) SuspendedQ {
+func (q BlockQ) FilterID(id uuid.UUID) BlockQ {
 	return q.applyConditions(sq.Eq{"id": id})
 }
 
-func (q SuspendedQ) FilterDistributorID(distributorID uuid.UUID) SuspendedQ {
+func (q BlockQ) FilterDistributorID(distributorID uuid.UUID) BlockQ {
 	return q.applyConditions(sq.Eq{"distributor_id": distributorID})
 }
 
-func (q SuspendedQ) FilterInitiatorID(initiatorID uuid.UUID) SuspendedQ {
+func (q BlockQ) FilterInitiatorID(initiatorID uuid.UUID) BlockQ {
 	return q.applyConditions(sq.Eq{"initiator_id": initiatorID})
 }
 
-func (q SuspendedQ) FilterStatus(status string) SuspendedQ {
+func (q BlockQ) FilterStatus(status string) BlockQ {
 	return q.applyConditions(sq.Eq{"status": status})
 }
 
-func (q SuspendedQ) OrderBySuspendedAt(ascending bool) SuspendedQ {
+func (q BlockQ) OrderByBlockedAt(ascending bool) BlockQ {
 	if ascending {
-		q.selector = q.selector.OrderBy("suspended_at ASC")
+		q.selector = q.selector.OrderBy("blocked_at ASC")
 	} else {
-		q.selector = q.selector.OrderBy("suspended_at DESC")
+		q.selector = q.selector.OrderBy("blocked_at DESC")
 	}
 	return q
 }
 
-func (q SuspendedQ) Page(limit, offset uint64) SuspendedQ {
+func (q BlockQ) Page(limit, offset uint64) BlockQ {
 	q.selector = q.selector.Limit(limit).Offset(offset)
 	q.counter = q.counter.Limit(1) // For counting, we don't need to limit the results
 
 	return q
 }
 
-func (q SuspendedQ) Count(ctx context.Context) (uint64, error) {
+func (q BlockQ) Count(ctx context.Context) (uint64, error) {
 	query, args, err := q.counter.ToSql()
 	if err != nil {
-		return 0, fmt.Errorf("building count query for table %s: %w", suspendedDistributorsTable, err)
+		return 0, fmt.Errorf("building count query for table %s: %w", blockedTable, err)
 	}
 
 	var count uint64
@@ -238,7 +238,7 @@ func (q SuspendedQ) Count(ctx context.Context) (uint64, error) {
 	}
 
 	if err != nil {
-		return 0, fmt.Errorf("executing count query for table %s: %w", suspendedDistributorsTable, err)
+		return 0, fmt.Errorf("executing count query for table %s: %w", blockedTable, err)
 	}
 
 	return count, nil
