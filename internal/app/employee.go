@@ -10,8 +10,8 @@ import (
 	"github.com/chains-lab/distributors-svc/internal/app/models"
 	"github.com/chains-lab/distributors-svc/internal/config/constant/enum"
 	"github.com/chains-lab/distributors-svc/internal/dbx"
-	"github.com/chains-lab/distributors-svc/internal/errx"
-	"github.com/chains-lab/distributors-svc/pkg/pagination"
+	"github.com/chains-lab/distributors-svc/internal/problems"
+	"github.com/chains-lab/pagi"
 	"github.com/google/uuid"
 )
 
@@ -46,13 +46,13 @@ func (a App) GetInitiatorEmployee(
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
-			return models.Employee{}, errx.RaiseInitiatorNotEmployee(
+			return models.Employee{}, problems.RaiseInitiatorNotEmployee(
 				ctx,
 				fmt.Errorf("initiator with userID %s not found: %w", initiatorID, err),
 				initiatorID,
 			)
 		default:
-			return models.Employee{}, errx.RaiseInternal(ctx, fmt.Errorf("getting employee with userID %s: %w", initiatorID, err))
+			return models.Employee{}, problems.RaiseInternal(ctx, fmt.Errorf("getting employee with userID %s: %w", initiatorID, err))
 		}
 	}
 
@@ -72,13 +72,13 @@ func (a App) GetEmployee(ctx context.Context, userID uuid.UUID) (models.Employee
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
-			return models.Employee{}, errx.RaiseEmployeeNotFound(
+			return models.Employee{}, problems.RaiseEmployeeNotFound(
 				ctx,
 				fmt.Errorf("employee with userID %s not found: %w", userID, err),
 				userID,
 			)
 		default:
-			return models.Employee{}, errx.RaiseInternal(ctx, fmt.Errorf("getting employee with userID %s: %w", userID, err))
+			return models.Employee{}, problems.RaiseInternal(ctx, fmt.Errorf("getting employee with userID %s: %w", userID, err))
 		}
 	}
 
@@ -99,14 +99,14 @@ func (a App) GetDistributorEmployee(ctx context.Context, userID, distributorID u
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
-			return models.Employee{}, errx.RaiseEmployeeNotFoundByDistributorID(
+			return models.Employee{}, problems.RaiseEmployeeNotFoundByDistributorID(
 				ctx,
 				fmt.Errorf("employee with userID %s and distributorID %s not found: %w", userID, distributorID, err),
 				userID,
 				distributorID,
 			)
 		default:
-			return models.Employee{}, errx.RaiseInternal(ctx, fmt.Errorf("getting employee with userID %s and distributorID %s: %w", userID, distributorID, err))
+			return models.Employee{}, problems.RaiseInternal(ctx, fmt.Errorf("getting employee with userID %s and distributorID %s: %w", userID, distributorID, err))
 		}
 	}
 
@@ -132,14 +132,14 @@ func (a App) CompareEmployeesRole(
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
-			return models.Employee{}, errx.RaiseInitiatorNotEmployee(
+			return models.Employee{}, problems.RaiseInitiatorNotEmployee(
 				ctx,
 				fmt.Errorf("initiator with userID %s not found in distributor %s: %w", initiatorID, distributorID, err),
 				initiatorID,
 			)
 		default:
 			return models.Employee{},
-				errx.RaiseInternal(
+				problems.RaiseInternal(
 					ctx,
 					fmt.Errorf("getting initiator with userID %s in distributor %s: %w", initiatorID, distributorID, err),
 				)
@@ -148,10 +148,10 @@ func (a App) CompareEmployeesRole(
 
 	access, err := enum.ComparisonEmployeeRoles(employee.Role, role)
 	if err != nil {
-		return models.Employee{}, errx.RaiseInternal(ctx, fmt.Errorf("comparing roles: %w", err))
+		return models.Employee{}, problems.RaiseInternal(ctx, fmt.Errorf("comparing roles: %w", err))
 	}
 	if access < 0 {
-		return models.Employee{}, errx.RaiseInitiatorEmployeeHaveNotEnoughPermissions(
+		return models.Employee{}, problems.RaiseInitiatorEmployeeHaveNotEnoughPermissions(
 			ctx,
 			fmt.Errorf("initiator have not enough rights"),
 			initiatorID,
@@ -184,7 +184,7 @@ func (a App) AllowedToInteractWithEmployee(
 	}
 
 	if initiator.DistributorID != user.DistributorID {
-		return -1, errx.RaiseInitiatorAndChosenEmployeeHaveDifferentDistributors(
+		return -1, problems.RaiseInitiatorAndChosenEmployeeHaveDifferentDistributors(
 			ctx,
 			fmt.Errorf("initiator %s and chosen employee %s have different distributors", initiatorID, userID),
 			initiatorID,
@@ -194,7 +194,7 @@ func (a App) AllowedToInteractWithEmployee(
 
 	access, err := enum.ComparisonEmployeeRoles(initiator.Role, user.Role)
 	if err != nil {
-		return -1, errx.RaiseInternal(ctx, fmt.Errorf("comparing roles: %w", err))
+		return -1, problems.RaiseInternal(ctx, fmt.Errorf("comparing roles: %w", err))
 	}
 
 	return access, nil
@@ -204,8 +204,8 @@ func (a App) SelectEmployees(
 	ctx context.Context,
 	filters map[string]any,
 	ascend bool,
-	pag pagination.Request,
-) ([]models.Employee, pagination.Response, error) {
+	pag pagi.Request,
+) ([]models.Employee, pagi.Response, error) {
 	query := a.employee.New()
 	if distributorID, ok := filters["distributor_id"].(uuid.UUID); ok {
 		query = query.FilterDistributorID(distributorID)
@@ -214,16 +214,16 @@ func (a App) SelectEmployees(
 		query = query.FilterRole(role)
 	}
 
-	limit, offset := pagination.CalculateLimitOffset(pag)
+	limit, offset := pagi.CalculateLimitOffset(pag)
 
 	total, err := query.Count(ctx)
 	if err != nil {
-		return nil, pagination.Response{}, errx.RaiseInternal(ctx, fmt.Errorf("counting employees: %w", err))
+		return nil, pagi.Response{}, problems.RaiseInternal(ctx, fmt.Errorf("counting employees: %w", err))
 	}
 
 	employees, err := query.Page(limit, offset).OrderByRole(ascend).Select(ctx)
 	if err != nil {
-		return nil, pagination.Response{}, errx.RaiseInternal(ctx, fmt.Errorf("selecting employees: %w", err))
+		return nil, pagi.Response{}, problems.RaiseInternal(ctx, fmt.Errorf("selecting employees: %w", err))
 	}
 
 	var result []models.Employee
@@ -237,7 +237,7 @@ func (a App) SelectEmployees(
 		})
 	}
 
-	return result, pagination.Response{
+	return result, pagi.Response{
 		Total: total,
 		Page:  pag.Page,
 		Size:  limit,
@@ -262,7 +262,7 @@ func (a App) UpdateEmployeeRole(
 	}
 
 	if allowed != 1 {
-		return models.Employee{}, errx.RaiseInitiatorEmployeeHaveNotEnoughPermissions(
+		return models.Employee{}, problems.RaiseInitiatorEmployeeHaveNotEnoughPermissions(
 			ctx,
 			fmt.Errorf("initiator have not enough rights to update employee role"),
 			initiatorID,
@@ -290,13 +290,13 @@ func (a App) UpdateEmployeeRole(
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
-			return models.Employee{}, errx.RaiseEmployeeNotFound(
+			return models.Employee{}, problems.RaiseEmployeeNotFound(
 				ctx,
 				fmt.Errorf("employee with userID %s not found in distributor %s: %w", userID, distributorID, err),
 				userID)
 		default:
 			return models.Employee{},
-				errx.RaiseInternal(
+				problems.RaiseInternal(
 					ctx,
 					fmt.Errorf("updating employee role for userID %s in distributor %s: %w", userID, distributorID, err),
 				)
@@ -318,7 +318,7 @@ func (a App) DeleteEmployee(ctx context.Context, initiatorID, userID, distributo
 		return err
 	}
 	if allowed != 1 {
-		return errx.RaiseInitiatorEmployeeHaveNotEnoughPermissions(
+		return problems.RaiseInitiatorEmployeeHaveNotEnoughPermissions(
 			ctx,
 			fmt.Errorf("initiator have not enough rights to delete employee"),
 			initiatorID,
@@ -330,13 +330,13 @@ func (a App) DeleteEmployee(ctx context.Context, initiatorID, userID, distributo
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
-			return errx.RaiseEmployeeNotFound(
+			return problems.RaiseEmployeeNotFound(
 				ctx,
 				fmt.Errorf("employee with userID %s not found in distributor %s: %w", userID, distributorID, err),
 				userID,
 			)
 		default:
-			return errx.RaiseInternal(
+			return problems.RaiseInternal(
 				ctx,
 				fmt.Errorf("deleting employee with userID %s in distributor %s: %w", userID, distributorID, err),
 			)

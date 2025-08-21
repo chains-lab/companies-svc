@@ -10,8 +10,8 @@ import (
 	"github.com/chains-lab/distributors-svc/internal/app/models"
 	"github.com/chains-lab/distributors-svc/internal/config/constant/enum"
 	"github.com/chains-lab/distributors-svc/internal/dbx"
-	"github.com/chains-lab/distributors-svc/internal/errx"
-	"github.com/chains-lab/distributors-svc/pkg/pagination"
+	"github.com/chains-lab/distributors-svc/internal/problems"
+	"github.com/chains-lab/pagi"
 	"github.com/google/uuid"
 )
 
@@ -40,10 +40,10 @@ func (a App) CreateDistributor(
 ) (models.Distributor, error) {
 	_, err := a.employee.New().FilterUserID(initiatorID).Get(ctx)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		return models.Distributor{}, errx.RaiseInternal(ctx, fmt.Errorf("getting employee: %w", err))
+		return models.Distributor{}, problems.RaiseInternal(ctx, fmt.Errorf("getting employee: %w", err))
 	}
 	if err == nil {
-		return models.Distributor{}, errx.RaiseCurrentEmployeeCanNotCreateDistributor(
+		return models.Distributor{}, problems.RaiseCurrentEmployeeCanNotCreateDistributor(
 			ctx,
 			fmt.Errorf("employee with userID %s already exists", initiatorID),
 			initiatorID,
@@ -61,7 +61,7 @@ func (a App) CreateDistributor(
 
 	err = a.distributor.New().Insert(ctx, stmt)
 	if err != nil {
-		return models.Distributor{}, errx.RaiseInternal(ctx, fmt.Errorf("inserting distributor: %w", err))
+		return models.Distributor{}, problems.RaiseInternal(ctx, fmt.Errorf("inserting distributor: %w", err))
 	}
 
 	return models.Distributor{
@@ -79,13 +79,13 @@ func (a App) GetDistributor(ctx context.Context, ID uuid.UUID) (models.Distribut
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
-			return models.Distributor{}, errx.RaiseDistributorNotFound(
+			return models.Distributor{}, problems.RaiseDistributorNotFound(
 				ctx,
 				fmt.Errorf("distributor %s not found: %w", ID, err),
 				ID,
 			)
 		default:
-			return models.Distributor{}, errx.RaiseInternal(ctx, fmt.Errorf("getting distributor %s: %w", ID, err))
+			return models.Distributor{}, problems.RaiseInternal(ctx, fmt.Errorf("getting distributor %s: %w", ID, err))
 		}
 	}
 
@@ -102,8 +102,8 @@ func (a App) GetDistributor(ctx context.Context, ID uuid.UUID) (models.Distribut
 func (a App) SelectDistributors(
 	ctx context.Context,
 	filters map[string]interface{},
-	pag pagination.Request,
-) ([]models.Distributor, pagination.Response, error) {
+	pag pagi.Request,
+) ([]models.Distributor, pagi.Response, error) {
 	query := a.distributor.New()
 	if status, ok := filters["status"]; ok {
 		query = query.FilterStatus(status.(string))
@@ -112,18 +112,18 @@ func (a App) SelectDistributors(
 		query = query.LikeName(name.(string))
 	}
 
-	limit, offset := pagination.CalculateLimitOffset(pag)
+	limit, offset := pagi.CalculateLimitOffset(pag)
 
 	query = query.Page(limit, offset)
 
 	count, err := query.Count(ctx)
 	if err != nil {
-		return nil, pagination.Response{}, errx.RaiseInternal(ctx, fmt.Errorf("counting distributors: %w", err))
+		return nil, pagi.Response{}, problems.RaiseInternal(ctx, fmt.Errorf("counting distributors: %w", err))
 	}
 
 	distributors, err := query.Select(ctx)
 	if err != nil {
-		return nil, pagination.Response{}, errx.RaiseInternal(ctx, fmt.Errorf("selecting distributors: %w", err))
+		return nil, pagi.Response{}, problems.RaiseInternal(ctx, fmt.Errorf("selecting distributors: %w", err))
 	}
 
 	var result []models.Distributor
@@ -138,7 +138,7 @@ func (a App) SelectDistributors(
 		})
 	}
 
-	return result, pagination.Response{
+	return result, pagi.Response{
 		Page:  pag.Page,
 		Size:  pag.Size,
 		Total: count,
@@ -162,20 +162,20 @@ func (a App) UpdateDistributorName(ctx context.Context,
 		"updated_at": time.Now().UTC(),
 	})
 	if err != nil {
-		return models.Distributor{}, errx.RaiseInternal(ctx, fmt.Errorf("updating distributor name: %w", err))
+		return models.Distributor{}, problems.RaiseInternal(ctx, fmt.Errorf("updating distributor name: %w", err))
 	}
 
 	distributor, err := distributorQ.Get(ctx)
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
-			return models.Distributor{}, errx.RaiseDistributorNotFound(
+			return models.Distributor{}, problems.RaiseDistributorNotFound(
 				ctx,
 				fmt.Errorf("distributor %s not found: %w", distributorID, err),
 				distributorID,
 			)
 		default:
-			return models.Distributor{}, errx.RaiseInternal(ctx, fmt.Errorf("getting distributor %s: %w", distributorID, err))
+			return models.Distributor{}, problems.RaiseInternal(ctx, fmt.Errorf("getting distributor %s: %w", distributorID, err))
 		}
 	}
 
@@ -206,7 +206,7 @@ func (a App) UpdateDistributorIcon(ctx context.Context,
 		"updated_at": time.Now().UTC(),
 	})
 	if err != nil {
-		return models.Distributor{}, errx.RaiseInternal(ctx, fmt.Errorf("updating distributor icon: %w", err))
+		return models.Distributor{}, problems.RaiseInternal(ctx, fmt.Errorf("updating distributor icon: %w", err))
 	}
 
 	return a.GetDistributor(ctx, distributorID)
@@ -226,16 +226,16 @@ func (a App) SetDistributorStatusInactive(
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
-			return models.Distributor{}, errx.RaiseDistributorNotFound(
+			return models.Distributor{}, problems.RaiseDistributorNotFound(
 				ctx,
 				fmt.Errorf("distributor %s not found: %w", distributorID, err),
 				distributorID)
 		default:
-			return models.Distributor{}, errx.RaiseInternal(ctx, fmt.Errorf("getting distributor %s: %w", distributorID, err))
+			return models.Distributor{}, problems.RaiseInternal(ctx, fmt.Errorf("getting distributor %s: %w", distributorID, err))
 		}
 	}
 	if distributor.Status == enum.DistributorStatusBlocked {
-		return models.Distributor{}, errx.RaiseDistributorStatusBlocked(
+		return models.Distributor{}, problems.RaiseDistributorStatusBlocked(
 			ctx,
 			fmt.Errorf("distributor %s is blocked", distributorID),
 			distributorID,
@@ -249,7 +249,7 @@ func (a App) SetDistributorStatusInactive(
 		"updated_at": time.Now().UTC(),
 	})
 	if err != nil {
-		return models.Distributor{}, errx.RaiseInternal(ctx, fmt.Errorf("updating distributor status: %w", err))
+		return models.Distributor{}, problems.RaiseInternal(ctx, fmt.Errorf("updating distributor status: %w", err))
 	}
 
 	return a.GetDistributor(ctx, distributorID)
@@ -269,18 +269,18 @@ func (a App) SetDistributorStatusActive(
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
-			return models.Distributor{}, errx.RaiseDistributorNotFound(
+			return models.Distributor{}, problems.RaiseDistributorNotFound(
 				ctx,
 				fmt.Errorf("distributor %s not found: %w", distributorID, err),
 				distributorID,
 			)
 		default:
 			return models.Distributor{},
-				errx.RaiseInternal(ctx, fmt.Errorf("getting distributor %s: %w", distributorID, err))
+				problems.RaiseInternal(ctx, fmt.Errorf("getting distributor %s: %w", distributorID, err))
 		}
 	}
 	if distributor.Status == enum.DistributorStatusBlocked {
-		return models.Distributor{}, errx.RaiseDistributorStatusBlocked(
+		return models.Distributor{}, problems.RaiseDistributorStatusBlocked(
 			ctx,
 			fmt.Errorf("distributor %s is block", distributorID),
 			distributorID,
@@ -294,21 +294,21 @@ func (a App) SetDistributorStatusActive(
 		"updated_at": time.Now().UTC(),
 	})
 	if err != nil {
-		return models.Distributor{}, errx.RaiseInternal(ctx, fmt.Errorf("updating distributor status: %w", err))
+		return models.Distributor{}, problems.RaiseInternal(ctx, fmt.Errorf("updating distributor status: %w", err))
 	}
 
 	distributor, err = distributorQ.Get(ctx)
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
-			return models.Distributor{}, errx.RaiseDistributorNotFound(
+			return models.Distributor{}, problems.RaiseDistributorNotFound(
 				ctx,
 				fmt.Errorf("distributor %s not found: %w", distributorID, err),
 				distributorID,
 			)
 		default:
 			return models.Distributor{},
-				errx.RaiseInternal(ctx, fmt.Errorf("getting distributor %s: %w", distributorID, err))
+				problems.RaiseInternal(ctx, fmt.Errorf("getting distributor %s: %w", distributorID, err))
 		}
 	}
 

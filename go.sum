@@ -12,8 +12,16 @@ github.com/chains-lab/distributors-proto v0.1.1 h1:g9zCvqDt3CZXfJiEi5t3TZnJvoF2y
 github.com/chains-lab/distributors-proto v0.1.1/go.mod h1:3hsQF5B2L/gsnYndr0bqxyPzmGCYBb/L7GipPs/xiCU=
 github.com/chains-lab/distributors-proto v0.1.2 h1:rV3fBlPKO5FeJ5LQxOHfRyJuJ4FbG5sDCs2r9+IlIy0=
 github.com/chains-lab/distributors-proto v0.1.2/go.mod h1:3hsQF5B2L/gsnYndr0bqxyPzmGCYBb/L7GipPs/xiCU=
+github.com/chains-lab/distributors-proto v0.1.3 h1:w0v8QQ5iv/lZd5J6+4jSEyHAzCJDnpL45oBVU+Qois8=
+github.com/chains-lab/distributors-proto v0.1.3/go.mod h1:3hsQF5B2L/gsnYndr0bqxyPzmGCYBb/L7GipPs/xiCU=
 github.com/chains-lab/gatekit v0.2.0 h1:h0VmrUqOrR/P1ioRhUq/Co794ig9zMVNGtLCvUXPN9s=
 github.com/chains-lab/gatekit v0.2.0/go.mod h1:4Bm8BXPMR+HTnMg7uEPGA4nCLMA8xD+fYifuKkn766Q=
+github.com/chains-lab/logium v0.1.0 h1:7xTW9FdvpcTKJO+m8hXcpjyjQZztpaXzNa5p91aul3c=
+github.com/chains-lab/logium v0.1.0/go.mod h1:6FqyL1KnUmThTZpZt5UzvTSukH3vgz+bgWkODxa3hxw=
+github.com/chains-lab/logium v0.1.1 h1:C5ZroPavjzmqFxW6ajga++NhgpduudSd7uvgWiYZcxw=
+github.com/chains-lab/logium v0.1.1/go.mod h1:6FqyL1KnUmThTZpZt5UzvTSukH3vgz+bgWkODxa3hxw=
+github.com/chains-lab/pagi v0.1.0 h1:4qJEPTbJtQpMZtLFi26Saus5zlgwCuZBE0i+11mdDDE=
+github.com/chains-lab/pagi v0.1.0/go.mod h1:YGTsu4toiabbZSgdaigSLen9m4qHGb/xsxtxy0fGav4=
 github.com/chains-lab/svc-errors v0.2.2 h1:70aJpuCHhptxOXQTIntfSwG8xi0WmthSPUpj3o2F0ds=
 github.com/chains-lab/svc-errors v0.2.2/go.mod h1:+DJZ+olXjBFfb3CdJaaJl1XEmIrmtGty9d78t39IXxA=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

@@ -2,40 +2,25 @@ package handlers
 
 import (
 	"context"
-	"fmt"
 
 	empProto "github.com/chains-lab/distributors-proto/gen/go/svc/employee"
+	"github.com/chains-lab/distributors-svc/internal/api/grpc/requests"
 	"github.com/chains-lab/distributors-svc/internal/api/grpc/responses"
-	"github.com/chains-lab/distributors-svc/internal/errx"
-	"github.com/google/uuid"
-	"google.golang.org/genproto/googleapis/rpc/errdetails"
 )
 
 func (s Service) GetDistributorEmployee(ctx context.Context, req *empProto.GetDistributorEmployeeRequest) (*empProto.Employee, error) {
-	userID, err := uuid.Parse(req.UserId)
+	userID, err := requests.UserID(ctx, req.UserId)
 	if err != nil {
-		s.Log(ctx).WithError(err).Errorf("invalid user ID: %s", req.UserId)
+		s.Log(ctx).WithError(err).Errorf("invalid user ID format: %s", req.UserId)
 
-		return nil, errx.RaiseInvalidArgument(
-			ctx, fmt.Errorf("invalid user ID format: %w", err),
-			&errdetails.BadRequest_FieldViolation{
-				Field:       "user_id",
-				Description: "invalid user ID format, must be a valid UUID",
-			},
-		)
+		return nil, err
 	}
 
-	distributorID, err := uuid.Parse(req.DistributorId)
+	distributorID, err := requests.DistributorID(ctx, req.DistributorId)
 	if err != nil {
-		s.Log(ctx).WithError(err).Errorf("invalid distributor ID: %s", req.DistributorId)
+		s.Log(ctx).WithError(err).Errorf("invalid distributor ID format: %s", req.DistributorId)
 
-		return nil, errx.RaiseInvalidArgument(
-			ctx, fmt.Errorf("invalid distributor ID format: %w", err),
-			&errdetails.BadRequest_FieldViolation{
-				Field:       "distributor_id",
-				Description: "invalid distributor ID format, must be a valid UUID",
-			},
-		)
+		return nil, err
 	}
 
 	employee, err := s.app.GetDistributorEmployee(ctx, userID, distributorID)

@@ -1,4 +1,4 @@
-package errx
+package problems
 
 import (
 	"context"
@@ -34,12 +34,12 @@ func RaiseInternal(ctx context.Context, cause error) error {
 	)
 }
 
-var ErrorNoPermissions = ape.Declare("NO_PERMISSIONS")
+var ErrorPermissionDenied = ape.Declare("PERMISSION_DENIED")
 
-func RaiseNoPermissions(ctx context.Context, cause error) error {
+func RaisePermissionDenied(ctx context.Context, cause error) error {
 	res, _ := status.New(codes.PermissionDenied, cause.Error()).WithDetails(
 		&errdetails.ErrorInfo{
-			Reason: ErrorNoPermissions.Error(),
+			Reason: ErrorPermissionDenied.Error(),
 			Domain: constant.ServiceName,
 			Metadata: map[string]string{
 				"timestamp": nowRFC3339Nano(),
@@ -47,7 +47,7 @@ func RaiseNoPermissions(ctx context.Context, cause error) error {
 		},
 	)
 
-	return ErrorNoPermissions.Raise(
+	return ErrorPermissionDenied.Raise(
 		cause,
 		res,
 	)

@@ -4,7 +4,7 @@ import (
 	pagProto "github.com/chains-lab/distributors-proto/gen/go/common/pagination"
 	disProto "github.com/chains-lab/distributors-proto/gen/go/svc/distributor"
 	"github.com/chains-lab/distributors-svc/internal/app/models"
-	"github.com/chains-lab/distributors-svc/pkg/pagination"
+	"github.com/chains-lab/pagi"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -18,7 +18,7 @@ func Distributor(distributor models.Distributor) *disProto.Distributor {
 	}
 }
 
-func DistributorsList(distributors []models.Distributor, pag pagination.Response) *disProto.DistributorsList {
+func DistributorsList(distributors []models.Distributor, pag pagi.Response) *disProto.DistributorsList {
 	list := make([]*disProto.Distributor, len(distributors))
 	for i, distributor := range distributors {
 		list[i] = Distributor(distributor)
@@ -51,7 +51,7 @@ func Block(block models.Block) *disProto.DistributorBlock {
 	return resp
 }
 
-func BlocksList(blocks []models.Block, pag pagination.Response) *disProto.DistributorBlocksList {
+func BlocksList(blocks []models.Block, pag pagi.Response) *disProto.DistributorBlocksList {
 	resp := &disProto.DistributorBlocksList{
 		Blocks: make([]*disProto.DistributorBlock, len(blocks)),
 		Pagination: &pagProto.Response{

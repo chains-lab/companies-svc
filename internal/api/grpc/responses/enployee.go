@@ -4,7 +4,7 @@ import (
 	pagProto "github.com/chains-lab/distributors-proto/gen/go/common/pagination"
 	empProto "github.com/chains-lab/distributors-proto/gen/go/svc/employee"
 	"github.com/chains-lab/distributors-svc/internal/app/models"
-	"github.com/chains-lab/distributors-svc/pkg/pagination"
+	"github.com/chains-lab/pagi"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -18,7 +18,7 @@ func Employee(employee models.Employee) *empProto.Employee {
 	}
 }
 
-func EmployeesList(employees []models.Employee, pag pagination.Response) *empProto.EmployeesList {
+func EmployeesList(employees []models.Employee, pag pagi.Response) *empProto.EmployeesList {
 	list := make([]*empProto.Employee, len(employees))
 	for i, employee := range employees {
 		list[i] = Employee(employee)
@@ -51,7 +51,7 @@ func EmployeeInvite(invite models.Invite) *empProto.Invite {
 	return resp
 }
 
-func EmployeeInvitesList(invites []models.Invite, pag pagination.Response) *empProto.InvitesList {
+func EmployeeInvitesList(invites []models.Invite, pag pagi.Response) *empProto.InvitesList {
 	list := make([]*empProto.Invite, len(invites))
 	for i, invite := range invites {
 		list[i] = EmployeeInvite(invite)

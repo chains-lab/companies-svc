@@ -1,4 +1,4 @@
-package errx
+package problems
 
 import (
 	"context"

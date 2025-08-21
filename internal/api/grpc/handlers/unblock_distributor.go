@@ -6,11 +6,10 @@ import (
 
 	disProto "github.com/chains-lab/distributors-proto/gen/go/svc/distributor"
 	"github.com/chains-lab/distributors-svc/internal/api/grpc/meta"
+	"github.com/chains-lab/distributors-svc/internal/api/grpc/requests"
 	"github.com/chains-lab/distributors-svc/internal/api/grpc/responses"
-	"github.com/chains-lab/distributors-svc/internal/errx"
+	"github.com/chains-lab/distributors-svc/internal/problems"
 	"github.com/chains-lab/gatekit/roles"
-	"github.com/google/uuid"
-	"google.golang.org/genproto/googleapis/rpc/errdetails"
 )
 
 func (s Service) UnblockDistributor(ctx context.Context, req *disProto.UnblockDistributorRequest) (*disProto.DistributorBlock, error) {
@@ -24,24 +23,17 @@ func (s Service) UnblockDistributor(ctx context.Context, req *disProto.UnblockDi
 	if initiator.Role != roles.Admin && initiator.Role != roles.SuperUser {
 		s.Log(ctx).Warnf("user %s with role %s attempted to unblock distributor %s", initiator.ID, initiator.Role, req.DistributorId)
 
-		return nil, errx.RaiseNoPermissions(
+		return nil, problems.RaisePermissionDenied(
 			ctx,
 			fmt.Errorf("user %s with role %s does not have permission to unblock distributors", initiator.ID, initiator.Role),
 		)
 	}
 
-	distributorID, err := uuid.Parse(req.DistributorId)
+	distributorID, err := requests.DistributorID(ctx, req.DistributorId)
 	if err != nil {
 		s.Log(ctx).WithError(err).Errorf("invalid distributor ID format: %s", req.DistributorId)
 
-		return nil, errx.RaiseInvalidArgument(
-			ctx,
-			fmt.Errorf("invalid distributor ID format: %s", req.DistributorId),
-			&errdetails.BadRequest_FieldViolation{
-				Field:       "distributor_id",
-				Description: "invalid UUID format for distributor ID",
-			},
-		)
+		return nil, err
 	}
 
 	block, err := s.app.UnblockForDistributor(ctx, distributorID)

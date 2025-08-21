@@ -1,0 +1,25 @@
+package requests
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/chains-lab/distributors-svc/internal/problems"
+	"github.com/google/uuid"
+	"google.golang.org/genproto/googleapis/rpc/errdetails"
+)
+
+func InviteID(ctx context.Context, inviteID string) (uuid.UUID, error) {
+	res, err := uuid.Parse(inviteID)
+	if err != nil {
+		return uuid.Nil, problems.RaiseInvalidArgument(
+			ctx, fmt.Errorf("invalid invite ID format: %w", err),
+			&errdetails.BadRequest_FieldViolation{
+				Field:       "invite_id",
+				Description: "invalid invite ID format, must be a valid UUID",
+			},
+		)
+	}
+
+	return res, nil
+}

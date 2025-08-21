@@ -8,19 +8,19 @@ import (
 	"github.com/chains-lab/distributors-svc/internal/api/grpc/meta"
 	"github.com/chains-lab/distributors-svc/internal/app"
 	"github.com/chains-lab/distributors-svc/internal/config"
-	"github.com/chains-lab/distributors-svc/pkg/logger"
+	"github.com/chains-lab/logium"
 )
 
 type Service struct {
 	app *app.App
 	cfg config.Config
-	log logger.Logger
+	log logium.Logger
 
 	disProto.UnimplementedDistributorServiceServer
 	empProto.UnimplementedEmployeeServiceServer
 }
 
-func NewService(a *app.App, cfg config.Config, log logger.Logger) *Service {
+func NewService(a *app.App, cfg config.Config, log logium.Logger) *Service {
 	return &Service{
 		app: a,
 		cfg: cfg,
@@ -28,6 +28,6 @@ func NewService(a *app.App, cfg config.Config, log logger.Logger) *Service {
 	}
 }
 
-func (s Service) Log(ctx context.Context) logger.Logger {
+func (s Service) Log(ctx context.Context) logium.Logger {
 	return s.log.WithField("request_id", meta.RequestID(ctx))
 }

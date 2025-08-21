@@ -4,24 +4,16 @@ import (
 	"context"
 
 	disProto "github.com/chains-lab/distributors-proto/gen/go/svc/distributor"
+	"github.com/chains-lab/distributors-svc/internal/api/grpc/requests"
 	"github.com/chains-lab/distributors-svc/internal/api/grpc/responses"
-	"github.com/chains-lab/distributors-svc/internal/errx"
-	"github.com/google/uuid"
-	"google.golang.org/genproto/googleapis/rpc/errdetails"
 )
 
 func (s Service) GetDistributorBlock(ctx context.Context, req *disProto.GetDistributorBlockRequest) (*disProto.DistributorBlock, error) {
-	blockID, err := uuid.Parse(req.BlockId)
+	blockID, err := requests.BlockID(ctx, req.BlockId)
 	if err != nil {
-		s.Log(ctx).WithError(err).Errorf("invalid block ID: %s", req.BlockId)
+		s.Log(ctx).WithError(err).Errorf("invalid block ID format: %s", req.BlockId)
 
-		return nil, errx.RaiseInvalidArgument(
-			ctx, err,
-			&errdetails.BadRequest_FieldViolation{
-				Field:       "block_id",
-				Description: "invalid block ID format must be uuid",
-			},
-		)
+		return nil, err
 	}
 
 	block, err := s.app.GetBlock(ctx, blockID)

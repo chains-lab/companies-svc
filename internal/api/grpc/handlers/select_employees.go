@@ -5,44 +5,31 @@ import (
 	"fmt"
 
 	empProto "github.com/chains-lab/distributors-proto/gen/go/svc/employee"
+	"github.com/chains-lab/distributors-svc/internal/api/grpc/requests"
 	"github.com/chains-lab/distributors-svc/internal/api/grpc/responses"
-	"github.com/chains-lab/distributors-svc/internal/config/constant/enum"
-	"github.com/chains-lab/distributors-svc/internal/errx"
-	"github.com/chains-lab/distributors-svc/pkg/pagination"
-	"github.com/google/uuid"
-	"google.golang.org/genproto/googleapis/rpc/errdetails"
+	"github.com/chains-lab/distributors-svc/internal/problems"
+	"github.com/chains-lab/pagi"
 )
 
 func (s Service) SelectEmployees(ctx context.Context, req *empProto.SelectEmployeesRequest) (*empProto.EmployeesList, error) {
 	filters := map[string]any{}
 
 	if req.Filters.DistributorId != nil {
-		distributorID, err := uuid.Parse(*req.Filters.DistributorId)
+		distributorID, err := requests.DistributorID(ctx, *req.Filters.DistributorId)
 		if err != nil {
-			s.Log(ctx).WithError(err).Error("invalid distributor ID format")
-			return nil, errx.RaiseInvalidArgument(
-				ctx, fmt.Errorf("invalid distributor ID format: %w", err),
-				&errdetails.BadRequest_FieldViolation{
-					Field:       "filters.distributor_id",
-					Description: "invalid UUID format for distributor ID",
-				},
-			)
+			s.Log(ctx).WithError(err).Errorf("invalid distributor ID format: %s", *req.Filters.DistributorId)
+
+			return nil, err
 		}
 
 		filters["distributor_id"] = distributorID
 	}
 	if req.Filters.Role != nil {
-		role, err := enum.ParseEmployeeRole(*req.Filters.Role)
+		role, err := requests.EmployeeRole(ctx, *req.Filters.Role)
 		if err != nil {
-			s.Log(ctx).WithError(err).Error("invalid employee role")
+			s.Log(ctx).WithError(err).Errorf("invalid employee role: %s", *req.Filters.Role)
 
-			return nil, errx.RaiseInvalidArgument(
-				ctx, fmt.Errorf("invalid employee role: %w", err),
-				&errdetails.BadRequest_FieldViolation{
-					Field:       "filters.role",
-					Description: "invalid employee role",
-				},
-			)
+			return nil, err
 		}
 
 		filters["role"] = role
@@ -57,14 +44,14 @@ func (s Service) SelectEmployees(ctx context.Context, req *empProto.SelectEmploy
 		ascend = false
 	}
 
-	employees, pag, err := s.app.SelectEmployees(ctx, filters, ascend, pagination.Request{
+	employees, pag, err := s.app.SelectEmployees(ctx, filters, ascend, pagi.Request{
 		Page: req.Pagination.Page,
 		Size: req.Pagination.Size,
 	})
 	if err != nil {
 		s.Log(ctx).WithError(err).Error("failed to select employees")
 
-		return nil, errx.RaiseInternal(ctx, fmt.Errorf("selecting employees: %w", err))
+		return nil, problems.RaiseInternal(ctx, fmt.Errorf("selecting employees: %w", err))
 	}
 
 	return responses.EmployeesList(employees, pag), nil

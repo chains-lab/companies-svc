@@ -10,8 +10,8 @@ import (
 	"github.com/chains-lab/distributors-svc/internal/app/models"
 	"github.com/chains-lab/distributors-svc/internal/config/constant/enum"
 	"github.com/chains-lab/distributors-svc/internal/dbx"
-	"github.com/chains-lab/distributors-svc/internal/errx"
-	"github.com/chains-lab/distributors-svc/pkg/pagination"
+	"github.com/chains-lab/distributors-svc/internal/problems"
+	"github.com/chains-lab/pagi"
 	"github.com/google/uuid"
 )
 
@@ -52,10 +52,10 @@ func (a App) BlockDistributor(
 
 	_, err := a.block.New().FilterDistributorID(distributorID).FilterStatus(enum.BlockStatusActive).Get(ctx)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		return models.Block{}, errx.RaiseInternal(ctx, fmt.Errorf("checking existing block: %w", err))
+		return models.Block{}, problems.RaiseInternal(ctx, fmt.Errorf("checking existing block: %w", err))
 	}
 	if err == nil {
-		return models.Block{}, errx.RaiseDistributorHaveAlreadyActiveBlock(
+		return models.Block{}, problems.RaiseDistributorHaveAlreadyActiveBlock(
 			ctx,
 			fmt.Errorf("distributor %s already has an active block", distributorID),
 			distributorID,
@@ -68,15 +68,15 @@ func (a App) BlockDistributor(
 			"updated_at": time.Now().UTC(),
 		})
 		if err != nil {
-			return errx.RaiseInternal(ctx, fmt.Errorf("updating distributor status: %w", err))
+			return problems.RaiseInternal(ctx, fmt.Errorf("updating distributor status: %w", err))
 		}
 
 		_, err = a.block.New().FilterDistributorID(distributorID).FilterStatus(enum.BlockStatusActive).Get(ctx)
 		if err != nil && !errors.Is(err, sql.ErrNoRows) {
-			return errx.RaiseInternal(ctx, fmt.Errorf("checking existing block: %w", err))
+			return problems.RaiseInternal(ctx, fmt.Errorf("checking existing block: %w", err))
 		}
 		if err == nil {
-			return errx.RaiseDistributorHaveAlreadyActiveBlock(
+			return problems.RaiseDistributorHaveAlreadyActiveBlock(
 				ctx,
 				fmt.Errorf("distributor %s already has an active block", distributorID),
 				distributorID,
@@ -85,7 +85,7 @@ func (a App) BlockDistributor(
 
 		err = a.block.Insert(ctx, blockages)
 		if err != nil {
-			return errx.RaiseInternal(ctx, fmt.Errorf("inserting new block: %w", err))
+			return problems.RaiseInternal(ctx, fmt.Errorf("inserting new block: %w", err))
 		}
 
 		return nil
@@ -111,14 +111,14 @@ func (a App) UnblockForDistributor(
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
-			return models.Block{}, errx.RaiseDistributorHaveNotActiveBlock(
+			return models.Block{}, problems.RaiseDistributorHaveNotActiveBlock(
 				ctx,
 				fmt.Errorf("distributor %s have not active block", distributorID),
 				distributorID,
 			)
 		default:
 			return models.Block{},
-				errx.RaiseInternal(ctx, fmt.Errorf("getting block for distributor %s: %w", distributorID, err))
+				problems.RaiseInternal(ctx, fmt.Errorf("getting block for distributor %s: %w", distributorID, err))
 		}
 	}
 
@@ -132,7 +132,7 @@ func (a App) UnblockForDistributor(
 			"cancelled_at": canceledAt,
 		})
 		if err != nil {
-			return errx.RaiseInternal(ctx, fmt.Errorf("updating block status: %w", err))
+			return problems.RaiseInternal(ctx, fmt.Errorf("updating block status: %w", err))
 		}
 
 		distributorQ := a.distributor.New().FilterID(distributorID)
@@ -142,7 +142,7 @@ func (a App) UnblockForDistributor(
 			"updated_at": canceledAt,
 		})
 		if err != nil {
-			return errx.RaiseInternal(ctx, fmt.Errorf("updating distributor status: %w", err))
+			return problems.RaiseInternal(ctx, fmt.Errorf("updating distributor status: %w", err))
 		}
 
 		return nil
@@ -156,10 +156,10 @@ func (a App) UnblockForDistributor(
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
 			return models.Block{},
-				errx.RaiseBlockNotFound(ctx, fmt.Errorf("block for distributor %s not found", distributorID), distributorID)
+				problems.RaiseBlockNotFound(ctx, fmt.Errorf("block for distributor %s not found", distributorID), distributorID)
 		default:
 			return models.Block{},
-				errx.RaiseInternal(ctx, fmt.Errorf("getting block for distributor %s: %w", distributorID, err))
+				problems.RaiseInternal(ctx, fmt.Errorf("getting block for distributor %s: %w", distributorID, err))
 		}
 	}
 
@@ -182,13 +182,13 @@ func (a App) GetBlock(
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
-			return models.Block{}, errx.RaiseBlockNotFound(
+			return models.Block{}, problems.RaiseBlockNotFound(
 				ctx,
 				fmt.Errorf("block with ID %s not found", ID),
 				ID,
 			)
 		default:
-			return models.Block{}, errx.RaiseInternal(ctx, fmt.Errorf("getting block with ID %s: %w", ID, err))
+			return models.Block{}, problems.RaiseInternal(ctx, fmt.Errorf("getting block with ID %s: %w", ID, err))
 		}
 	}
 
@@ -206,8 +206,8 @@ func (a App) GetBlock(
 func (a App) SelectBlockages(
 	ctx context.Context,
 	filters map[string]any,
-	pag pagination.Request,
-) ([]models.Block, pagination.Response, error) {
+	pag pagi.Request,
+) ([]models.Block, pagi.Response, error) {
 	query := a.block.New()
 
 	if distributorID, ok := filters["distributor_id"].(uuid.UUID); ok {
@@ -220,16 +220,16 @@ func (a App) SelectBlockages(
 		query = query.FilterStatus(status)
 	}
 
-	limit, offset := pagination.CalculateLimitOffset(pag)
+	limit, offset := pagi.CalculateLimitOffset(pag)
 
 	count, err := query.Count(ctx)
 	if err != nil {
-		return nil, pagination.Response{}, errx.RaiseInternal(ctx, fmt.Errorf("counting blockages: %w", err))
+		return nil, pagi.Response{}, problems.RaiseInternal(ctx, fmt.Errorf("counting blockages: %w", err))
 	}
 
 	blockages, err := query.OrderByBlockedAt(true).Page(limit, offset).Select(ctx)
 	if err != nil {
-		return nil, pagination.Response{}, errx.RaiseInternal(ctx, fmt.Errorf("selecting blockages: %w", err))
+		return nil, pagi.Response{}, problems.RaiseInternal(ctx, fmt.Errorf("selecting blockages: %w", err))
 	}
 
 	res := make([]models.Block, 0, len(blockages))
@@ -250,7 +250,7 @@ func (a App) SelectBlockages(
 		res = append(res, el)
 	}
 
-	return res, pagination.Response{
+	return res, pagi.Response{
 		Total: count,
 		Page:  pag.Page,
 		Size:  limit,

@@ -12,7 +12,7 @@ import (
 	"github.com/chains-lab/distributors-svc/internal/app"
 	"github.com/chains-lab/distributors-svc/internal/config"
 	"github.com/chains-lab/distributors-svc/internal/dbx"
-	"github.com/chains-lab/distributors-svc/pkg/logger"
+	"github.com/chains-lab/logium"
 	"github.com/sirupsen/logrus"
 )
 
@@ -22,7 +22,7 @@ func Run(args []string) bool {
 		logrus.Fatalf("failed to load config: %v", err)
 	}
 
-	log := logger.NewLogger(cfg)
+	log := logium.NewLogger(cfg.Server.Log.Level, cfg.Server.Log.Format)
 	log.Info("Starting server...")
 
 	var (
