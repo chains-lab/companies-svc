@@ -1,0 +1,15 @@
+type: object
+required:
+  - id
+  - type
+  - attributes
+properties:
+  id:
+    type: string
+    format: uuid
+    description: "employee invite id"
+  type:
+    type: string
+    enum: [ employee_invite ]
+  attributes:
+    $ref: './EmployeeInviteAttributes.yaml'

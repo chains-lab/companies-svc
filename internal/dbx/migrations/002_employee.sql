@@ -28,7 +28,7 @@ CREATE TABLE "employee_invites" (
     "invited_by"      UUID           NOT NULL,
     "role"            employee_roles NOT NULL,
     "status"          invite_status  NOT NULL DEFAULT 'sent',
-    "answered_at"     TIMESTAMP      NULL,
+    "answered_at"     TIMESTAMP,
     "created_at"      TIMESTAMP      NOT NULL
 
     CHECK (

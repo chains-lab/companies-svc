@@ -1,0 +1,15 @@
+type: object
+required:
+  - id
+  - type
+  - attributes
+properties:
+  id:
+    type: string
+    format: uuid
+    description: "distributor id"
+  type:
+    type: string
+    enum: [ distributor ]
+  attributes:
+    $ref: './DistributorAttributes.yaml'

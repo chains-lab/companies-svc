@@ -3,6 +3,7 @@ package meta
 type ctxKey int
 
 const (
-	RequestIDCtxKey ctxKey = iota
+	LogCtxKey ctxKey = iota
+	RequestIDCtxKey
 	UserCtxKey
 )

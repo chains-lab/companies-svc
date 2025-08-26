@@ -1,0 +1,38 @@
+openapi: 3.0.0
+info:
+  title: Cifra SSO REST API
+  description: SSO REST API for Cifra app
+  version: 0.0.1
+
+paths:
+  /test:
+    post:
+      tags:
+        - Test
+      description: Test
+      responses:
+        '201':
+          description: successfully
+#  /re-news/sso/v1/public/google/login:
+#    $ref: './paths/Login.yaml'
+#  /re-news/sso/v1/public/refresh:
+#    $ref: './paths/Refresh.yaml'
+#  /re-news/sso/v1/public/account:
+#    $ref: './paths/Account.yaml'
+#  /re-news/sso/v1/public/sessions:
+#    $ref: './paths/Sessions.yaml'
+#  /re-news/sso/v1/public/sessions/{session_id}:
+#    $ref: './paths/Session.yaml'
+#  /re-news/sso/v1/private/account/{account_id}:
+#    $ref: './paths/AccountGetById.yaml'
+#  /re-news/sso/v1/private/accounts/{account_id}/{role}:
+#    $ref: './paths/AccountRole.yaml'
+#  /re-news/sso/v1/private/accounts/{account_id}/sessions:
+#    $ref: './paths/AdminGetSessions.yaml'
+#  /re-news/sso/v1/private/accounts/{account_id}/sessions/{session_id}:
+#    $ref: './paths/AdminGetSession.yaml'
+
+components:
+  schemas:
+    Errors:
+      $ref: './spec/components/schemas/Errors.yaml'

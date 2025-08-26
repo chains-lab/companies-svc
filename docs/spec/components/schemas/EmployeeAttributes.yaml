@@ -1,0 +1,22 @@
+type: object
+required:
+  - distributor_id
+  - role
+  - created_at
+  - updated_at
+properties:
+    distributor_id:
+        type: string
+        format: uuid
+        description: "The unique identifier for the distributor associated with the employee."
+    role:
+        type: string
+        description: "The role of the employee within the distributor's organization (e.g., manager, staff)."
+    created_at:
+        type: string
+        format: date-time
+        description: "The timestamp when the employee record was created."
+    updated_at:
+        type: string
+        format: date-time
+        description: "The timestamp when the employee record was last updated."

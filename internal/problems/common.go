@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/chains-lab/distributors-svc/internal/config/constant"
-	"github.com/chains-lab/svc-errors/ape"
+	"github.com/chains-lab/distributors-svc/pkg/ape"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

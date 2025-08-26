@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/chains-lab/distributors-svc/internal/config/constant"
-	"github.com/chains-lab/svc-errors/ape"
+	"github.com/chains-lab/distributors-svc/pkg/ape"
 	"github.com/google/uuid"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
