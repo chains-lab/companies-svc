@@ -1,29 +1,53 @@
 package handlers
 
 import (
-	"context"
+	"errors"
+	"net/http"
 
-	disProto "github.com/chains-lab/distributors-proto/gen/go/svc/distributor"
-	"github.com/chains-lab/distributors-svc/internal/api/grpc/meta"
-	"github.com/chains-lab/distributors-svc/internal/api/grpc/responses"
+	"github.com/chains-lab/ape"
+	"github.com/chains-lab/ape/problems"
+	"github.com/chains-lab/distributors-svc/internal/api/rest/meta"
+	"github.com/chains-lab/distributors-svc/internal/api/rest/requests"
+	"github.com/chains-lab/distributors-svc/internal/api/rest/responses"
+	"github.com/chains-lab/distributors-svc/internal/errx"
 )
 
-func (s Service) CreateDistributor(ctx context.Context, req *disProto.CreateDistributorRequest) (*disProto.Distributor, error) {
-	initiator, err := meta.User(ctx)
+func (s Service) CreateDistributor(w http.ResponseWriter, r *http.Request) {
+	initiator, err := meta.User(r.Context())
 	if err != nil {
-		s.Log(ctx).WithError(err).Error("failed to get user from context")
+		s.Log(r).WithError(err).Error("failed to get user from context")
 
-		return nil, err
+		ape.RenderErr(w, problems.Unauthorized("failed to get user from context"))
+		return
 	}
 
-	distributor, err := s.app.CreateDistributor(ctx, initiator.ID, req.Name)
+	req, err := requests.CreateDistributor(r)
 	if err != nil {
-		s.Log(ctx).WithError(err).Errorf("failed to create distributor")
+		s.Log(r).WithError(err).Errorf("invalid create distributor request")
 
-		return nil, err
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
 	}
 
-	s.Log(ctx).Infof("distributor %s created successfully", distributor.ID)
+	distributor, err := s.app.CreateDistributor(
+		r.Context(),
+		initiator.ID,
+		req.Data.Attributes.Name,
+		req.Data.Attributes.Icon,
+	)
+	if err != nil {
+		s.Log(r).WithError(err).Errorf("failed to create distributor")
 
-	return responses.Distributor(distributor), nil
+		switch {
+		case errors.Is(err, errx.InitiatorIsAlreadyEmployee):
+			ape.RenderErr(w, problems.Conflict("Current employee can not create distributor"))
+		default:
+			ape.RenderErr(w, problems.InternalError())
+		}
+		return
+	}
+
+	s.Log(r).Infof("distributor %s created successfully", distributor.ID)
+
+	ape.Render(w, http.StatusCreated, responses.Distributor(distributor))
 }

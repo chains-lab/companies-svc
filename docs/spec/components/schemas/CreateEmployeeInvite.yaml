@@ -1,0 +1,32 @@
+type: object
+required:
+  - data
+properties:
+  data:
+    type: object
+    required:
+      - type
+      - attributes
+    properties:
+      type:
+        type: string
+        enum: [ send_employee_invite ]
+      attributes:
+        type: object
+        required:
+          - distributor_id
+          - user_id
+          - role
+        properties:
+          distributor_id:
+            type: string
+            format: uuid
+            description: The UUID of the distributor to which the user is being invited.
+          user_id:
+            type: string
+            format: uuid
+            description: The UUID of the user being invited.
+          role:
+            type: string
+            description: The role assigned to the invited user within the distributor.
+            enum: [ admin, member ]

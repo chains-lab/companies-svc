@@ -1,0 +1,26 @@
+type: object
+required:
+  - data
+properties:
+  data:
+    type: object
+    required:
+      - type
+      - attributes
+    properties:
+      type:
+        type: string
+        enum: [ block_distributor ]
+      attributes:
+        type: object
+        required:
+          - distributor_id
+          - reason
+        properties:
+          distributor_id:
+            type: string
+            format: uuid
+            description: The UUID of the distributor to be blocked.
+          reason:
+            type: string
+            description: The reason for blocking the distributor.

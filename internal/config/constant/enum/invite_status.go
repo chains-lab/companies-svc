@@ -18,14 +18,14 @@ var InviteStatuses = []string{
 
 var ErrorInviteStatusNotSupported = fmt.Errorf("invite status not supported, must be one of: %v", GetAllInviteStatuses())
 
-func ParseInviteStatus(status string) (string, error) {
+func ParseInviteStatus(status string) error {
 	for _, s := range InviteStatuses {
 		if s == status {
-			return s, nil
+			return nil
 		}
 	}
 
-	return "", fmt.Errorf("'%s', %w", status, ErrorInviteStatusNotSupported)
+	return fmt.Errorf("'%s', %w", status, ErrorInviteStatusNotSupported)
 }
 
 func GetAllInviteStatuses() []string {

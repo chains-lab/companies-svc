@@ -193,15 +193,15 @@ func (q BlockQ) FilterID(id uuid.UUID) BlockQ {
 	return q.applyConditions(sq.Eq{"id": id})
 }
 
-func (q BlockQ) FilterDistributorID(distributorID uuid.UUID) BlockQ {
+func (q BlockQ) FilterDistributorID(distributorID ...uuid.UUID) BlockQ {
 	return q.applyConditions(sq.Eq{"distributor_id": distributorID})
 }
 
-func (q BlockQ) FilterInitiatorID(initiatorID uuid.UUID) BlockQ {
+func (q BlockQ) FilterInitiatorID(initiatorID ...uuid.UUID) BlockQ {
 	return q.applyConditions(sq.Eq{"initiator_id": initiatorID})
 }
 
-func (q BlockQ) FilterStatus(status string) BlockQ {
+func (q BlockQ) FilterStatus(status ...string) BlockQ {
 	return q.applyConditions(sq.Eq{"status": status})
 }
 

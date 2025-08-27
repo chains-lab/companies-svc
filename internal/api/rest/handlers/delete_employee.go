@@ -1,42 +1,60 @@
 package handlers
 
 import (
-	"context"
+	"errors"
+	"net/http"
 
-	empProto "github.com/chains-lab/distributors-proto/gen/go/svc/employee"
-	"github.com/chains-lab/distributors-svc/internal/api/grpc/meta"
-	"github.com/chains-lab/distributors-svc/internal/api/grpc/requests"
-	"google.golang.org/protobuf/types/known/emptypb"
+	"github.com/chains-lab/ape"
+	"github.com/chains-lab/ape/problems"
+	"github.com/chains-lab/distributors-svc/internal/api/rest/meta"
+	"github.com/chains-lab/distributors-svc/internal/errx"
+	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 )
 
-func (s Service) DeleteEmployee(ctx context.Context, req *empProto.DeleteEmployeeRequest) (*emptypb.Empty, error) {
-	initiator, err := meta.User(ctx)
+func (s Service) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
+	initiator, err := meta.User(r.Context())
 	if err != nil {
-		s.Log(ctx).WithError(err).Error("failed to get user from context")
-		return nil, err
+		s.Log(r).WithError(err).Error("failed to get user from context")
+
+		ape.RenderErr(w, problems.BadRequest(err)...)
+		return
 	}
 
-	userID, err := requests.UserID(ctx, req.UserId)
+	userID, err := uuid.Parse(chi.URLParam(r, "user_id"))
 	if err != nil {
-		s.Log(ctx).WithError(err).Errorf("invalid user ID format: %s", req.UserId)
+		s.Log(r).WithError(err).Errorf("invalid user ID format")
 
-		return nil, err
+		ape.RenderErr(w, problems.InvalidParameter("user_id", err))
+		return
 	}
 
-	distributorID, err := requests.DistributorID(ctx, req.DistributorId)
+	distributorID, err := uuid.Parse(chi.URLParam(r, "distributor_id"))
 	if err != nil {
-		s.Log(ctx).WithError(err).Errorf("invalid distributor ID format: %s", req.DistributorId)
+		s.Log(r).WithError(err).Errorf("invalid distributor ID format")
 
-		return nil, err
+		ape.RenderErr(w, problems.InvalidParameter("distributor_id", err))
+		return
 	}
 
-	err = s.app.DeleteEmployee(ctx, initiator.ID, userID, distributorID)
+	err = s.app.DeleteEmployee(r.Context(), initiator.ID, userID, distributorID)
 	if err != nil {
-		s.Log(ctx).WithError(err).Errorf("failed to delete employee with user_id: %s", userID)
-		return nil, err
+		s.Log(r).WithError(err).Errorf("failed to delete employee with user_id: %s", userID)
+		switch {
+		case errors.Is(err, errx.InitiatorEmployeeHaveNotEnoughRights):
+			ape.RenderErr(w, problems.Forbidden("initiator employee have not enough rights"))
+		case errors.Is(err, errx.DistributorNotFound):
+			ape.RenderErr(w, problems.NotFound("distributor not found"))
+		case errors.Is(err, errx.EmployeeNotFound):
+			ape.RenderErr(w, problems.NotFound("employee not found"))
+		default:
+			ape.RenderErr(w, problems.InternalError())
+		}
+
+		return
 	}
 
-	s.Log(ctx).Infof("employee %s deleted successfully", userID)
+	s.Log(r).Infof("employee %s deleted successfully", userID)
 
-	return &emptypb.Empty{}, nil
+	return
 }

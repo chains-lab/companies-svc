@@ -1,27 +1,37 @@
 package handlers
 
 import (
-	"context"
+	"errors"
+	"net/http"
 
-	disProto "github.com/chains-lab/distributors-proto/gen/go/svc/distributor"
-	"github.com/chains-lab/distributors-svc/internal/api/grpc/requests"
-	"github.com/chains-lab/distributors-svc/internal/api/grpc/responses"
+	"github.com/chains-lab/ape"
+	"github.com/chains-lab/ape/problems"
+	"github.com/chains-lab/distributors-svc/internal/errx"
+	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 )
 
-func (s Service) GetDistributor(ctx context.Context, req *disProto.GetDistributorRequest) (*disProto.Distributor, error) {
-	distributorID, err := requests.DistributorID(ctx, req.DistributorId)
+func (s Service) GetDistributor(w http.ResponseWriter, r *http.Request) {
+	distributorID, err := uuid.Parse(chi.URLParam(r, "distributor_id"))
 	if err != nil {
-		s.Log(ctx).WithError(err).Errorf("invalid distributor ID format: %s", req.DistributorId)
+		s.Log(r).WithError(err).Errorf("invalid distributor ID format")
 
-		return nil, err
+		ape.RenderErr(w, problems.InvalidParameter("distributor_id", err))
+		return
 	}
 
-	distributor, err := s.app.GetDistributor(ctx, distributorID)
+	distributor, err := s.app.GetDistributor(r.Context(), distributorID)
 	if err != nil {
-		s.Log(ctx).WithError(err).Errorf("failed to get distributor with ID: %s", distributorID)
+		s.Log(r).WithError(err).Error("failed to get distributor")
 
-		return nil, err
+		switch {
+		case errors.Is(err, errx.DistributorNotFound):
+			ape.RenderErr(w, problems.NotFound("Distributor not found"))
+		default:
+			ape.RenderErr(w, problems.InternalError())
+		}
+		return
 	}
 
-	return responses.Distributor(distributor), nil
+	ape.Render(w, http.StatusOK, distributor)
 }

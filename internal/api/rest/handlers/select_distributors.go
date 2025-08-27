@@ -1,39 +1,49 @@
 package handlers
 
 import (
-	"context"
+	"net/http"
+	"strings"
 
-	disProto "github.com/chains-lab/distributors-proto/gen/go/svc/distributor"
-	"github.com/chains-lab/distributors-svc/internal/api/grpc/requests"
-	"github.com/chains-lab/distributors-svc/internal/api/grpc/responses"
+	"github.com/chains-lab/ape"
+	"github.com/chains-lab/ape/problems"
+	"github.com/chains-lab/distributors-svc/internal/api/rest/responses"
+	"github.com/chains-lab/distributors-svc/internal/app"
+	"github.com/chains-lab/distributors-svc/internal/config/constant/enum"
 	"github.com/chains-lab/pagi"
 )
 
-func (s Service) SelectDistributors(ctx context.Context, req *disProto.SelectDistributorsRequest) (*disProto.DistributorsList, error) {
-	filters := map[string]any{}
-	if req.Filters.Status != nil {
-		res, err := requests.DistributorStatus(ctx, *req.Filters.Status)
-		if err != nil {
-			s.Log(ctx).WithError(err).Errorf("invalid distributor status: %s", *req.Filters.Status)
+func (s Service) SelectDistributors(w http.ResponseWriter, r *http.Request) {
+	filters := app.SelectDistributorsParams{}
+	q := r.URL.Query()
 
-			return nil, err
+	if sts := q["status"]; len(sts) > 0 {
+		filters.Statuses = make([]string, 0, len(sts))
+		for _, raw := range sts {
+			v := strings.TrimSpace(raw)
+			if err := enum.ParseDistributorStatus(v); err != nil {
+				s.Log(r).WithError(err).Errorf("invalid distributor status format: %s", raw)
+				ape.RenderErr(w, problems.InvalidParameter("status", err))
+				return
+			}
+			filters.Statuses = append(filters.Statuses, v)
 		}
-
-		filters["status"] = res
-	}
-	if req.Filters.NameLike != nil {
-		filters["name"] = req.Filters.NameLike
 	}
 
-	distributors, pag, err := s.app.SelectDistributors(ctx, filters, pagi.Request{
-		Page: req.Pagination.Page,
-		Size: req.Pagination.Size,
-	})
+	if name := strings.TrimSpace(q.Get("name")); name != "" {
+		filters.Name = &name
+	}
+
+	pagReq, sort := pagi.GetPagination(r)
+
+	distributors, pag, err := s.app.SelectDistributors(r.Context(), filters, pagReq, sort)
 	if err != nil {
-		s.Log(ctx).WithError(err).Error("failed to select distributors")
+		s.Log(r).WithError(err).Error("failed to select distributors")
 
-		return nil, err
+		switch {
+		default:
+			ape.RenderErr(w, problems.InternalError())
+		}
 	}
 
-	return responses.DistributorsList(distributors, pag), nil
+	ape.Render(w, http.StatusOK, responses.DistributorCollection(distributors, pag))
 }

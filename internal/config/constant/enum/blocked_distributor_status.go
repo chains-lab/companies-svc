@@ -14,14 +14,14 @@ var BlockStatuses = []string{
 
 var ErrorBlockStatusNotSupported = fmt.Errorf("block distributor status must be one of: %s", GetAllBlockStatuses())
 
-func ParseBlockStatus(status string) (string, error) {
+func ParseBlockStatus(status string) error {
 	for _, s := range BlockStatuses {
 		if s == status {
-			return s, nil
+			return nil
 		}
 	}
 
-	return "", fmt.Errorf("'%s', %w", status, ErrorBlockStatusNotSupported)
+	return fmt.Errorf("'%s', %w", status, ErrorBlockStatusNotSupported)
 }
 
 func GetAllBlockStatuses() []string {

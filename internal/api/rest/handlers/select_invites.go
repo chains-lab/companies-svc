@@ -1,86 +1,91 @@
 package handlers
 
 import (
-	"context"
+	"net/http"
 
-	empProto "github.com/chains-lab/distributors-proto/gen/go/svc/employee"
-	"github.com/chains-lab/distributors-svc/internal/api/grpc/requests"
-	"github.com/chains-lab/distributors-svc/internal/api/grpc/responses"
+	"github.com/chains-lab/ape"
+	"github.com/chains-lab/ape/problems"
+	"github.com/chains-lab/distributors-svc/internal/api/rest/responses"
+	"github.com/chains-lab/distributors-svc/internal/app"
+	"github.com/chains-lab/distributors-svc/internal/config/constant/enum"
 	"github.com/chains-lab/pagi"
+	"github.com/google/uuid"
 )
 
-func (s Service) SelectInvites(ctx context.Context, req *empProto.SelectInvitesRequest) (*empProto.InvitesList, error) {
-	filters := map[string]any{}
+func (s Service) SelectInvites(w http.ResponseWriter, r *http.Request) {
+	filters := app.SelectInvitesParams{}
+	q := r.URL.Query()
 
-	if req.Filters.DistributorId != nil {
-		distributorID, err := requests.DistributorID(ctx, *req.Filters.DistributorId)
-		if err != nil {
-			s.Log(ctx).WithError(err).Errorf("invalid distributor ID format: %s", *req.Filters.DistributorId)
-
-			return nil, err
+	if ids := q["distributor_id"]; len(ids) > 0 {
+		for _, idStr := range ids {
+			id, err := uuid.Parse(idStr)
+			if err != nil {
+				s.Log(r).WithError(err).Errorf("invalid distributor ID format: %s", idStr)
+				ape.RenderErr(w, problems.InvalidParameter("distributor_id", err))
+				return
+			}
+			filters.Distributors = append(filters.Distributors, id)
 		}
-
-		filters["distributor_id"] = distributorID
 	}
-	if req.Filters.UserId != nil {
-		userID, err := requests.UserID(ctx, *req.Filters.UserId)
-		if err != nil {
-			s.Log(ctx).WithError(err).Errorf("invalid user ID format: %s", *req.Filters.UserId)
 
-			return nil, err
+	if ids := q["user_id"]; len(ids) > 0 {
+		for _, idStr := range ids {
+			id, err := uuid.Parse(idStr)
+			if err != nil {
+				s.Log(r).WithError(err).Errorf("invalid user ID format: %s", idStr)
+				ape.RenderErr(w, problems.InvalidParameter("user_id", err))
+				return
+			}
+			filters.ForUsers = append(filters.ForUsers, id)
 		}
-
-		filters["user_id"] = userID
 	}
-	if req.Filters.InvitedBy != nil {
-		invitedByID, err := requests.InviteID(ctx, *req.Filters.InvitedBy)
-		if err != nil {
-			s.Log(ctx).WithError(err).Error("invalid invited by ID format")
 
-			return nil, err
+	if ids := q["invited_by"]; len(ids) > 0 {
+		for _, idStr := range ids {
+			id, err := uuid.Parse(idStr)
+			if err != nil {
+				s.Log(r).WithError(err).Errorf("invalid invited_by format: %s", idStr)
+				ape.RenderErr(w, problems.InvalidParameter("invited_by", err))
+				return
+			}
+			filters.Inviters = append(filters.Inviters, id)
 		}
-
-		filters["invited_by"] = invitedByID
 	}
-	if req.Filters.Status != nil {
-		status, err := requests.InviteStatus(ctx, *req.Filters.Status)
-		if err != nil {
-			s.Log(ctx).WithError(err).Error("invalid invite status")
 
-			return nil, err
+	if sts := q["status"]; len(sts) > 0 {
+		for _, st := range sts {
+			if err := enum.ParseInviteStatus(st); err != nil {
+				s.Log(r).WithError(err).Errorf("invalid invite status: %s", st)
+				ape.RenderErr(w, problems.InvalidParameter("status", err))
+				return
+			}
+			filters.Statuses = append(filters.Statuses, st)
 		}
-
-		filters["status"] = status
 	}
-	if req.Filters.Role != nil {
-		role, err := requests.EmployeeRole(ctx, *req.Filters.Role)
-		if err != nil {
-			s.Log(ctx).WithError(err).Error("invalid employee role")
 
-			return nil, err
+	if roles := q["role"]; len(roles) > 0 {
+		for _, role := range roles {
+			if err := enum.ParseEmployeeRole(role); err != nil {
+				s.Log(r).WithError(err).Errorf("invalid role: %s", role)
+				ape.RenderErr(w, problems.InvalidParameter("role", err))
+				return
+			}
+			filters.Roles = append(filters.Roles, role)
 		}
-
-		filters["role"] = role
 	}
 
-	ascend := true
+	pagReq, sort := pagi.GetPagination(r)
 
-	switch req.Sort.(type) {
-	case *empProto.SelectInvitesRequest_SendAtAscend:
-		ascend = true
-	case *empProto.SelectInvitesRequest_SendAtDescend:
-		ascend = false
-	}
-
-	invites, pag, err := s.app.SelectInvites(ctx, filters, ascend, pagi.Request{
-		Page: req.Pagination.Page,
-		Size: req.Pagination.Size,
-	})
+	invites, pag, err := s.app.SelectInvites(r.Context(), filters, pagReq, sort)
 	if err != nil {
-		s.Log(ctx).WithError(err).Error("failed to select invites")
+		s.Log(r).WithError(err).Error("failed to select invites")
 
-		return nil, err
+		switch {
+		default:
+			ape.RenderErr(w, problems.InternalError())
+		}
+		return
 	}
 
-	return responses.EmployeeInvitesList(invites, pag), nil
+	ape.Render(w, http.StatusOK, responses.EmployeeInvitesCollection(invites, pag))
 }

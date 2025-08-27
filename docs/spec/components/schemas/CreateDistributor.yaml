@@ -1,0 +1,26 @@
+type: object
+required:
+  - data
+properties:
+  data:
+    type: object
+    required:
+      - type
+      - attributes
+    properties:
+      type:
+        type: string
+        enum: [ create_distributor ]
+      attributes:
+        type: object
+        required:
+          - icon
+          - name
+        properties:
+          icon:
+            type: string
+            format: uri
+            description: URL to the distributor's icon image.
+          name:
+            type: string
+            description: The name of the distributor.

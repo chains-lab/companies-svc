@@ -1,58 +1,59 @@
 package handlers
 
 import (
-	"context"
-	"fmt"
+	"net/http"
+	"strings"
 
-	empProto "github.com/chains-lab/distributors-proto/gen/go/svc/employee"
-	"github.com/chains-lab/distributors-svc/internal/api/grpc/requests"
-	"github.com/chains-lab/distributors-svc/internal/api/grpc/responses"
-	"github.com/chains-lab/distributors-svc/internal/problems"
+	"github.com/chains-lab/ape"
+	"github.com/chains-lab/ape/problems"
+	"github.com/chains-lab/distributors-svc/internal/api/rest/responses"
+	"github.com/chains-lab/distributors-svc/internal/app"
+	"github.com/chains-lab/distributors-svc/internal/config/constant/enum"
 	"github.com/chains-lab/pagi"
+	"github.com/google/uuid"
 )
 
-func (s Service) SelectEmployees(ctx context.Context, req *empProto.SelectEmployeesRequest) (*empProto.EmployeesList, error) {
-	filters := map[string]any{}
+func (s Service) SelectEmployees(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	filters := app.SelectEmployeesParams{}
 
-	if req.Filters.DistributorId != nil {
-		distributorID, err := requests.DistributorID(ctx, *req.Filters.DistributorId)
-		if err != nil {
-			s.Log(ctx).WithError(err).Errorf("invalid distributor ID format: %s", *req.Filters.DistributorId)
-
-			return nil, err
+	if ids := q["distributor_id"]; len(ids) > 0 {
+		filters.Distributors = make([]uuid.UUID, 0, len(ids))
+		for _, raw := range ids {
+			v, err := uuid.Parse(strings.TrimSpace(raw))
+			if err != nil {
+				s.Log(r).WithError(err).Errorf("invalid distributor ID format: %s", raw)
+				ape.RenderErr(w, problems.InvalidParameter("distributor_id", err))
+				return
+			}
+			filters.Distributors = append(filters.Distributors, v)
 		}
-
-		filters["distributor_id"] = distributorID
 	}
-	if req.Filters.Role != nil {
-		role, err := requests.EmployeeRole(ctx, *req.Filters.Role)
-		if err != nil {
-			s.Log(ctx).WithError(err).Errorf("invalid employee role: %s", *req.Filters.Role)
 
-			return nil, err
+	if roles := q["role"]; len(roles) > 0 {
+		filters.Roles = make([]string, 0, len(roles))
+		for _, raw := range roles {
+			if err := enum.ParseEmployeeRole(raw); err != nil {
+				s.Log(r).WithError(err).Errorf("invalid role format: %s", raw)
+				ape.RenderErr(w, problems.InvalidParameter("role", err))
+				return
+			}
+			filters.Roles = append(filters.Roles, raw)
 		}
-
-		filters["role"] = role
 	}
 
-	ascend := true
+	pagReq, sort := pagi.GetPagination(r)
 
-	switch req.Sort.(type) {
-	case *empProto.SelectEmployeesRequest_RolesAscend:
-		ascend = true
-	case *empProto.SelectEmployeesRequest_RolesDescend:
-		ascend = false
-	}
-
-	employees, pag, err := s.app.SelectEmployees(ctx, filters, ascend, pagi.Request{
-		Page: req.Pagination.Page,
-		Size: req.Pagination.Size,
-	})
+	employees, pag, err := s.app.SelectEmployees(r.Context(), filters, pagReq, sort)
 	if err != nil {
-		s.Log(ctx).WithError(err).Error("failed to select employees")
+		s.Log(r).WithError(err).Error("failed to select employees")
 
-		return nil, problems.RaiseInternal(ctx, fmt.Errorf("selecting employees: %w", err))
+		switch {
+		default:
+			ape.RenderErr(w, problems.InternalError())
+		}
+		return
 	}
 
-	return responses.EmployeesList(employees, pag), nil
+	ape.Render(w, http.StatusOK, responses.EmployeeCollection(employees, pag))
 }

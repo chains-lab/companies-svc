@@ -185,23 +185,30 @@ func (q InviteQ) FilterID(id uuid.UUID) InviteQ {
 	return q.applyConditions(sq.Eq{"id": id})
 }
 
-func (q InviteQ) FilterDistributorID(distributorID uuid.UUID) InviteQ {
-	return q.applyConditions(sq.Eq{"distributor_id": distributorID})
+func (q InviteQ) FilterDistributorID(ids ...uuid.UUID) InviteQ {
+	if len(ids) == 0 {
+		return q // ничего не добавляем
+	}
+	vals := make([]any, len(ids))
+	for i, id := range ids {
+		vals[i] = id
+	}
+	return q.applyConditions(sq.Eq{"distributor_id": ids})
 }
 
-func (q InviteQ) FilterUserID(userID uuid.UUID) InviteQ {
+func (q InviteQ) FilterUserID(userID ...uuid.UUID) InviteQ {
 	return q.applyConditions(sq.Eq{"user_id": userID})
 }
 
-func (q InviteQ) FilterInvitedBy(userID uuid.UUID) InviteQ {
+func (q InviteQ) FilterInvitedBy(userID ...uuid.UUID) InviteQ {
 	return q.applyConditions(sq.Eq{"invited_by": userID})
 }
 
-func (q InviteQ) FilterRole(role string) InviteQ {
+func (q InviteQ) FilterRole(role ...string) InviteQ {
 	return q.applyConditions(sq.Eq{"role": role})
 }
 
-func (q InviteQ) FilterStatus(status string) InviteQ {
+func (q InviteQ) FilterStatus(status ...string) InviteQ {
 	return q.applyConditions(sq.Eq{"status": status})
 }
 

@@ -186,11 +186,11 @@ func (q EmployeeQ) FilterUserID(userID uuid.UUID) EmployeeQ {
 	return q.applyConditions(sq.Eq{"user_id": userID})
 }
 
-func (q EmployeeQ) FilterDistributorID(distributorID uuid.UUID) EmployeeQ {
+func (q EmployeeQ) FilterDistributorID(distributorID ...uuid.UUID) EmployeeQ {
 	return q.applyConditions(sq.Eq{"distributor_id": distributorID})
 }
 
-func (q EmployeeQ) FilterRole(role string) EmployeeQ {
+func (q EmployeeQ) FilterRole(role ...string) EmployeeQ {
 	return q.applyConditions(sq.Eq{"role": role})
 }
 

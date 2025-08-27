@@ -194,7 +194,7 @@ func (q DistributorsQ) FilterID(id uuid.UUID) DistributorsQ {
 	return q.applyConditions(sq.Eq{"id": id})
 }
 
-func (q DistributorsQ) FilterStatus(status string) DistributorsQ {
+func (q DistributorsQ) FilterStatus(status ...string) DistributorsQ {
 	return q.applyConditions(sq.Eq{"status": status})
 }
 
@@ -227,6 +227,15 @@ func (q DistributorsQ) Page(limit, offset uint64) DistributorsQ {
 	q.selector = q.selector.Limit(limit).Offset(offset)
 	q.counter = q.counter.Limit(limit).Offset(offset)
 
+	return q
+}
+
+func (q DistributorsQ) OrderByName(ascend bool) DistributorsQ {
+	if ascend {
+		q.selector = q.selector.OrderBy("name ASC")
+	} else {
+		q.selector = q.selector.OrderBy("name DESC")
+	}
 	return q
 }
 

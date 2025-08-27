@@ -12,4 +12,4 @@ properties:
     type: string
     enum: [ employee ]
   attributes:
-    $ref: './Employee.yaml'
+    $ref: './EmployeeAttributes.yaml'

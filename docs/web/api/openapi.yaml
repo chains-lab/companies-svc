@@ -16,6 +16,63 @@ paths:
       - Test
 components:
   schemas:
+    CreateDistributor:
+      properties:
+        data:
+          $ref: '#/components/schemas/CreateDistributor_data'
+      required:
+      - data
+      type: object
+    CreateDistributorBlock:
+      properties:
+        data:
+          $ref: '#/components/schemas/CreateDistributorBlock_data'
+      required:
+      - data
+      type: object
+    CreateEmployeeInvite:
+      properties:
+        data:
+          $ref: '#/components/schemas/CreateEmployeeInvite_data'
+      required:
+      - data
+      type: object
+    UpdateEmployee:
+      properties:
+        data:
+          $ref: '#/components/schemas/UpdateEmployee_data'
+      required:
+      - data
+      type: object
+    UpdateDistributor:
+      properties:
+        data:
+          $ref: '#/components/schemas/UpdateDistributor_data'
+      required:
+      - data
+      type: object
+    PaginationData:
+      properties:
+        page_number:
+          description: The current page number.
+          example: 1
+          format: int64
+          type: integer
+        page_size:
+          description: The number of items per page.
+          example: 10
+          format: int64
+          type: integer
+        total_items:
+          description: The total number of items available.
+          example: 100
+          format: int64
+          type: integer
+      required:
+      - page_number
+      - page_size
+      - total_items
+      type: object
     Errors:
       description: Standard JSON:API error
       properties:
@@ -26,6 +83,418 @@ components:
           type: array
       required:
       - errors
+      type: object
+    Employee:
+      properties:
+        data:
+          $ref: '#/components/schemas/EmployeeData'
+      required:
+      - data
+      type: object
+    EmployeeData:
+      properties:
+        id:
+          description: user id
+          format: uuid
+          type: string
+        type:
+          enum:
+          - employee
+          type: string
+        attributes:
+          $ref: '#/components/schemas/EmployeeAttributes'
+      required:
+      - attributes
+      - id
+      - type
+      type: object
+    EmployeeAttributes:
+      properties:
+        distributor_id:
+          description: The unique identifier for the distributor associated with the
+            employee.
+          format: uuid
+          type: string
+        role:
+          description: "The role of the employee within the distributor's organization\
+            \ (e.g., manager, staff)."
+          type: string
+        created_at:
+          description: The timestamp when the employee record was created.
+          format: date-time
+          type: string
+        updated_at:
+          description: The timestamp when the employee record was last updated.
+          format: date-time
+          type: string
+      required:
+      - created_at
+      - distributor_id
+      - role
+      - updated_at
+      type: object
+    EmployeesCollection:
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/EmployeeData'
+          type: array
+        links:
+          $ref: '#/components/schemas/PaginationData'
+      required:
+      - data
+      - links
+      type: object
+    EmployeeInvite:
+      properties:
+        data:
+          $ref: '#/components/schemas/EmployeeInviteData'
+      required:
+      - data
+      type: object
+    EmployeeInviteData:
+      properties:
+        id:
+          description: employee invite id
+          format: uuid
+          type: string
+        type:
+          enum:
+          - employee_invite
+          type: string
+        attributes:
+          $ref: '#/components/schemas/EmployeeInviteAttributes'
+      required:
+      - attributes
+      - id
+      - type
+      type: object
+    EmployeeInviteAttributes:
+      properties:
+        distributor_id:
+          description: The unique identifier for the distributor associated with the
+            employee invite.
+          format: uuid
+          type: string
+        user_id:
+          description: The unique identifier for the user being invited as an employee.
+          format: uuid
+          type: string
+        invited_by:
+          description: The unique identifier for the user who sent the invitation.
+          format: uuid
+          type: string
+        role:
+          description: "The role of the invited employee within the distributor's\
+            \ organization (e.g., manager, staff)."
+          type: string
+        status:
+          description: The current status of the employee invitation.
+          enum:
+          - pending
+          - accepted
+          - declined
+          type: string
+        answered_at:
+          description: The timestamp when the invitation was responded to (accepted
+            or declined).
+          format: date-time
+          type: string
+        created_at:
+          description: The timestamp when the employee invite was created.
+          format: date-time
+          type: string
+      required:
+      - created_at
+      - distributor_id
+      - invited_by
+      - role
+      - status
+      - user_id
+      type: object
+    EmployeesInvitesCollection:
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/EmployeeInviteData'
+          type: array
+        links:
+          $ref: '#/components/schemas/PaginationData'
+      required:
+      - data
+      - links
+      type: object
+    Distributor:
+      properties:
+        data:
+          $ref: '#/components/schemas/DistributorData'
+      required:
+      - data
+      type: object
+    DistributorData:
+      properties:
+        id:
+          description: distributor id
+          format: uuid
+          type: string
+        type:
+          enum:
+          - distributor
+          type: string
+        attributes:
+          $ref: '#/components/schemas/DistributorAttributes'
+      required:
+      - attributes
+      - id
+      - type
+      type: object
+    DistributorAttributes:
+      properties:
+        icon:
+          description: URL to the distributor's icon image.
+          format: uri
+          type: string
+        name:
+          description: The name of the distributor.
+          type: string
+        status:
+          description: "The current status of the distributor (e.g., active, inactive)."
+          type: string
+        updated_at:
+          description: The timestamp of the last update to the distributor's information.
+          format: date-time
+          type: string
+        created_at:
+          format: date-time
+          type: string
+      required:
+      - created_at
+      - icon
+      - name
+      - status
+      - updated_at
+      type: object
+    DistributorsCollection:
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/DistributorData'
+          type: array
+        links:
+          $ref: '#/components/schemas/PaginationData'
+      required:
+      - data
+      - links
+      type: object
+    DistributorBlock:
+      properties:
+        data:
+          $ref: '#/components/schemas/DistributorBlockData'
+      required:
+      - data
+      type: object
+    DistributorBlockData:
+      properties:
+        id:
+          description: distributor block id
+          format: uuid
+          type: string
+        type:
+          enum:
+          - distributor_block
+          type: string
+        attributes:
+          $ref: '#/components/schemas/DistributorBlockAttributes'
+      required:
+      - attributes
+      - id
+      - type
+      type: object
+    DistributorBlockAttributes:
+      properties:
+        distributor_id:
+          description: ID of the distributor being blocked
+          example: 550e8400-e29b-41d4-a716-446655440000
+          format: uuid
+          type: string
+        initiator_id:
+          description: ID of the user who initiated the block
+          example: 660e8400-e29b-41d4-a716-446655440000
+          format: uuid
+          type: string
+        reason:
+          description: Reason for blocking the distributor
+          example: Violation of terms of service
+          type: string
+        status:
+          description: Current status of the block
+          example: active
+          type: string
+        blocked_at:
+          description: Timestamp when the block was initiated
+          example: 2023-10-01T12:00:00Z
+          format: date-time
+          type: string
+        cancelled_at:
+          description: "Timestamp when the block was lifted, if applicable"
+          example: 2023-10-15T12:00:00Z
+          format: date-time
+          type: string
+      required:
+      - blocked_at
+      - distributor_id
+      - initiator_id
+      - reason
+      - status
+      type: object
+    DistributorBlocksCollection:
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/DistributorBlockData'
+          type: array
+        links:
+          $ref: '#/components/schemas/PaginationData'
+      required:
+      - data
+      - links
+      type: object
+    CreateDistributor_data_attributes:
+      properties:
+        icon:
+          description: URL to the distributor's icon image.
+          format: uri
+          type: string
+        name:
+          description: The name of the distributor.
+          type: string
+      required:
+      - icon
+      - name
+      type: object
+    CreateDistributor_data:
+      properties:
+        type:
+          enum:
+          - create_distributor
+          type: string
+        attributes:
+          $ref: '#/components/schemas/CreateDistributor_data_attributes'
+      required:
+      - attributes
+      - type
+      type: object
+    CreateDistributorBlock_data_attributes:
+      properties:
+        distributor_id:
+          description: The UUID of the distributor to be blocked.
+          format: uuid
+          type: string
+        reason:
+          description: The reason for blocking the distributor.
+          type: string
+      required:
+      - distributor_id
+      - reason
+      type: object
+    CreateDistributorBlock_data:
+      properties:
+        type:
+          enum:
+          - block_distributor
+          type: string
+        attributes:
+          $ref: '#/components/schemas/CreateDistributorBlock_data_attributes'
+      required:
+      - attributes
+      - type
+      type: object
+    CreateEmployeeInvite_data_attributes:
+      properties:
+        distributor_id:
+          description: The UUID of the distributor to which the user is being invited.
+          format: uuid
+          type: string
+        user_id:
+          description: The UUID of the user being invited.
+          format: uuid
+          type: string
+        role:
+          description: The role assigned to the invited user within the distributor.
+          enum:
+          - admin
+          - member
+          type: string
+      required:
+      - distributor_id
+      - role
+      - user_id
+      type: object
+    CreateEmployeeInvite_data:
+      properties:
+        type:
+          enum:
+          - send_employee_invite
+          type: string
+        attributes:
+          $ref: '#/components/schemas/CreateEmployeeInvite_data_attributes'
+      required:
+      - attributes
+      - type
+      type: object
+    UpdateEmployee_data_attributes:
+      properties:
+        role:
+          description: "The role of the employee within the distributor's organization\
+            \ (e.g., manager, staff)."
+          example: manager
+          type: string
+      required:
+      - role
+      type: object
+    UpdateEmployee_data:
+      properties:
+        id:
+          description: The UUID of the employee to be updated.
+          format: uuid
+          type: string
+        type:
+          enum:
+          - update_employee
+          type: string
+        attributes:
+          $ref: '#/components/schemas/UpdateEmployee_data_attributes'
+      required:
+      - attributes
+      - id
+      - type
+      type: object
+    UpdateDistributor_data_attributes:
+      properties:
+        icon:
+          description: URL to the distributor's icon image.
+          format: uri
+          type: string
+        name:
+          description: The name of the distributor.
+          type: string
+      type: object
+    UpdateDistributor_data:
+      properties:
+        id:
+          description: The UUID of the distributor to be updated.
+          format: uuid
+          type: string
+        type:
+          enum:
+          - update_distributor
+          type: string
+        attributes:
+          $ref: '#/components/schemas/UpdateDistributor_data_attributes'
+      required:
+      - attributes
+      - id
+      - type
       type: object
     Errors_errors_inner:
       properties:

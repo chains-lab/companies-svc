@@ -1,27 +1,38 @@
 package handlers
 
 import (
-	"context"
+	"errors"
+	"net/http"
 
-	disProto "github.com/chains-lab/distributors-proto/gen/go/svc/distributor"
-	"github.com/chains-lab/distributors-svc/internal/api/grpc/requests"
-	"github.com/chains-lab/distributors-svc/internal/api/grpc/responses"
+	"github.com/chains-lab/ape"
+	"github.com/chains-lab/ape/problems"
+	"github.com/chains-lab/distributors-svc/internal/api/rest/responses"
+	"github.com/chains-lab/distributors-svc/internal/errx"
+	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 )
 
-func (s Service) GetDistributorBlock(ctx context.Context, req *disProto.GetDistributorBlockRequest) (*disProto.DistributorBlock, error) {
-	blockID, err := requests.BlockID(ctx, req.BlockId)
+func (s Service) GetDistributorBlock(w http.ResponseWriter, r *http.Request) {
+	blockID, err := uuid.Parse(chi.URLParam(r, "block_id"))
 	if err != nil {
-		s.Log(ctx).WithError(err).Errorf("invalid block ID format: %s", req.BlockId)
+		s.Log(r).WithError(err).Errorf("invalid block ID format")
 
-		return nil, err
+		ape.RenderErr(w, problems.InvalidParameter("block_id", err))
+		return
 	}
 
-	block, err := s.app.GetBlock(ctx, blockID)
+	block, err := s.app.GetBlock(r.Context(), blockID)
 	if err != nil {
-		s.Log(ctx).WithError(err).Errorf("failed to get distributor block for ID: %s", blockID)
+		s.Log(r).WithError(err).Errorf("failed to get distributor block for ID: %s", blockID)
 
-		return nil, err
+		switch {
+		case errors.Is(err, errx.DistributorBlockNotFound):
+			ape.RenderErr(w, problems.NotFound("Block not found"))
+		default:
+			ape.RenderErr(w, problems.InternalError())
+		}
 	}
 
-	return responses.Block(block), nil
+	ape.Render(w, http.StatusOK, responses.DistributorBlock(block))
+	return
 }

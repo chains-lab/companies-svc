@@ -16,14 +16,14 @@ var distributorStatuses = []string{
 
 var ErrorDistributorStatusNotSupported = fmt.Errorf("distributor status not supported mus be one of: %v", GetAllDistributorStatuses())
 
-func ParseDistributorStatus(status string) (string, error) {
+func ParseDistributorStatus(status string) error {
 	for _, s := range distributorStatuses {
 		if s == status {
-			return s, nil
+			return nil
 		}
 	}
 
-	return "", fmt.Errorf("'%s', %w", status, ErrorDistributorStatusNotSupported)
+	return fmt.Errorf("'%s', %w", status, ErrorDistributorStatusNotSupported)
 }
 
 func GetAllDistributorStatuses() []string {

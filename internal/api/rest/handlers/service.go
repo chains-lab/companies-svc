@@ -1,21 +1,20 @@
 package handlers
 
 import (
-	"context"
+	"net/http"
 
-	"github.com/chains-lab/distributors-svc/internal/api/rest/meta"
 	"github.com/chains-lab/distributors-svc/internal/app"
 	"github.com/chains-lab/distributors-svc/internal/config"
 	"github.com/chains-lab/logium"
 )
 
 type Service struct {
-	app app.App
+	app *app.App
 	log logium.Logger
 	cfg config.Config
 }
 
-func NewService(cfg config.Config, log logium.Logger, a app.App) Service {
+func NewService(cfg config.Config, log logium.Logger, a *app.App) Service {
 	return Service{
 		app: a,
 		cfg: cfg,
@@ -23,6 +22,6 @@ func NewService(cfg config.Config, log logium.Logger, a app.App) Service {
 	}
 }
 
-func (s Service) Log(ctx context.Context) logium.Logger {
-	return s.log.WithField("request_id", meta.RequestID(ctx))
+func (s Service) Log(r *http.Request) logium.Logger {
+	return s.log
 }

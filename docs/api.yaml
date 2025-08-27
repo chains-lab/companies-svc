@@ -34,5 +34,53 @@ paths:
 
 components:
   schemas:
+    #requests
+    CreateDistributor:
+      $ref: './spec/components/schemas/CreateDistributor.yaml'
+    CreateDistributorBlock:
+      $ref: './spec/components/schemas/CreateDistributorBlock.yaml'
+    CreateEmployeeInvite:
+      $ref: './spec/components/schemas/CreateEmployeeInvite.yaml'
+    UpdateEmployee:
+      $ref: './spec/components/schemas/UpdateEmployee.yaml'
+    UpdateDistributor:
+      $ref: './spec/components/schemas/UpdateDistributor.yaml'
+
+
+    #responses
+    PaginationData:
+      $ref: './spec/components/schemas/PaginationData.yaml'
     Errors:
       $ref: './spec/components/schemas/Errors.yaml'
+    Employee:
+        $ref: './spec/components/schemas/Employee.yaml'
+    EmployeeData:
+        $ref: './spec/components/schemas/EmployeeData.yaml'
+    EmployeeAttributes:
+        $ref: './spec/components/schemas/EmployeeAttributes.yaml'
+    EmployeesCollection:
+        $ref: './spec/components/schemas/EmployeesCollection.yaml'
+    EmployeeInvite:
+        $ref: './spec/components/schemas/EmployeeInvite.yaml'
+    EmployeeInviteData:
+        $ref: './spec/components/schemas/EmployeeInviteData.yaml'
+    EmployeeInviteAttributes:
+        $ref: './spec/components/schemas/EmployeeInviteAttributes.yaml'
+    EmployeesInvitesCollection:
+      $ref: './spec/components/schemas/EmployeeInvitesCollection.yaml'
+    Distributor:
+        $ref: './spec/components/schemas/Distributor.yaml'
+    DistributorData:
+        $ref: './spec/components/schemas/DistributorData.yaml'
+    DistributorAttributes:
+        $ref: './spec/components/schemas/DistributorAttributes.yaml'
+    DistributorsCollection:
+        $ref: './spec/components/schemas/DistributorsCollection.yaml'
+    DistributorBlock:
+        $ref: './spec/components/schemas/DistributorBlock.yaml'
+    DistributorBlockData:
+        $ref: './spec/components/schemas/DistributorBlockData.yaml'
+    DistributorBlockAttributes:
+        $ref: './spec/components/schemas/DistributorBlockAttributes.yaml'
+    DistributorBlocksCollection:
+       $ref: './spec/components/schemas/DistributorBlocksCollection.yaml'

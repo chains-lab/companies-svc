@@ -1,27 +1,39 @@
 package handlers
 
 import (
-	"context"
+	"errors"
+	"net/http"
 
-	empProto "github.com/chains-lab/distributors-proto/gen/go/svc/employee"
-	"github.com/chains-lab/distributors-svc/internal/api/grpc/requests"
-	"github.com/chains-lab/distributors-svc/internal/api/grpc/responses"
+	"github.com/chains-lab/ape"
+	"github.com/chains-lab/ape/problems"
+	"github.com/chains-lab/distributors-svc/internal/api/rest/responses"
+	"github.com/chains-lab/distributors-svc/internal/errx"
+	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 )
 
-func (s Service) GetEmployee(ctx context.Context, req *empProto.GetEmployeeRequest) (*empProto.Employee, error) {
-	userID, err := requests.UserID(ctx, req.UserId)
+func (s Service) GetEmployee(w http.ResponseWriter, r *http.Request) {
+	userID, err := uuid.Parse(chi.URLParam(r, "user_id"))
 	if err != nil {
-		s.Log(ctx).WithError(err).Errorf("invalid user ID format: %s", req.UserId)
+		s.Log(r).WithError(err).Errorf("invalid user ID format")
 
-		return nil, err
+		ape.RenderErr(w, problems.InvalidParameter("user_id", err))
+		return
 	}
 
-	employee, err := s.app.GetEmployee(ctx, userID)
+	employee, err := s.app.GetEmployee(r.Context(), userID)
 	if err != nil {
-		s.Log(ctx).WithError(err).Errorf("failed to get employee for user ID: %s", userID)
+		s.Log(r).WithError(err).Errorf("failed to get employee")
 
-		return nil, err
+		switch {
+		case errors.Is(err, errx.EmployeeNotFound):
+			ape.RenderErr(w, problems.NotFound("Employee not found"))
+		default:
+			ape.RenderErr(w, problems.InternalError())
+		}
+		return
 	}
 
-	return responses.Employee(employee), nil
+	ape.Render(w, http.StatusOK, responses.Employee(employee))
+	return
 }
