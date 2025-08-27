@@ -10,6 +10,8 @@ github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496 h1:zV3ejI06
 github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496/go.mod h1:oGkLhpf+kjZl6xBf758TQhh5XrAeiJv/7FRz/2spLIg=
 github.com/chains-lab/ape v0.4.9 h1:b5YtFotnmFhsLfcQnXy68WfvazH0TB7nCh1sEwBjaxY=
 github.com/chains-lab/ape v0.4.9/go.mod h1:1xFb/pocztb1NW6ghAMJxuez/nausXgnHs+68pCzolI=
+github.com/chains-lab/ape v0.4.10 h1:d1cHoQBYdaj3c6a00nsFdetookyutm37ivXgx3cpf1k=
+github.com/chains-lab/ape v0.4.10/go.mod h1:1xFb/pocztb1NW6ghAMJxuez/nausXgnHs+68pCzolI=
 github.com/chains-lab/distributors-proto v0.1.3 h1:w0v8QQ5iv/lZd5J6+4jSEyHAzCJDnpL45oBVU+Qois8=
 github.com/chains-lab/distributors-proto v0.1.3/go.mod h1:3hsQF5B2L/gsnYndr0bqxyPzmGCYBb/L7GipPs/xiCU=
 github.com/chains-lab/gatekit v0.2.0 h1:h0VmrUqOrR/P1ioRhUq/Co794ig9zMVNGtLCvUXPN9s=

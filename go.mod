@@ -5,7 +5,7 @@ go 1.24.5
 require (
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/alecthomas/kingpin v2.2.6+incompatible
-	github.com/chains-lab/ape v0.4.9
+	github.com/chains-lab/ape v0.4.10
 	github.com/chains-lab/distributors-proto v0.1.3
 	github.com/chains-lab/gatekit v0.2.0
 	github.com/chains-lab/httplab v0.0.2

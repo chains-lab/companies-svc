@@ -37,13 +37,6 @@ components:
       required:
       - data
       type: object
-    UpdateEmployee:
-      properties:
-        data:
-          $ref: '#/components/schemas/UpdateEmployee_data'
-      required:
-      - data
-      type: object
     UpdateDistributor:
       properties:
         data:
@@ -440,33 +433,6 @@ components:
           $ref: '#/components/schemas/CreateEmployeeInvite_data_attributes'
       required:
       - attributes
-      - type
-      type: object
-    UpdateEmployee_data_attributes:
-      properties:
-        role:
-          description: "The role of the employee within the distributor's organization\
-            \ (e.g., manager, staff)."
-          example: manager
-          type: string
-      required:
-      - role
-      type: object
-    UpdateEmployee_data:
-      properties:
-        id:
-          description: The UUID of the employee to be updated.
-          format: uuid
-          type: string
-        type:
-          enum:
-          - update_employee
-          type: string
-        attributes:
-          $ref: '#/components/schemas/UpdateEmployee_data_attributes'
-      required:
-      - attributes
-      - id
       - type
       type: object
     UpdateDistributor_data_attributes:

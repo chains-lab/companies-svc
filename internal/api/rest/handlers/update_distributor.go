@@ -31,7 +31,10 @@ func (s Service) UpdateDistributor(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if req.Data.Id != chi.URLParam(r, "distributor_id") {
-		ape.RenderErr(w, problems.InvalidParameter("distributor_id", fmt.Errorf("path ID and body ID do not match")))
+		ape.RenderErr(w,
+			problems.InvalidParameter("distributor_id", fmt.Errorf("path ID and body ID do not match")),
+			problems.InvalidPointer("/data/id", fmt.Errorf("path ID and body ID do not match")),
+		)
 
 		return
 	}
@@ -40,7 +43,10 @@ func (s Service) UpdateDistributor(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		s.Log(r).WithError(err).Errorf("invalid distributor id: %s", req.Data.Id)
 
-		ape.RenderErr(w, problems.InvalidParameter("id", err))
+		ape.RenderErr(w,
+			problems.InvalidParameter("distributor_id", err),
+			problems.InvalidPointer("/data/id", err),
+		)
 		return
 	}
 

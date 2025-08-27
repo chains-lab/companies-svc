@@ -37,9 +37,6 @@ docs/TestAPI.md
 docs/UpdateDistributor.md
 docs/UpdateDistributorData.md
 docs/UpdateDistributorDataAttributes.md
-docs/UpdateEmployee.md
-docs/UpdateEmployeeData.md
-docs/UpdateEmployeeDataAttributes.md
 git_push.sh
 go.mod
 go.sum
@@ -74,9 +71,6 @@ model_pagination_data.go
 model_update_distributor.go
 model_update_distributor_data.go
 model_update_distributor_data_attributes.go
-model_update_employee.go
-model_update_employee_data.go
-model_update_employee_data_attributes.go
 response.go
 test/api_test__test.go
 utils.go

@@ -41,8 +41,6 @@ components:
       $ref: './spec/components/schemas/CreateDistributorBlock.yaml'
     CreateEmployeeInvite:
       $ref: './spec/components/schemas/CreateEmployeeInvite.yaml'
-    UpdateEmployee:
-      $ref: './spec/components/schemas/UpdateEmployee.yaml'
     UpdateDistributor:
       $ref: './spec/components/schemas/UpdateDistributor.yaml'
 

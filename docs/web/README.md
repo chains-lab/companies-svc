@@ -114,9 +114,6 @@ Class | Method | HTTP request | Description
  - [UpdateDistributor](docs/UpdateDistributor.md)
  - [UpdateDistributorData](docs/UpdateDistributorData.md)
  - [UpdateDistributorDataAttributes](docs/UpdateDistributorDataAttributes.md)
- - [UpdateEmployee](docs/UpdateEmployee.md)
- - [UpdateEmployeeData](docs/UpdateEmployeeData.md)
- - [UpdateEmployeeDataAttributes](docs/UpdateEmployeeDataAttributes.md)
 
 
 ## Documentation For Authorization
