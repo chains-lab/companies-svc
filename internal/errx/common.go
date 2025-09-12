@@ -4,4 +4,4 @@ import (
 	"github.com/chains-lab/ape"
 )
 
-var Internal = ape.DeclareError("INTERNAL_ERROR")
+var ErrorInternal = ape.DeclareError("INTERNAL_ERROR")

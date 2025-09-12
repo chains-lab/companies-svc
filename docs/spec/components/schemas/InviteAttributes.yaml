@@ -1,0 +1,30 @@
+type: object
+required:
+  - status
+  - role
+  - distributor_id
+  - token
+  - expires_at
+  - created_at
+properties:
+  status:
+    type: string
+    description: "status of the invite"
+  role:
+    type: string
+    description: "role of the user in this city"
+  distributor_id:
+    type: string
+    format: uuid
+    description: "distributor id"
+  token:
+    type: string
+    description: "unique token for the invite"
+  expires_at:
+    type: string
+    format: date-time
+    description: "timestamp when the invite will expire"
+  created_at:
+    type: string
+    format: date-time
+    description: "timestamp when the invite was created"

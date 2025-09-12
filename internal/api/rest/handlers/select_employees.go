@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 
@@ -8,14 +9,14 @@ import (
 	"github.com/chains-lab/ape/problems"
 	"github.com/chains-lab/distributors-svc/internal/api/rest/responses"
 	"github.com/chains-lab/distributors-svc/internal/app"
-	"github.com/chains-lab/distributors-svc/internal/config/constant/enum"
+	"github.com/chains-lab/distributors-svc/internal/errx"
 	"github.com/chains-lab/pagi"
 	"github.com/google/uuid"
 )
 
-func (s Service) SelectEmployees(w http.ResponseWriter, r *http.Request) {
+func (s Service) ListEmployees(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
-	filters := app.SelectEmployeesParams{}
+	filters := app.FilterEmployeeList{}
 
 	if ids := q["distributor_id"]; len(ids) > 0 {
 		filters.Distributors = make([]uuid.UUID, 0, len(ids))
@@ -33,22 +34,19 @@ func (s Service) SelectEmployees(w http.ResponseWriter, r *http.Request) {
 	if roles := q["role"]; len(roles) > 0 {
 		filters.Roles = make([]string, 0, len(roles))
 		for _, raw := range roles {
-			if err := enum.ParseEmployeeRole(raw); err != nil {
-				s.Log(r).WithError(err).Errorf("invalid role format: %s", raw)
-				ape.RenderErr(w, problems.InvalidParameter("role", err))
-				return
-			}
 			filters.Roles = append(filters.Roles, raw)
 		}
 	}
 
 	pagReq, sort := pagi.GetPagination(r)
 
-	employees, pag, err := s.app.SelectEmployees(r.Context(), filters, pagReq, sort)
+	employees, pag, err := s.app.ListEmployees(r.Context(), filters, pagReq, sort)
 	if err != nil {
 		s.Log(r).WithError(err).Error("failed to select employees")
 
 		switch {
+		case errors.Is(err, errx.ErrorInvalidEmployeeRole):
+			ape.RenderErr(w, problems.InvalidParameter("role", err))
 		default:
 			ape.RenderErr(w, problems.InternalError())
 		}

@@ -50,7 +50,7 @@ func (s Service) UpdateDistributor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	input := app.UpdateDistributorInput{}
+	input := app.UpdateDistributorParams{}
 	if req.Data.Attributes.Name != nil {
 		input.Name = req.Data.Attributes.Name
 	}

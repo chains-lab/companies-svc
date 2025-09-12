@@ -46,7 +46,7 @@ func (s Service) CreateDistributorBlock(w http.ResponseWriter, r *http.Request) 
 		switch {
 		case errors.Is(err, errx.DistributorHaveAlreadyActiveBlock):
 			ape.RenderErr(w, problems.Conflict("distributor already have active block"))
-		case errors.Is(err, errx.DistributorNotFound):
+		case errors.Is(err, errx.ErrorDistributorNotFound):
 			ape.RenderErr(w, problems.NotFound("distributor not found"))
 		default:
 			ape.RenderErr(w, problems.InternalError())

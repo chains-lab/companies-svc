@@ -1,15 +1,14 @@
 package handlers
 
 import (
-	"fmt"
+	"errors"
 	"net/http"
 
 	"github.com/chains-lab/ape"
 	"github.com/chains-lab/ape/problems"
 	"github.com/chains-lab/distributors-svc/internal/api/rest/meta"
 	"github.com/chains-lab/distributors-svc/internal/api/rest/responses"
-	"github.com/chains-lab/distributors-svc/internal/app/models"
-	"github.com/chains-lab/distributors-svc/internal/config/constant/enum"
+	"github.com/chains-lab/distributors-svc/internal/errx"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 )
@@ -31,43 +30,22 @@ func (s Service) UpdateDistributorStatus(w http.ResponseWriter, r *http.Request)
 	}
 
 	status := chi.URLParam(r, "status")
-	if err := enum.ParseDistributorStatus(status); err != nil {
-		s.Log(r).WithError(err).Errorf("invalid distributor status: %s", status)
 
-		ape.RenderErr(w, problems.InvalidParameter("status", err))
-		return
-	}
+	distributor, err := s.app.SetDistributorStatus(r.Context(), initiator.ID, distributorID, status)
+	if err != nil {
+		s.Log(r).WithError(err).Errorf("failed to set distributor %s status to active", distributorID)
 
-	var distributor models.Distributor
-	switch status {
-	case enum.DistributorStatusActive:
-		distributor, err = s.app.SetDistributorStatusActive(r.Context(), initiator.ID, distributorID)
-		if err != nil {
-			s.Log(r).WithError(err).Errorf("failed to set distributor %s status to active", distributorID)
-
-			switch {
-			default:
-				ape.RenderErr(w, problems.InternalError())
-			}
-			return
+		switch {
+		case errors.Is(err, errx.ErrorInitiatorNotEmployee):
+			ape.RenderErr(w, problems.PreconditionFailed("initiator is not an employee"))
+		case errors.Is(err, errx.ErrorInitiatorEmployeeHaveNotEnoughRights):
+			ape.RenderErr(w, problems.Forbidden("initiator have not enough rights"))
+		case errors.Is(err, errx.UnexpectedDistributorSetStatus):
+			ape.RenderErr(w, problems.PreconditionFailed("distributor status is blocked"))
+		default:
+			ape.RenderErr(w, problems.InternalError())
 		}
-
-	case enum.DistributorStatusInactive:
-		distributor, err = s.app.SetDistributorStatusInactive(r.Context(), initiator.ID, distributorID)
-		if err != nil {
-			s.Log(r).WithError(err).Errorf("failed to set distributor %s status to inactive", distributorID)
-
-			switch {
-			default:
-				ape.RenderErr(w, problems.InternalError())
-			}
-			return
-		}
-
-	default:
-		ape.RenderErr(w, problems.InvalidParameter("status", fmt.Errorf("unsupported status: %s", status)))
 		return
-
 	}
 
 	s.Log(r).Infof("distributor %s status set to active successfully", distributor.ID)

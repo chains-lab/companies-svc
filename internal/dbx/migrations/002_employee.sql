@@ -21,22 +21,21 @@ CREATE Type "invite_status" AS ENUM (
     'rejected'
 );
 
-CREATE TABLE "employee_invites" (
-    "id"              UUID           PRIMARY KEY NOT NULL,
-    "distributor_id"  UUID           NOT NULL REFERENCES "distributors" ("id") ON DELETE CASCADE,
-    "user_id"         UUID           NOT NULL,
-    "invited_by"      UUID           NOT NULL,
-    "role"            employee_roles NOT NULL,
-    "status"          invite_status  NOT NULL DEFAULT 'sent',
-    "answered_at"     TIMESTAMP,
-    "created_at"      TIMESTAMP      NOT NULL
+CREATE TABLE invites (
+    id             UUID           PRIMARY KEY,
+    status         status         NOT NULL DEFAULT 'sent',
+    role           employee_roles NOT NULL,
+    distributor_id UUID           NOT NULL REFERENCES distributor(id) ON DELETE CASCADE,
+    user_id        UUID,
+    answered_at    TIMESTAMP,
+    expires_at     TIMESTAMP      NOT NULL,
+    created_at     TIMESTAMP      NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
 
-    CHECK (
-        (status = 'sent'  AND answered_at IS NULL) OR
+    CONSTRAINT invite_status_answered_ck CHECK (
+        (status = 'sent'     AND answered_at IS NULL) OR
         (status IN ('accepted','rejected') AND answered_at IS NOT NULL)
-    ),
-    CHECK (expires_at > created_at)
-);
+    )
+)
 
 -- +migrate Down
 DROP TABLE IF EXISTS "employee_invites" CASCADE;

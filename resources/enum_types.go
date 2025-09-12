@@ -10,6 +10,6 @@ const (
 
 	EmployeeType = "employee"
 
-	EmployeeInviteType       = "employee_invite"
+	InviteType               = "distributor_invite"
 	CreateEmployeeInviteType = "create_employee_invite"
 )

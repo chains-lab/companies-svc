@@ -26,7 +26,7 @@ func (s Service) GetEmployee(w http.ResponseWriter, r *http.Request) {
 		s.Log(r).WithError(err).Errorf("failed to get employee")
 
 		switch {
-		case errors.Is(err, errx.EmployeeNotFound):
+		case errors.Is(err, errx.ErrorEmployeeNotFound):
 			ape.RenderErr(w, problems.NotFound("Employee not found"))
 		default:
 			ape.RenderErr(w, problems.InternalError())

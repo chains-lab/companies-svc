@@ -4,12 +4,20 @@ import (
 	"github.com/chains-lab/ape"
 )
 
-var InviteNotFound = ape.DeclareError("INVITE_NOT_FOUND")
+var ErrorInviteNotFound = ape.DeclareError("INVITE_NOT_FOUND")
 
-var InviteIsNotActive = ape.DeclareError("INVITE_IS_NOT_ACTIVE")
+var ErrorInvalidInviteToken = ape.DeclareError("INVALID_INVITE_TOKEN")
 
-var InviteIsNotForInitiator = ape.DeclareError("INVITE_IS_NOT_FOR_INITIATOR")
+var ErrorInviteAlreadyAnswered = ape.DeclareError("INVITE_ALREADY_ANSWERED")
 
-var CantSendInviteForCurrentEmployee = ape.DeclareError("CANT_SEND_INVITE_FOR_CURRENT_EMPLOYEE")
+var ErrorInviteExpired = ape.DeclareError("INVITE_EXPIRED")
 
-var UserHaveAlreadyInviteForInitiatorDistributor = ape.DeclareError("USER_HAVE_ALREADY_INVITE_FOR_INITIATOR_DISTRIBUTOR")
+var ErrorInvalidEmployeeRole = ape.DeclareError("INVALID_EMPLOYEE_ROLE")
+
+var ErrorInitiatorRoleHaveNotEnoughRights = ape.DeclareError("INITIATOR_ROLE_HAVE_NOT_ENOUGH_RIGHTS")
+
+var ErrorInvalidInviteStatus = ape.DeclareError("INVALID_INVITE_STATUS")
+
+var ErrorInvalidBlockStatus = ape.DeclareError("INVALID_BLOCK_STATUS")
+
+var ErrorUnexpectedInviteStatus = ape.DeclareError("UNEXPECTED_INVITE_STATUS")

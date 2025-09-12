@@ -69,7 +69,7 @@ func (q DistributorsQ) Insert(ctx context.Context, input Distributor) error {
 		return fmt.Errorf("building selector query for table: %s input: %w", distributorsTable, err)
 	}
 
-	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
 		_, err = tx.ExecContext(ctx, query, args...)
 	} else {
 		_, err = q.db.ExecContext(ctx, query, args...)
@@ -85,7 +85,7 @@ func (q DistributorsQ) Get(ctx context.Context) (Distributor, error) {
 	}
 
 	var row *sql.Row
-	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
 		row = tx.QueryRowContext(ctx, query, args...)
 	} else {
 		row = q.db.QueryRowContext(ctx, query, args...)
@@ -114,7 +114,7 @@ func (q DistributorsQ) Select(ctx context.Context) ([]Distributor, error) {
 	}
 
 	var rows *sql.Rows
-	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
 		rows, err = tx.QueryContext(ctx, query, args...)
 	} else {
 		rows, err = q.db.QueryContext(ctx, query, args...)
@@ -166,7 +166,7 @@ func (q DistributorsQ) Update(ctx context.Context, input map[string]any) error {
 		return fmt.Errorf("building updater query for table: %s: %w", distributorsTable, err)
 	}
 
-	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
 		_, err = tx.ExecContext(ctx, query, args...)
 	} else {
 		_, err = q.db.ExecContext(ctx, query, args...)
@@ -181,7 +181,7 @@ func (q DistributorsQ) Delete(ctx context.Context) error {
 		return fmt.Errorf("building deleter query for table: %s: %w", distributorsTable, err)
 	}
 
-	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
 		_, err = tx.ExecContext(ctx, query, args...)
 	} else {
 		_, err = q.db.ExecContext(ctx, query, args...)
@@ -210,7 +210,7 @@ func (q DistributorsQ) Count(ctx context.Context) (uint64, error) {
 	}
 
 	var count uint64
-	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
 		err = tx.QueryRowContext(ctx, query, args...).Scan(&count)
 	} else {
 		err = q.db.QueryRowContext(ctx, query, args...).Scan(&count)
@@ -247,7 +247,7 @@ func (q DistributorsQ) Transaction(fn func(ctx context.Context) error) error {
 		return fmt.Errorf("failed to start transaction: %w", err)
 	}
 
-	ctxWithTx := context.WithValue(ctx, txKey, tx)
+	ctxWithTx := context.WithValue(ctx, TxKey, tx)
 
 	if err := fn(ctxWithTx); err != nil {
 		if rbErr := tx.Rollback(); rbErr != nil {

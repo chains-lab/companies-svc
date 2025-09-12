@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type DistributerBlock struct {
+type Block struct {
 	ID            uuid.UUID  `json:"id"`
 	DistributorID uuid.UUID  `json:"distributor_id"`
 	InitiatorID   uuid.UUID  `json:"initiator_id"`

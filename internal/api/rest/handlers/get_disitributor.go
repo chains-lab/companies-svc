@@ -25,7 +25,7 @@ func (s Service) GetDistributor(w http.ResponseWriter, r *http.Request) {
 		s.Log(r).WithError(err).Error("failed to get distributor")
 
 		switch {
-		case errors.Is(err, errx.DistributorNotFound):
+		case errors.Is(err, errx.ErrorDistributorNotFound):
 			ape.RenderErr(w, problems.NotFound("Distributor not found"))
 		default:
 			ape.RenderErr(w, problems.InternalError())

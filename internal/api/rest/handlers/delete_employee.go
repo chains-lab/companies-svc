@@ -41,11 +41,13 @@ func (s Service) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		s.Log(r).WithError(err).Errorf("failed to delete employee with user_id: %s", userID)
 		switch {
-		case errors.Is(err, errx.InitiatorEmployeeHaveNotEnoughRights):
+		case errors.Is(err, errx.InitiatorAndUserHaveDifferentDistributors):
+			ape.RenderErr(w, problems.Forbidden("initiator and user have different distributors"))
+		case errors.Is(err, errx.ErrorInitiatorEmployeeHaveNotEnoughRights):
 			ape.RenderErr(w, problems.Forbidden("initiator employee have not enough rights"))
-		case errors.Is(err, errx.DistributorNotFound):
+		case errors.Is(err, errx.ErrorDistributorNotFound):
 			ape.RenderErr(w, problems.NotFound("distributor not found"))
-		case errors.Is(err, errx.EmployeeNotFound):
+		case errors.Is(err, errx.ErrorEmployeeNotFound):
 			ape.RenderErr(w, problems.NotFound("employee not found"))
 		default:
 			ape.RenderErr(w, problems.InternalError())
@@ -56,5 +58,6 @@ func (s Service) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
 
 	s.Log(r).Infof("employee %s deleted successfully", userID)
 
+	w.WriteHeader(http.StatusNoContent)
 	return
 }

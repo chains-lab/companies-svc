@@ -39,13 +39,13 @@ func (s Service) CanceledDistributorBlock(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	block, err := s.app.CanceledDistributorBlock(r.Context(), blockID)
+	block, err := s.app.UnblockDistributor(r.Context(), blockID)
 	if err != nil {
 		s.Log(r).WithError(err).Errorf("failed to canceled block distributor")
 
 		switch {
 		case errors.Is(err, errx.DistributorBlockNotFound):
-			ape.RenderErr(w, problems.NotFound("distributor not found"))
+			ape.RenderErr(w, problems.NotFound("distributor block not found"))
 		default:
 			ape.RenderErr(w, problems.InternalError())
 		}

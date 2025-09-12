@@ -10,237 +10,387 @@ import (
 	"github.com/google/uuid"
 )
 
-const employeeInvitesTable = "employee_invites"
+const invitesTable = "invites"
 
+// Invite — модель строки из invites.
 type Invite struct {
-	ID            uuid.UUID  `db:"id"`
-	DistributorID uuid.UUID  `db:"distributor_id"`
-	UserID        uuid.UUID  `db:"user_id"`
-	InvitedBy     uuid.UUID  `db:"invited_by"`
-	Role          string     `db:"role"` // enum employee_roles
-	Status        string     `db:"status"`
-	AnsweredAt    *time.Time `db:"answered_at"`
-	CreatedAt     time.Time  `db:"created_at"`
+	ID            uuid.UUID     `db:"id"`
+	Status        string        `db:"status"` // 'sent' | 'accepted' | 'rejected'
+	Role          string        `db:"role"`   // enum employee_roles
+	DistributorID uuid.UUID     `db:"distributor_id"`
+	UserID        uuid.NullUUID `db:"user_id"`     // может быть NULL до акцепта
+	AnsweredAt    sql.NullTime  `db:"answered_at"` // NULL для sent
+	ExpiresAt     time.Time     `db:"expires_at"`
+	CreatedAt     time.Time     `db:"created_at"`
 }
 
+// InviteQ — билдер запросов к invites (в стиле твоих Q-структур).
 type InviteQ struct {
 	db       *sql.DB
 	selector sq.SelectBuilder
-	updater  sq.UpdateBuilder
 	inserter sq.InsertBuilder
+	updater  sq.UpdateBuilder
 	deleter  sq.DeleteBuilder
 	counter  sq.SelectBuilder
 }
 
-func NewInvitesQ(db *sql.DB) InviteQ {
-	builder := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
+func NewInviteQ(db *sql.DB) InviteQ {
+	b := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
+	cols := []string{
+		"id",
+		"status",
+		"role",
+		"city_id",
+		"distributor_id",
+		"user_id",
+		"answered_at",
+		"expires_at",
+		"created_at",
+	}
 	return InviteQ{
 		db:       db,
-		selector: builder.Select("*").From(employeeInvitesTable),
-		updater:  builder.Update(employeeInvitesTable),
-		inserter: builder.Insert(employeeInvitesTable),
-		deleter:  builder.Delete(employeeInvitesTable),
-		counter:  builder.Select("COUNT(*) AS count").From(employeeInvitesTable),
+		selector: b.Select(cols...).From(invitesTable),
+		inserter: b.Insert(invitesTable),
+		updater:  b.Update(invitesTable),
+		deleter:  b.Delete(invitesTable),
+		counter:  b.Select("COUNT(*) AS count").From(invitesTable),
 	}
 }
 
-func (q InviteQ) New() InviteQ {
-	return NewInvitesQ(q.db)
-}
+func (q InviteQ) New() InviteQ { return NewInviteQ(q.db) }
 
-func (q InviteQ) applyConditions(conds ...sq.Sqlizer) InviteQ {
-	q.selector = q.selector.Where(conds)
-	q.counter = q.counter.Where(conds)
-	q.updater = q.updater.Where(conds)
-	q.deleter = q.deleter.Where(conds)
-	return q
-}
-
-func scanInvitation(scanner interface{ Scan(dest ...any) error }) (Invite, error) {
-	var inv Invite
-	var nt sql.NullTime
-
-	err := scanner.Scan(
-		&inv.ID,
-		&inv.DistributorID,
-		&inv.UserID,
-		&inv.InvitedBy,
-		&inv.Role,
-		&inv.Status,
-		&nt,
-		&inv.CreatedAt,
-	)
-	if err != nil {
-		return inv, err
-	}
-	if nt.Valid {
-		t := nt.Time
-		inv.AnsweredAt = &t
-	}
-	return inv, nil
-}
-
+// Insert — вставка новой записи. Если ID == uuid.Nil, возьмётся из переданного значения (требуется задать снаружи).
+// created_at/updated_at можно не заполнять — если в схеме стоят DEFAULT, но ты их явно задаёшь в других местах.
 func (q InviteQ) Insert(ctx context.Context, input Invite) error {
 	values := map[string]interface{}{
-		"id":             input.ID,
-		"distributor_id": input.DistributorID,
-		"user_id":        input.UserID,
-		"invited_by":     input.InvitedBy,
-		"role":           input.Role,
-		"status":         input.Status,
-		"answered_at":    input.AnsweredAt,
-		"created_at":     input.CreatedAt,
+		"id":         input.ID,
+		"status":     input.Status,
+		"role":       input.Role,
+		"city_id":    input.DistributorID,
+		"expires_at": input.ExpiresAt,
 	}
 
-	query, args, err := q.inserter.SetMap(values).ToSql()
+	if input.UserID.Valid {
+		values["user_id"] = input.UserID
+	}
+	if input.AnsweredAt.Valid {
+		values["answered_at"] = input.AnsweredAt
+	}
+	if !input.CreatedAt.IsZero() {
+		values["created_at"] = input.CreatedAt
+	}
+
+	sqlStr, args, err := q.inserter.SetMap(values).ToSql()
 	if err != nil {
-		return fmt.Errorf("building insert query for table %s: %w", employeeInvitesTable, err)
+		return fmt.Errorf("build insert %s: %w", invitesTable, err)
 	}
 
-	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
-		_, err = tx.ExecContext(ctx, query, args...)
+	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
+		_, err = tx.ExecContext(ctx, sqlStr, args...)
 	} else {
-		_, err = q.db.ExecContext(ctx, query, args...)
+		_, err = q.db.ExecContext(ctx, sqlStr, args...)
 	}
 	return err
 }
 
+// Get — вернуть одну запись по текущим фильтрам.
 func (q InviteQ) Get(ctx context.Context) (Invite, error) {
-	query, args, err := q.selector.Limit(1).ToSql()
+	sqlStr, args, err := q.selector.Limit(1).ToSql()
 	if err != nil {
-		return Invite{}, fmt.Errorf("building select query for %s: %w", employeeInvitesTable, err)
+		return Invite{}, fmt.Errorf("build select %s: %w", invitesTable, err)
 	}
 
 	var row *sql.Row
-	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
-		row = tx.QueryRowContext(ctx, query, args...)
+	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
+		row = tx.QueryRowContext(ctx, sqlStr, args...)
 	} else {
-		row = q.db.QueryRowContext(ctx, query, args...)
+		row = q.db.QueryRowContext(ctx, sqlStr, args...)
 	}
 
-	inv, err := scanInvitation(row)
-	if err != nil {
-		return Invite{}, fmt.Errorf("scanning row for %s: %w", employeeInvitesTable, err)
+	var m Invite
+	var userID uuid.NullUUID
+	var answeredAt sql.NullTime
+
+	if err := row.Scan(
+		&m.ID,
+		&m.Status,
+		&m.Role,
+		&m.DistributorID,
+		&userID,
+		&answeredAt,
+		&m.ExpiresAt,
+		&m.CreatedAt,
+	); err != nil {
+		return Invite{}, err
 	}
-	return inv, nil
+
+	if userID.Valid {
+		m.UserID = userID
+	}
+	if answeredAt.Valid {
+		m.AnsweredAt = answeredAt
+	}
+
+	return m, nil
 }
 
+// Select — выбрать множество по текущим фильтрам.
 func (q InviteQ) Select(ctx context.Context) ([]Invite, error) {
-	query, args, err := q.selector.ToSql()
+	sqlStr, args, err := q.selector.ToSql()
 	if err != nil {
-		return nil, fmt.Errorf("building select query for %s: %w", employeeInvitesTable, err)
+		return nil, fmt.Errorf("build select %s: %w", invitesTable, err)
 	}
 
 	var rows *sql.Rows
-	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
-		rows, err = tx.QueryContext(ctx, query, args...)
+	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
+		rows, err = tx.QueryContext(ctx, sqlStr, args...)
 	} else {
-		rows, err = q.db.QueryContext(ctx, query, args...)
+		rows, err = q.db.QueryContext(ctx, sqlStr, args...)
 	}
 	if err != nil {
-		return nil, fmt.Errorf("executing select for %s: %w", employeeInvitesTable, err)
+		return nil, err
 	}
 	defer rows.Close()
 
-	var res []Invite
+	var out []Invite
 	for rows.Next() {
-		inv, err := scanInvitation(rows)
-		if err != nil {
-			return nil, fmt.Errorf("scanning row for %s: %w", employeeInvitesTable, err)
+		var m Invite
+		var userID uuid.NullUUID
+		var answeredAt sql.NullTime
+		if err := rows.Scan(
+			&m.ID,
+			&m.Status,
+			&m.Role,
+			&m.DistributorID,
+			&userID,
+			&answeredAt,
+			&m.ExpiresAt,
+			&m.CreatedAt,
+		); err != nil {
+			return nil, err
 		}
-		res = append(res, inv)
+		if userID.Valid {
+			m.UserID = userID
+		}
+		if answeredAt.Valid {
+			m.AnsweredAt = answeredAt
+		}
+		out = append(out, m)
 	}
-	return res, nil
+	return out, nil
 }
 
-func (q InviteQ) Update(ctx context.Context, input map[string]any) error {
-	query, args, err := q.updater.SetMap(input).ToSql()
-	if err != nil {
-		return fmt.Errorf("building update query for %s: %w", employeeInvitesTable, err)
+// UpdateInviteParams — частичное обновление (DAL без бизнес-логики).
+type UpdateInviteParams struct {
+	Status        *string
+	Role          *string
+	DistributorID *uuid.UUID
+	UserID        *uuid.NullUUID // двойной указатель, чтобы различать "не менять", "установить", "обнулить(nil)"
+	AnsweredAt    *sql.NullTime  // аналогично: nil — не менять; *nil — записать NULL; *&t — записать t
+	ExpiresAt     *time.Time
+}
+
+// Update — выполнит UPDATE по текущим фильтрам.
+// ВАЖНО: как и в твоих Q, без вызова Filter* получишь UPDATE всех строк — ответственность на слое выше.
+func (q InviteQ) Update(ctx context.Context, p UpdateInviteParams) error {
+	updates := map[string]interface{}{}
+	if p.Role != nil {
+		updates["role"] = *p.Role
+	}
+	if p.Status != nil {
+		updates["status"] = *p.Status
+	}
+	if p.DistributorID != nil {
+		updates["distributor_id"] = *p.DistributorID
+	}
+	if p.UserID != nil { // задано желание изменить user_id
+		if p.UserID.Valid {
+			updates["user_id"] = p.UserID.UUID
+		} else {
+			updates["user_id"] = nil
+		}
+	}
+	if p.AnsweredAt != nil {
+		if p.AnsweredAt.Valid {
+			updates["answered_at"] = p.AnsweredAt.Time
+		} else {
+			updates["answered_at"] = nil
+		}
+	}
+	if p.ExpiresAt != nil {
+		updates["expires_at"] = *p.ExpiresAt
 	}
 
-	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
-		_, err = tx.ExecContext(ctx, query, args...)
+	if len(updates) == 0 {
+		return nil
+	}
+
+	sqlStr, args, err := q.updater.SetMap(updates).ToSql()
+	if err != nil {
+		return fmt.Errorf("build update %s: %w", invitesTable, err)
+	}
+
+	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
+		_, err = tx.ExecContext(ctx, sqlStr, args...)
 	} else {
-		_, err = q.db.ExecContext(ctx, query, args...)
+		_, err = q.db.ExecContext(ctx, sqlStr, args...)
 	}
 	return err
 }
 
 func (q InviteQ) Delete(ctx context.Context) error {
-	query, args, err := q.deleter.ToSql()
+	sqlStr, args, err := q.deleter.ToSql()
 	if err != nil {
-		return fmt.Errorf("building delete query for %s: %w", employeeInvitesTable, err)
+		return fmt.Errorf("build delete %s: %w", invitesTable, err)
 	}
-
-	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
-		_, err = tx.ExecContext(ctx, query, args...)
+	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
+		_, err = tx.ExecContext(ctx, sqlStr, args...)
 	} else {
-		_, err = q.db.ExecContext(ctx, query, args...)
+		_, err = q.db.ExecContext(ctx, sqlStr, args...)
 	}
 	return err
 }
 
+// --------- Фильтры ---------
+
 func (q InviteQ) FilterID(id uuid.UUID) InviteQ {
-	return q.applyConditions(sq.Eq{"id": id})
+	q.selector = q.selector.Where(sq.Eq{"id": id})
+	q.updater = q.updater.Where(sq.Eq{"id": id})
+	q.deleter = q.deleter.Where(sq.Eq{"id": id})
+	q.counter = q.counter.Where(sq.Eq{"id": id})
+	return q
 }
 
-func (q InviteQ) FilterDistributorID(ids ...uuid.UUID) InviteQ {
-	if len(ids) == 0 {
-		return q // ничего не добавляем
-	}
-	vals := make([]any, len(ids))
-	for i, id := range ids {
-		vals[i] = id
-	}
-	return q.applyConditions(sq.Eq{"distributor_id": ids})
+func (q InviteQ) FilterDistributorID(distributorID uuid.UUID) InviteQ {
+	q.selector = q.selector.Where(sq.Eq{"distributor_id": distributorID})
+	q.updater = q.updater.Where(sq.Eq{"distributor_id": distributorID})
+	q.deleter = q.deleter.Where(sq.Eq{"distributor_id": distributorID})
+	q.counter = q.counter.Where(sq.Eq{"distributor_id": distributorID})
+	return q
 }
 
-func (q InviteQ) FilterUserID(userID ...uuid.UUID) InviteQ {
-	return q.applyConditions(sq.Eq{"user_id": userID})
-}
-
-func (q InviteQ) FilterInvitedBy(userID ...uuid.UUID) InviteQ {
-	return q.applyConditions(sq.Eq{"invited_by": userID})
-}
-
-func (q InviteQ) FilterRole(role ...string) InviteQ {
-	return q.applyConditions(sq.Eq{"role": role})
+func (q InviteQ) FilterUserID(userID uuid.UUID) InviteQ {
+	q.selector = q.selector.Where(sq.Eq{"user_id": userID})
+	q.updater = q.updater.Where(sq.Eq{"user_id": userID})
+	q.deleter = q.deleter.Where(sq.Eq{"user_id": userID})
+	q.counter = q.counter.Where(sq.Eq{"user_id": userID})
+	return q
 }
 
 func (q InviteQ) FilterStatus(status ...string) InviteQ {
-	return q.applyConditions(sq.Eq{"status": status})
+	q.selector = q.selector.Where(sq.Eq{"status": status})
+	q.updater = q.updater.Where(sq.Eq{"status": status})
+	q.deleter = q.deleter.Where(sq.Eq{"status": status})
+	q.counter = q.counter.Where(sq.Eq{"status": status})
+	return q
 }
 
-func (q InviteQ) OrderByCreatedAt(asc bool) InviteQ {
-	if asc {
-		q.selector = q.selector.OrderBy("created_at ASC")
+func (q InviteQ) FilterRole(role ...string) InviteQ {
+	q.selector = q.selector.Where(sq.Eq{"role": role})
+	q.updater = q.updater.Where(sq.Eq{"role": role})
+	q.deleter = q.deleter.Where(sq.Eq{"role": role})
+	q.counter = q.counter.Where(sq.Eq{"role": role})
+	return q
+}
+
+func (q InviteQ) FilterExpiresBefore(t time.Time) InviteQ {
+	q.selector = q.selector.Where(sq.LtOrEq{"expires_at": t})
+	q.updater = q.updater.Where(sq.LtOrEq{"expires_at": t})
+	q.deleter = q.deleter.Where(sq.LtOrEq{"expires_at": t})
+	q.counter = q.counter.Where(sq.LtOrEq{"expires_at": t})
+	return q
+}
+
+func (q InviteQ) FilterExpiresAfter(t time.Time) InviteQ {
+	q.selector = q.selector.Where(sq.Gt{"expires_at": t})
+	q.updater = q.updater.Where(sq.Gt{"expires_at": t})
+	q.deleter = q.deleter.Where(sq.Gt{"expires_at": t})
+	q.counter = q.counter.Where(sq.Gt{"expires_at": t})
+	return q
+}
+
+func (q InviteQ) FilterAnswered(answered bool) InviteQ {
+	if answered {
+		q.selector = q.selector.Where("answered_at IS NOT NULL")
+		q.updater = q.updater.Where("answered_at IS NOT NULL")
+		q.deleter = q.deleter.Where("answered_at IS NOT NULL")
+		q.counter = q.counter.Where("answered_at IS NOT NULL")
 	} else {
-		q.selector = q.selector.OrderBy("created_at DESC")
+		q.selector = q.selector.Where("answered_at IS NULL")
+		q.updater = q.updater.Where("answered_at IS NULL")
+		q.deleter = q.deleter.Where("answered_at IS NULL")
+		q.counter = q.counter.Where("answered_at IS NULL")
 	}
 	return q
 }
 
-func (q InviteQ) Page(limit, offset uint64) InviteQ {
-	q.selector = q.selector.Limit(limit).Offset(offset)
-	q.counter = q.counter.Limit(1) // count не нужно ограничивать выборкой
+func (q InviteQ) FilterCreatedBetween(from, to time.Time) InviteQ {
+	q.selector = q.selector.Where(sq.And{
+		sq.GtOrEq{"created_at": from},
+		sq.LtOrEq{"created_at": to},
+	})
+	q.updater = q.updater.Where(sq.And{
+		sq.GtOrEq{"created_at": from},
+		sq.LtOrEq{"created_at": to},
+	})
+	q.deleter = q.deleter.Where(sq.And{
+		sq.GtOrEq{"created_at": from},
+		sq.LtOrEq{"created_at": to},
+	})
+	q.counter = q.counter.Where(sq.And{
+		sq.GtOrEq{"created_at": from},
+		sq.LtOrEq{"created_at": to},
+	})
+	return q
+}
+
+func (q InviteQ) OrderByCreatedAt(asc bool) InviteQ {
+	dir := "ASC"
+	if !asc {
+		dir = "DESC"
+	}
+	q.selector = q.selector.OrderBy("created_at " + dir)
+	return q
+}
+
+func (q InviteQ) OrderByUpdatedAt(asc bool) InviteQ {
+	dir := "ASC"
+	if !asc {
+		dir = "DESC"
+	}
+	q.selector = q.selector.OrderBy("updated_at " + dir)
+	return q
+}
+
+func (q InviteQ) OrderByExpiresAt(asc bool) InviteQ {
+	dir := "ASC"
+	if !asc {
+		dir = "DESC"
+	}
+	q.selector = q.selector.OrderBy("expires_at " + dir)
 	return q
 }
 
 func (q InviteQ) Count(ctx context.Context) (uint64, error) {
-	query, args, err := q.counter.ToSql()
+	sqlStr, args, err := q.counter.ToSql()
 	if err != nil {
-		return 0, fmt.Errorf("building count query for %s: %w", employeeInvitesTable, err)
+		return 0, fmt.Errorf("build count %s: %w", invitesTable, err)
 	}
 
-	var count uint64
-	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
-		err = tx.QueryRowContext(ctx, query, args...).Scan(&count)
+	var n uint64
+	var row *sql.Row
+	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
+		row = tx.QueryRowContext(ctx, sqlStr, args...)
 	} else {
-		err = q.db.QueryRowContext(ctx, query, args...).Scan(&count)
+		row = q.db.QueryRowContext(ctx, sqlStr, args...)
 	}
-	if err != nil {
-		return 0, fmt.Errorf("executing count for %s: %w", employeeInvitesTable, err)
+	if err := row.Scan(&n); err != nil {
+		return 0, fmt.Errorf("scan count %s: %w", invitesTable, err)
 	}
-	return count, nil
+	return n, nil
+}
+
+func (q InviteQ) Page(limit, offset uint64) InviteQ {
+	q.selector = q.selector.Limit(limit).Offset(offset)
+	return q
 }

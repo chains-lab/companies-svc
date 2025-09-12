@@ -1,17 +1,21 @@
 package app
 
 import (
+	"context"
 	"database/sql"
+	"fmt"
 
+	"github.com/chains-lab/distributors-svc/internal/app/entities/distributor"
+	"github.com/chains-lab/distributors-svc/internal/app/entities/employee"
 	"github.com/chains-lab/distributors-svc/internal/config"
 	"github.com/chains-lab/distributors-svc/internal/dbx"
 )
 
 type App struct {
-	distributor distributorsQ
-	employee    employeesQ
-	block       blockagesQ
-	invite      inviteQ
+	distributor distributor.Distributor
+	employee    employee.Employee
+
+	db *sql.DB
 }
 
 func NewApp(cfg config.Config) (App, error) {
@@ -21,9 +25,33 @@ func NewApp(cfg config.Config) (App, error) {
 	}
 
 	return App{
-		distributor: dbx.NewDistributorsQ(pg),
-		employee:    dbx.NewEmployeesQ(pg),
-		block:       dbx.NewBlockagesQ(pg),
-		invite:      dbx.NewInvitesQ(pg),
+		distributor: distributor.NewDistributor(pg),
+		employee:    employee.NewEmployee(pg, cfg),
+
+		db: pg,
 	}, nil
+}
+
+func (a App) transaction(fn func(ctx context.Context) error) error {
+	ctx := context.Background()
+
+	tx, err := a.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("failed to start transaction: %w", err)
+	}
+
+	ctxWithTx := context.WithValue(ctx, dbx.TxKey, tx)
+
+	if err := fn(ctxWithTx); err != nil {
+		if rbErr := tx.Rollback(); rbErr != nil {
+			return fmt.Errorf("transaction failed: %v, rollback error: %v", err, rbErr)
+		}
+		return fmt.Errorf("transaction failed: %w", err)
+	}
+
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	return nil
 }

@@ -39,8 +39,8 @@ func (s Service) CreateDistributor(w http.ResponseWriter, r *http.Request) {
 		s.Log(r).WithError(err).Errorf("failed to create distributor")
 
 		switch {
-		case errors.Is(err, errx.InitiatorIsAlreadyEmployee):
-			ape.RenderErr(w, problems.Conflict("Current employee can not create distributor"))
+		case errors.Is(err, errx.ErrorCurrentEmployeeCanCreateDistributor):
+			ape.RenderErr(w, problems.PreconditionFailed("Current employee can not create distributor"))
 		default:
 			ape.RenderErr(w, problems.InternalError())
 		}

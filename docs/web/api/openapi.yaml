@@ -138,84 +138,74 @@ components:
       - data
       - links
       type: object
-    EmployeeInvite:
+    Invite:
       properties:
         data:
-          $ref: '#/components/schemas/EmployeeInviteData'
+          $ref: '#/components/schemas/InviteData'
       required:
       - data
       type: object
-    EmployeeInviteData:
+    InviteData:
       properties:
         id:
-          description: employee invite id
+          description: invite id
           format: uuid
           type: string
         type:
           enum:
-          - employee_invite
+          - distributor_invite
           type: string
         attributes:
-          $ref: '#/components/schemas/EmployeeInviteAttributes'
+          $ref: '#/components/schemas/InviteAttributes'
       required:
       - attributes
       - id
       - type
       type: object
-    EmployeeInviteAttributes:
+    InviteAttributes:
       properties:
-        distributor_id:
-          description: The unique identifier for the distributor associated with the
-            employee invite.
-          format: uuid
-          type: string
-        user_id:
-          description: The unique identifier for the user being invited as an employee.
-          format: uuid
-          type: string
-        invited_by:
-          description: The unique identifier for the user who sent the invitation.
-          format: uuid
+        status:
+          description: status of the invite
           type: string
         role:
-          description: "The role of the invited employee within the distributor's\
-            \ organization (e.g., manager, staff)."
+          description: role of the user in this city
           type: string
-        status:
-          description: The current status of the employee invitation.
-          enum:
-          - pending
-          - accepted
-          - declined
+        distributor_id:
+          description: distributor id
+          format: uuid
           type: string
-        answered_at:
-          description: The timestamp when the invitation was responded to (accepted
-            or declined).
+        token:
+          description: unique token for the invite
+          type: string
+        expires_at:
+          description: timestamp when the invite will expire
           format: date-time
           type: string
         created_at:
-          description: The timestamp when the employee invite was created.
+          description: timestamp when the invite was created
           format: date-time
           type: string
       required:
       - created_at
       - distributor_id
-      - invited_by
+      - expires_at
       - role
       - status
-      - user_id
+      - token
       type: object
-    EmployeesInvitesCollection:
+    SentInvite:
       properties:
         data:
-          items:
-            $ref: '#/components/schemas/EmployeeInviteData'
-          type: array
-        links:
-          $ref: '#/components/schemas/PaginationData'
+          $ref: '#/components/schemas/SentInvite_data'
       required:
       - data
-      - links
+      type: object
+    AnswerToInvite:
+      properties:
+        data:
+          $ref: '#/components/schemas/AnswerToInvite_data'
+      required:
+      - data
       type: object
     Distributor:
       properties:
@@ -487,4 +477,62 @@ components:
       required:
       - status
       - title
+      type: object
+    SentInvite_data_attributes:
+      properties:
+        distributor_id:
+          description: ID of the distributor the invite is for
+          format: uuid
+          type: string
+        role:
+          description: Role assigned to the invited user
+          type: string
+      required:
+      - distributor_id
+      - role
+      type: object
+    SentInvite_data:
+      properties:
+        id:
+          description: invite id
+          format: uuid
+          type: string
+        type:
+          enum:
+          - distributor_invite
+          type: string
+        attributes:
+          $ref: '#/components/schemas/SentInvite_data_attributes'
+      required:
+      - attributes
+      - id
+      - type
+      type: object
+    AnswerToInvite_data_attributes:
+      properties:
+        answer:
+          description: answer to the invite
+          enum:
+          - accepted
+          - declined
+          type: string
+      required:
+      - answer
+      type: object
+    AnswerToInvite_data:
+      properties:
+        id:
+          description: invite id
+          format: uuid
+          type: string
+        type:
+          enum:
+          - answer_to_invite
+          type: string
+        attributes:
+          $ref: '#/components/schemas/AnswerToInvite_data_attributes'
+      required:
+      - attributes
+      - id
+      - type
       type: object

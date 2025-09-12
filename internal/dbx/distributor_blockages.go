@@ -95,7 +95,7 @@ func (q BlockQ) Insert(ctx context.Context, input Blockages) error {
 		return fmt.Errorf("building inserter query for table: %s input: %w", blockedTable, err)
 	}
 
-	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
 		_, err = tx.ExecContext(ctx, query, args...)
 	} else {
 		_, err = q.db.ExecContext(ctx, query, args...)
@@ -111,7 +111,7 @@ func (q BlockQ) Get(ctx context.Context) (Blockages, error) {
 	}
 
 	var row *sql.Row
-	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
 		row = tx.QueryRowContext(ctx, query, args...)
 	} else {
 		row = q.db.QueryRowContext(ctx, query, args...)
@@ -131,7 +131,7 @@ func (q BlockQ) Select(ctx context.Context) ([]Blockages, error) {
 	}
 
 	var rows *sql.Rows
-	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
 		rows, err = tx.QueryContext(ctx, query, args...)
 	} else {
 		rows, err = q.db.QueryContext(ctx, query, args...)
@@ -164,7 +164,7 @@ func (q BlockQ) Update(ctx context.Context, input map[string]any) error {
 		return fmt.Errorf("building updater query for table: %s: %w", blockedTable, err)
 	}
 
-	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
 		_, err = tx.ExecContext(ctx, query, args...)
 	} else {
 		_, err = q.db.ExecContext(ctx, query, args...)
@@ -180,7 +180,7 @@ func (q BlockQ) Delete(ctx context.Context) error {
 		return fmt.Errorf("building deleter query for table: %s: %w", blockedTable, err)
 	}
 
-	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
 		_, err = tx.ExecContext(ctx, query, args...)
 	} else {
 		_, err = q.db.ExecContext(ctx, query, args...)
@@ -228,7 +228,7 @@ func (q BlockQ) Count(ctx context.Context) (uint64, error) {
 	}
 
 	var count uint64
-	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
 		err = tx.QueryRowContext(ctx, query, args...).Scan(&count)
 	} else {
 		err = q.db.QueryRowContext(ctx, query, args...).Scan(&count)

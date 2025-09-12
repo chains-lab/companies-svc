@@ -6,7 +6,7 @@ import (
 	"github.com/chains-lab/pagi"
 )
 
-func DistributorBlock(m models.DistributerBlock) resources.DistributorBlock {
+func DistributorBlock(m models.Block) resources.DistributorBlock {
 	resp := resources.DistributorBlock{
 		Data: resources.DistributorBlockData{
 			Id:   m.ID.String(),
@@ -28,7 +28,7 @@ func DistributorBlock(m models.DistributerBlock) resources.DistributorBlock {
 	return resp
 }
 
-func DistributorBlockCollection(ms []models.DistributerBlock, pag pagi.Response) resources.DistributorBlocksCollection {
+func DistributorBlockCollection(ms []models.Block, pag pagi.Response) resources.DistributorBlocksCollection {
 	items := make([]resources.DistributorBlockData, 0, len(ms))
 	for _, m := range ms {
 		items = append(items, DistributorBlock(m).Data)

@@ -51,21 +51,23 @@ components:
     Errors:
       $ref: './spec/components/schemas/Errors.yaml'
     Employee:
-        $ref: './spec/components/schemas/Employee.yaml'
+      $ref: './spec/components/schemas/Employee.yaml'
     EmployeeData:
-        $ref: './spec/components/schemas/EmployeeData.yaml'
+      $ref: './spec/components/schemas/EmployeeData.yaml'
     EmployeeAttributes:
-        $ref: './spec/components/schemas/EmployeeAttributes.yaml'
+      $ref: './spec/components/schemas/EmployeeAttributes.yaml'
     EmployeesCollection:
-        $ref: './spec/components/schemas/EmployeesCollection.yaml'
-    EmployeeInvite:
-        $ref: './spec/components/schemas/EmployeeInvite.yaml'
-    EmployeeInviteData:
-        $ref: './spec/components/schemas/EmployeeInviteData.yaml'
-    EmployeeInviteAttributes:
-        $ref: './spec/components/schemas/EmployeeInviteAttributes.yaml'
-    EmployeesInvitesCollection:
-      $ref: './spec/components/schemas/EmployeeInvitesCollection.yaml'
+      $ref: './spec/components/schemas/EmployeesCollection.yaml'
+    Invite:
+      $ref: './spec/components/schemas/Invite.yaml'
+    InviteData:
+      $ref: './spec/components/schemas/InviteData.yaml'
+    InviteAttributes:
+      $ref: './spec/components/schemas/InviteAttributes.yaml'
+    SentInvite:
+      $ref: './spec/components/schemas/SentInvite.yaml'
+    AnswerToInvite:
+      $ref: './spec/components/schemas/AnswerToInvite.yaml'
     Distributor:
         $ref: './spec/components/schemas/Distributor.yaml'
     DistributorData:
