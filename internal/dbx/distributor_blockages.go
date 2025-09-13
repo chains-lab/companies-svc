@@ -33,6 +33,7 @@ type BlockQ struct {
 
 func NewBlockagesQ(db *sql.DB) BlockQ {
 	builder := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
+
 	return BlockQ{
 		db:       db,
 		selector: builder.Select("*").From(blockedTable),
@@ -41,15 +42,6 @@ func NewBlockagesQ(db *sql.DB) BlockQ {
 		deleter:  builder.Delete(blockedTable),
 		counter:  builder.Select("COUNT(*) AS count").From(blockedTable),
 	}
-}
-
-func (q BlockQ) applyConditions(conditions ...sq.Sqlizer) BlockQ {
-	q.selector = q.selector.Where(conditions)
-	q.counter = q.counter.Where(conditions)
-	q.updater = q.updater.Where(conditions)
-	q.deleter = q.deleter.Where(conditions)
-
-	return q
 }
 
 func scanBlock(scanner interface{ Scan(dest ...any) error }) (Blockages, error) {
@@ -190,19 +182,35 @@ func (q BlockQ) Delete(ctx context.Context) error {
 }
 
 func (q BlockQ) FilterID(id uuid.UUID) BlockQ {
-	return q.applyConditions(sq.Eq{"id": id})
+	q.selector = q.selector.Where(sq.Eq{"id": id})
+	q.counter = q.counter.Where(sq.Eq{"id": id})
+	q.updater = q.updater.Where(sq.Eq{"id": id})
+	q.deleter = q.deleter.Where(sq.Eq{"id": id})
+	return q
 }
 
 func (q BlockQ) FilterDistributorID(distributorID ...uuid.UUID) BlockQ {
-	return q.applyConditions(sq.Eq{"distributor_id": distributorID})
+	q.selector = q.selector.Where(sq.Eq{"distributor_id": distributorID})
+	q.counter = q.counter.Where(sq.Eq{"distributor_id": distributorID})
+	q.updater = q.updater.Where(sq.Eq{"distributor_id": distributorID})
+	q.deleter = q.deleter.Where(sq.Eq{"distributor_id": distributorID})
+	return q
 }
 
 func (q BlockQ) FilterInitiatorID(initiatorID ...uuid.UUID) BlockQ {
-	return q.applyConditions(sq.Eq{"initiator_id": initiatorID})
+	q.selector = q.selector.Where(sq.Eq{"initiator_id": initiatorID})
+	q.counter = q.counter.Where(sq.Eq{"initiator_id": initiatorID})
+	q.updater = q.updater.Where(sq.Eq{"initiator_id": initiatorID})
+	q.deleter = q.deleter.Where(sq.Eq{"initiator_id": initiatorID})
+	return q
 }
 
 func (q BlockQ) FilterStatus(status ...string) BlockQ {
-	return q.applyConditions(sq.Eq{"status": status})
+	q.selector = q.selector.Where(sq.Eq{"status": status})
+	q.counter = q.counter.Where(sq.Eq{"status": status})
+	q.updater = q.updater.Where(sq.Eq{"status": status})
+	q.deleter = q.deleter.Where(sq.Eq{"status": status})
+	return q
 }
 
 func (q BlockQ) OrderByBlockedAt(ascending bool) BlockQ {

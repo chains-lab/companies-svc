@@ -12,20 +12,6 @@ import (
 	"github.com/google/uuid"
 )
 
-package handlers
-
-import (
-"errors"
-"net/http"
-
-"github.com/chains-lab/ape"
-"github.com/chains-lab/ape/problems"
-"github.com/chains-lab/distributors-svc/internal/api/rest/responses"
-"github.com/chains-lab/distributors-svc/internal/errx"
-"github.com/go-chi/chi/v5"
-"github.com/google/uuid"
-)
-
 func (s Service) GetBlock(w http.ResponseWriter, r *http.Request) {
 	blockID, err := uuid.Parse(chi.URLParam(r, "block_id"))
 	if err != nil {
@@ -50,4 +36,3 @@ func (s Service) GetBlock(w http.ResponseWriter, r *http.Request) {
 	ape.Render(w, http.StatusOK, responses.DistributorBlock(block))
 	return
 }
-

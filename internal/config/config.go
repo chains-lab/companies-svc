@@ -24,21 +24,6 @@ type DatabaseConfig struct {
 	SQL struct {
 		URL string `mapstructure:"url"`
 	} `mapstructure:"sql"`
-
-	Redis struct {
-		Addr     string `mapstructure:"addr"`
-		Password string `mapstructure:"password"`
-		DB       int    `mapstructure:"db"`
-		Lifetime int    `mapstructure:"lifetime"`
-	} `mapstructure:"redis"`
-}
-
-type OAuthConfig struct {
-	Google struct {
-		ClientID     string `mapstructure:"client_id"`
-		ClientSecret string `mapstructure:"client_secret"`
-		RedirectURL  string `mapstructure:"redirect_url"`
-	}
 }
 
 type KafkaConfig struct {
@@ -51,24 +36,13 @@ type JWTConfig struct {
 			SecretKey     string        `mapstructure:"secret_key"`
 			TokenLifetime time.Duration `mapstructure:"token_lifetime"`
 		} `mapstructure:"access_token"`
-		RefreshToken struct {
-			SecretKey     string        `mapstructure:"secret_key"`
-			EncryptionKey string        `mapstructure:"encryption_key"`
-			TokenLifetime time.Duration `mapstructure:"token_lifetime"`
-		} `mapstructure:"refresh_token"`
 	} `mapstructure:"user"`
 	Service struct {
 		SecretKey string `mapstructure:"secret_key"`
 	} `mapstructure:"service"`
-	Invite struct {
+	Invites struct {
 		SecretKey string `mapstructure:"secret_key"`
-	}
-}
-
-type RabbitConfig struct {
-	URL      string `mapstructure:"url"`
-	User     string `mapstructure:"user"`
-	Password string `mapstructure:"password"`
+	} `mapstructure:"employee-invites"`
 }
 
 type SwaggerConfig struct {
@@ -80,8 +54,6 @@ type SwaggerConfig struct {
 type Config struct {
 	Server   ServerConfig   `mapstructure:"server"`
 	JWT      JWTConfig      `mapstructure:"jwt"`
-	OAuth    OAuthConfig    `mapstructure:"oauth"`
-	Rabbit   RabbitConfig   `mapstructure:"rabbit"`
 	Kafka    KafkaConfig    `mapstructure:"kafka"`
 	Database DatabaseConfig `mapstructure:"database"`
 	Swagger  SwaggerConfig  `mapstructure:"swagger"`

@@ -36,20 +36,10 @@ type InviteQ struct {
 
 func NewInviteQ(db *sql.DB) InviteQ {
 	b := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
-	cols := []string{
-		"id",
-		"status",
-		"role",
-		"city_id",
-		"distributor_id",
-		"user_id",
-		"answered_at",
-		"expires_at",
-		"created_at",
-	}
+
 	return InviteQ{
 		db:       db,
-		selector: b.Select(cols...).From(invitesTable),
+		selector: b.Select("*").From(invitesTable),
 		inserter: b.Insert(invitesTable),
 		updater:  b.Update(invitesTable),
 		deleter:  b.Delete(invitesTable),

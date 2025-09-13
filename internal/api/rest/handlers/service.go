@@ -14,7 +14,7 @@ type Service struct {
 	cfg config.Config
 }
 
-func NewService(cfg config.Config, log logium.Logger, a *app.App) Service {
+func NewAdaptrer(cfg config.Config, log logium.Logger, a *app.App) Service {
 	return Service{
 		app: a,
 		cfg: cfg,

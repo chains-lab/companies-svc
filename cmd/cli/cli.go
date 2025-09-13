@@ -8,7 +8,6 @@ import (
 	"syscall"
 
 	"github.com/alecthomas/kingpin"
-	"github.com/chains-lab/distributors-svc/internal/api"
 	"github.com/chains-lab/distributors-svc/internal/app"
 	"github.com/chains-lab/distributors-svc/internal/config"
 	"github.com/chains-lab/distributors-svc/internal/dbx"
@@ -54,11 +53,11 @@ func Run(args []string) bool {
 
 	switch cmd {
 	case serviceCmd.FullCommand():
-		api.Start(ctx, cfg, log, &wg, &application)
+		Start(ctx, cfg, log, &wg, &application)
 	case migrateUpCmd.FullCommand():
-		err = dbx.MigrateUp(cfg)
+		err = dbx.MigrateUp(cfg.Database.SQL.URL)
 	case migrateDownCmd.FullCommand():
-		err = dbx.MigrateDown(cfg)
+		err = dbx.MigrateDown(cfg.Database.SQL.URL)
 	default:
 		log.Errorf("unknown command %s", cmd)
 		return false

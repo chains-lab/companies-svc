@@ -1,7 +1,6 @@
 package jwtmanager
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/chains-lab/distributors-svc/internal/config"
@@ -34,6 +33,6 @@ type inviteClaims struct {
 func NewManager(cfg config.Config) Manager {
 	return Manager{
 		iss: enum.CitiesSVC,
-		sk:  cfg.JWT.Invite.SecretKey,
+		sk:  cfg.JWT.Invites.SecretKey,
 	}
 }

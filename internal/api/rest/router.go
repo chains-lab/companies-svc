@@ -31,7 +31,7 @@ type Handlers interface {
 	GetBlock(w http.ResponseWriter, r *http.Request)
 }
 
-func (a *Rest) Run(ctx context.Context, cfg config.Config, h Handlers) {
+func (a *Rest) Router(ctx context.Context, cfg config.Config, h Handlers) {
 	svc := mdlv.ServiceGrant(enum.CitiesSVC, cfg.JWT.Service.SecretKey)
 	auth := mdlv.Auth(meta.UserCtxKey, cfg.JWT.User.AccessToken.SecretKey)
 	sysadmin := mdlv.RoleGrant(meta.UserCtxKey, map[string]bool{

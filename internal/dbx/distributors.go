@@ -32,6 +32,7 @@ type DistributorsQ struct {
 
 func NewDistributorsQ(db *sql.DB) DistributorsQ {
 	builder := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
+
 	return DistributorsQ{
 		db:       db,
 		selector: builder.Select("*").From(distributorsTable),
@@ -42,39 +43,24 @@ func NewDistributorsQ(db *sql.DB) DistributorsQ {
 	}
 }
 
-func (q DistributorsQ) applyConditions(conditions ...sq.Sqlizer) DistributorsQ {
-	q.selector = q.selector.Where(conditions)
-	q.counter = q.counter.Where(conditions)
-	q.updater = q.updater.Where(conditions)
-	q.deleter = q.deleter.Where(conditions)
-
-	return q
-}
-
 func (q DistributorsQ) New() DistributorsQ {
 	return NewDistributorsQ(q.db)
 }
 
-func (q DistributorsQ) Insert(ctx context.Context, input Distributor) error {
-	values := map[string]interface{}{
-		"id":         input.ID,
-		"icon":       input.Icon,
-		"name":       input.Name,
-		"status":     input.Status,
-		"updated_at": input.UpdatedAt,
-		"created_at": input.CreatedAt,
-	}
-	query, args, err := q.inserter.SetMap(values).ToSql()
+func (q DistributorsQ) Insert(ctx context.Context, in Distributor) error {
+	qry, args, err := q.inserter.
+		Columns("id", "icon", "name", "status", "updated_at", "created_at").
+		Values(in.ID, in.Icon, in.Name, in.Status, in.UpdatedAt, in.CreatedAt).
+		ToSql()
 	if err != nil {
-		return fmt.Errorf("building selector query for table: %s input: %w", distributorsTable, err)
+		return fmt.Errorf("build insert %s: %w", distributorsTable, err)
 	}
 
 	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
-		_, err = tx.ExecContext(ctx, query, args...)
+		_, err = tx.ExecContext(ctx, qry, args...)
 	} else {
-		_, err = q.db.ExecContext(ctx, query, args...)
+		_, err = q.db.ExecContext(ctx, qry, args...)
 	}
-
 	return err
 }
 
@@ -191,16 +177,28 @@ func (q DistributorsQ) Delete(ctx context.Context) error {
 }
 
 func (q DistributorsQ) FilterID(id uuid.UUID) DistributorsQ {
-	return q.applyConditions(sq.Eq{"id": id})
+	q.selector = q.selector.Where(sq.Eq{"id": id})
+	q.counter = q.counter.Where(sq.Eq{"id": id})
+	q.updater = q.updater.Where(sq.Eq{"id": id})
+	q.deleter = q.deleter.Where(sq.Eq{"id": id})
+	return q
 }
 
 func (q DistributorsQ) FilterStatus(status ...string) DistributorsQ {
-	return q.applyConditions(sq.Eq{"status": status})
+	q.selector = q.selector.Where(sq.Eq{"status": status})
+	q.counter = q.counter.Where(sq.Eq{"status": status})
+	q.updater = q.updater.Where(sq.Eq{"status": status})
+	q.deleter = q.deleter.Where(sq.Eq{"status": status})
+	return q
 }
 
 func (q DistributorsQ) LikeName(name string) DistributorsQ {
-	p := fmt.Sprintf("%%%s%%", name)
-	return q.applyConditions(sq.Like{"name": p})
+	cond := sq.Expr("name ILIKE ?", fmt.Sprintf("%%%s%%", name))
+	q.selector = q.selector.Where(cond)
+	q.counter = q.counter.Where(cond)
+	q.updater = q.updater.Where(cond)
+	q.deleter = q.deleter.Where(cond)
+	return q
 }
 
 func (q DistributorsQ) Count(ctx context.Context) (uint64, error) {

@@ -21,7 +21,7 @@ type CreateParams struct {
 
 func (e Employee) CreateEmployee(ctx context.Context, params CreateParams) (models.Employee, error) {
 	_, err := e.GetByUserID(ctx, params.UserID)
-	if err != nil && errors.Is(err, errx.ErrorEmployeeNotFound) {
+	if err != nil && !errors.Is(err, errx.ErrorEmployeeNotFound) {
 		return models.Employee{}, err
 	}
 	if err == nil {

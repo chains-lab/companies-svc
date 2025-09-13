@@ -12,9 +12,7 @@ import (
 )
 
 func (e Employee) GetByUserID(ctx context.Context, userID uuid.UUID) (models.Employee, error) {
-	employee, err := e.employee.New().
-		FilterUserID(userID).
-		Get(ctx)
+	employee, err := e.employee.New().FilterUserID(userID).Get(ctx)
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):

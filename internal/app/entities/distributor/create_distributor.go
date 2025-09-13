@@ -21,13 +21,14 @@ func (d Distributor) Create(
 	ctx context.Context,
 	params CreateParams,
 ) (models.Distributor, error) {
+	now := time.Now().UTC()
 	stmt := dbx.Distributor{
 		ID:        uuid.New(),
 		Name:      params.Name,
 		Icon:      params.Icon,
 		Status:    enum.DistributorStatusActive,
-		CreatedAt: time.Now().UTC(),
-		UpdatedAt: time.Now().UTC(),
+		CreatedAt: now,
+		UpdatedAt: now,
 	}
 
 	err := d.distributor.New().Insert(ctx, stmt)

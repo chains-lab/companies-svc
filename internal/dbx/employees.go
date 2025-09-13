@@ -32,6 +32,7 @@ type EmployeeQ struct {
 
 func NewEmployeesQ(db *sql.DB) EmployeeQ {
 	builder := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
+
 	return EmployeeQ{
 		db:       db,
 		selector: builder.Select("*").From(employeesTable),
@@ -42,39 +43,24 @@ func NewEmployeesQ(db *sql.DB) EmployeeQ {
 	}
 }
 
-func (q EmployeeQ) applyConditions(conditions ...sq.Sqlizer) EmployeeQ {
-	q.selector = q.selector.Where(conditions)
-	q.counter = q.counter.Where(conditions)
-	q.updater = q.updater.Where(conditions)
-	q.deleter = q.deleter.Where(conditions)
-
-	return q
-}
-
 func (q EmployeeQ) New() EmployeeQ {
 	return NewEmployeesQ(q.db)
 }
 
-func (q EmployeeQ) Insert(ctx context.Context, input Employee) error {
-	values := map[string]interface{}{
-		"user_id":        input.UserID,
-		"distributor_id": input.DistributorID,
-		"role":           input.Role,
-		"updated_at":     input.UpdatedAt,
-		"created_at":     input.CreatedAt,
-	}
-
-	query, args, err := q.inserter.SetMap(values).ToSql()
+func (q EmployeeQ) Insert(ctx context.Context, in Employee) error {
+	qry, args, err := q.inserter.
+		Columns("user_id", "distributor_id", "role", "updated_at", "created_at").
+		Values(in.UserID, in.DistributorID, in.Role, in.UpdatedAt, in.CreatedAt).
+		ToSql()
 	if err != nil {
-		return err
+		return fmt.Errorf("build insert %s: %w", employeesTable, err)
 	}
 
 	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
-		_, err = tx.ExecContext(ctx, query, args...)
+		_, err = tx.ExecContext(ctx, qry, args...)
 	} else {
-		_, err = q.db.ExecContext(ctx, query, args...)
+		_, err = q.db.ExecContext(ctx, qry, args...)
 	}
-
 	return err
 }
 
@@ -183,15 +169,27 @@ func (q EmployeeQ) Delete(ctx context.Context) error {
 }
 
 func (q EmployeeQ) FilterUserID(userID uuid.UUID) EmployeeQ {
-	return q.applyConditions(sq.Eq{"user_id": userID})
+	q.selector = q.selector.Where(sq.Eq{"user_id": userID})
+	q.counter = q.counter.Where(sq.Eq{"user_id": userID})
+	q.updater = q.updater.Where(sq.Eq{"user_id": userID})
+	q.deleter = q.deleter.Where(sq.Eq{"user_id": userID})
+	return q
 }
 
 func (q EmployeeQ) FilterDistributorID(distributorID ...uuid.UUID) EmployeeQ {
-	return q.applyConditions(sq.Eq{"distributor_id": distributorID})
+	q.selector = q.selector.Where(sq.Eq{"distributor_id": distributorID})
+	q.counter = q.counter.Where(sq.Eq{"distributor_id": distributorID})
+	q.updater = q.updater.Where(sq.Eq{"distributor_id": distributorID})
+	q.deleter = q.deleter.Where(sq.Eq{"distributor_id": distributorID})
+	return q
 }
 
 func (q EmployeeQ) FilterRole(role ...string) EmployeeQ {
-	return q.applyConditions(sq.Eq{"role": role})
+	q.selector = q.selector.Where(sq.Eq{"role": role})
+	q.counter = q.counter.Where(sq.Eq{"role": role})
+	q.updater = q.updater.Where(sq.Eq{"role": role})
+	q.deleter = q.deleter.Where(sq.Eq{"role": role})
+	return q
 }
 
 func (q EmployeeQ) OrderByRole(ascend bool) EmployeeQ {
@@ -232,7 +230,6 @@ func (q EmployeeQ) Count(ctx context.Context) (uint64, error) {
 
 func (q EmployeeQ) Page(limit, offset uint64) EmployeeQ {
 	q.selector = q.selector.Limit(limit).Offset(offset)
-	q.counter = q.counter.Limit(limit).Offset(offset)
 
 	return q
 }
