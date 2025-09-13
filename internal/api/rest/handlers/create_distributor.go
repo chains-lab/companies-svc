@@ -12,42 +12,42 @@ import (
 	"github.com/chains-lab/distributors-svc/internal/errx"
 )
 
-func (s Service) CreateDistributor(w http.ResponseWriter, r *http.Request) {
+func (a Adapter) CreateDistributor(w http.ResponseWriter, r *http.Request) {
 	initiator, err := meta.User(r.Context())
 	if err != nil {
-		s.Log(r).WithError(err).Error("failed to get user from context")
-
+		a.log.WithError(err).Error("failed to get user from context")
 		ape.RenderErr(w, problems.Unauthorized("failed to get user from context"))
+
 		return
 	}
 
 	req, err := requests.CreateDistributor(r)
 	if err != nil {
-		s.Log(r).WithError(err).Errorf("invalid create distributor request")
-
+		a.log.WithError(err).Errorf("invalid create distributor request")
 		ape.RenderErr(w, problems.BadRequest(err)...)
+
 		return
 	}
 
-	distributor, err := s.app.CreateDistributor(
+	distributor, err := a.app.CreateDistributor(
 		r.Context(),
 		initiator.ID,
 		req.Data.Attributes.Name,
 		req.Data.Attributes.Icon,
 	)
 	if err != nil {
-		s.Log(r).WithError(err).Errorf("failed to create distributor")
-
+		a.log.WithError(err).Errorf("failed to create distributor")
 		switch {
-		case errors.Is(err, errx.ErrorCurrentEmployeeCanCreateDistributor):
+		case errors.Is(err, errx.ErrorCurrentEmployeeCannotCreateDistributor):
 			ape.RenderErr(w, problems.PreconditionFailed("Current employee can not create distributor"))
 		default:
 			ape.RenderErr(w, problems.InternalError())
 		}
+
 		return
 	}
 
-	s.Log(r).Infof("distributor %s created successfully", distributor.ID)
+	a.log.Infof("distributor %s created successfully", distributor.ID)
 
 	ape.Render(w, http.StatusCreated, responses.Distributor(distributor))
 }

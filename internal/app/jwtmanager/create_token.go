@@ -17,8 +17,8 @@ type InvitePayload struct {
 
 func (m Manager) CreateInviteToken(p InvitePayload) (string, error) {
 	claims := inviteClaims{
-
-		Role: p.Role,
+		DistributorID: p.DistributorID,
+		Role:          p.Role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ID:        p.ID.String(),
 			Issuer:    m.iss,

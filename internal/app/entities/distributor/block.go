@@ -25,11 +25,11 @@ func (d Distributor) Block(
 		DistributorID: distributorID,
 		InitiatorID:   initiatorID,
 		Reason:        reason,
-		Status:        enum.BlockStatusActive,
+		Status:        enum.DistributorBlockStatusActive,
 		BlockedAt:     time.Now().UTC(),
 	}
 
-	_, err := d.block.New().FilterDistributorID(distributorID).FilterStatus(enum.BlockStatusActive).Get(ctx)
+	_, err := d.block.New().FilterDistributorID(distributorID).FilterStatus(enum.DistributorBlockStatusActive).Get(ctx)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return models.Block{}, errx.ErrorInternal.Raise(
 			fmt.Errorf("internal error: %w", err),
@@ -52,7 +52,7 @@ func (d Distributor) Block(
 			)
 		}
 
-		_, err = d.block.New().FilterDistributorID(distributorID).FilterStatus(enum.BlockStatusActive).Get(ctx)
+		_, err = d.block.New().FilterDistributorID(distributorID).FilterStatus(enum.DistributorBlockStatusActive).Get(ctx)
 		if err != nil && !errors.Is(err, sql.ErrNoRows) {
 			return errx.ErrorInternal.Raise(
 				fmt.Errorf("checking existing block: %w", err),

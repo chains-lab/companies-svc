@@ -12,37 +12,37 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s Service) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
+func (a Adapter) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
 	initiator, err := meta.User(r.Context())
 	if err != nil {
-		s.Log(r).WithError(err).Error("failed to get user from context")
-
+		a.log.WithError(err).Error("failed to get user from context")
 		ape.RenderErr(w, problems.BadRequest(err)...)
+
 		return
 	}
 
 	userID, err := uuid.Parse(chi.URLParam(r, "user_id"))
 	if err != nil {
-		s.Log(r).WithError(err).Errorf("invalid user ID format")
-
+		a.log.WithError(err).Errorf("invalid user ID format")
 		ape.RenderErr(w, problems.InvalidParameter("user_id", err))
+
 		return
 	}
 
 	distributorID, err := uuid.Parse(chi.URLParam(r, "distributor_id"))
 	if err != nil {
-		s.Log(r).WithError(err).Errorf("invalid distributor ID format")
-
+		a.log.WithError(err).Errorf("invalid distributor ID format")
 		ape.RenderErr(w, problems.InvalidParameter("distributor_id", err))
+
 		return
 	}
 
-	err = s.app.DeleteEmployee(r.Context(), initiator.ID, userID, distributorID)
+	err = a.app.DeleteEmployee(r.Context(), initiator.ID, userID, distributorID)
 	if err != nil {
-		s.Log(r).WithError(err).Errorf("failed to delete employee with user_id: %s", userID)
+		a.log.WithError(err).Errorf("failed to delete employee with user_id: %s", userID)
 		switch {
-		case errors.Is(err, errx.InitiatorAndUserHaveDifferentDistributors):
-			ape.RenderErr(w, problems.Forbidden("initiator and user have different distributors"))
+		case errors.Is(err, errx.ErrorInitiatorAndUserHaveDifferentDistributors):
+			ape.RenderErr(w, problems.Conflict("initiator and user have different distributors"))
 		case errors.Is(err, errx.ErrorInitiatorEmployeeHaveNotEnoughRights):
 			ape.RenderErr(w, problems.Forbidden("initiator employee have not enough rights"))
 		case errors.Is(err, errx.ErrorDistributorNotFound):
@@ -56,7 +56,7 @@ func (s Service) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.Log(r).Infof("employee %s deleted successfully", userID)
+	a.log.Infof("employee %s deleted successfully", userID)
 
 	w.WriteHeader(http.StatusNoContent)
 	return

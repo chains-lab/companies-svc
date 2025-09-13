@@ -2,6 +2,8 @@ package distributor
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
@@ -13,45 +15,41 @@ import (
 
 func (d Distributor) Unblock(
 	ctx context.Context,
-	blockID uuid.UUID,
-) (models.Block, error) {
-	block, err := d.GetBlock(ctx, blockID)
+	distributorID uuid.UUID,
+) (models.Distributor, error) {
+	dis, err := d.GetDistributor(ctx, distributorID)
+	if err != nil {
+		return models.Distributor{}, err
+	}
 
 	canceledAt := time.Now().UTC()
-	trErr := d.distributor.Transaction(func(ctx context.Context) error {
-		err = d.block.FilterID(blockID).FilterStatus(enum.BlockStatusActive).Update(ctx, map[string]any{
-			"status":       enum.BlockStatusCanceled,
-			"cancelled_at": canceledAt,
-		})
-		if err != nil {
-			return errx.ErrorInternal.Raise(
+
+	err = d.block.FilterDistributorID(distributorID).FilterStatus(enum.DistributorBlockStatusActive).Update(ctx, map[string]any{
+		"status":       enum.DistributorBlockStatusCanceled,
+		"cancelled_at": canceledAt,
+	})
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return models.Distributor{}, errx.ErrorNoActiveBlockForDistributor.Raise(
+				fmt.Errorf("no active block for distributor %s: %w", distributorID, err),
+			)
+		default:
+			return models.Distributor{}, errx.ErrorInternal.Raise(
 				fmt.Errorf("updating block status: %w", err),
 			)
 		}
-
-		err = d.distributor.New().FilterID(block.DistributorID).Update(ctx, map[string]any{
-			"status":     enum.DistributorStatusInactive,
-			"updated_at": canceledAt,
-		})
-		if err != nil {
-			return errx.ErrorInternal.Raise(
-				fmt.Errorf("updating distributor status: %w", err),
-			)
-		}
-
-		return nil
-	})
-	if trErr != nil {
-		return models.Block{}, trErr
 	}
 
-	return models.Block{
-		ID:            block.ID,
-		DistributorID: block.DistributorID,
-		InitiatorID:   block.InitiatorID,
-		Reason:        block.Reason,
-		Status:        enum.BlockStatusCanceled,
-		BlockedAt:     block.BlockedAt,
-		CanceledAt:    &canceledAt,
-	}, nil
+	err = d.distributor.New().FilterID(distributorID).Update(ctx, map[string]any{
+		"status":     enum.DistributorStatusInactive,
+		"updated_at": canceledAt,
+	})
+	if err != nil {
+		return models.Distributor{}, errx.ErrorInternal.Raise(
+			fmt.Errorf("updating distributor status: %w", err),
+		)
+	}
+
+	return d.GetDistributor(ctx, dis.ID)
 }

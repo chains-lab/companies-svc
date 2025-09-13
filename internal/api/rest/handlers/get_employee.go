@@ -12,28 +12,27 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s Service) GetEmployee(w http.ResponseWriter, r *http.Request) {
+func (a Adapter) GetEmployee(w http.ResponseWriter, r *http.Request) {
 	userID, err := uuid.Parse(chi.URLParam(r, "user_id"))
 	if err != nil {
-		s.Log(r).WithError(err).Errorf("invalid user ID format")
-
+		a.log.WithError(err).Errorf("invalid user ID format")
 		ape.RenderErr(w, problems.InvalidParameter("user_id", err))
+
 		return
 	}
 
-	employee, err := s.app.GetEmployee(r.Context(), userID)
+	employee, err := a.app.GetEmployee(r.Context(), userID)
 	if err != nil {
-		s.Log(r).WithError(err).Errorf("failed to get employee")
-
+		a.log.WithError(err).Errorf("failed to get employee")
 		switch {
 		case errors.Is(err, errx.ErrorEmployeeNotFound):
 			ape.RenderErr(w, problems.NotFound("Employee not found"))
 		default:
 			ape.RenderErr(w, problems.InternalError())
 		}
+
 		return
 	}
 
 	ape.Render(w, http.StatusOK, responses.Employee(employee))
-	return
 }

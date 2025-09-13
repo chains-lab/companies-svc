@@ -15,44 +15,46 @@ import (
 	"github.com/chains-lab/gatekit/roles"
 )
 
-func (s Service) CanceledDistributorBlock(w http.ResponseWriter, r *http.Request) {
+func (a Adapter) CanceledDistributorBlock(w http.ResponseWriter, r *http.Request) {
 	initiator, err := meta.User(r.Context())
 	if err != nil {
-		s.Log(r).WithError(err).Error("failed to get user from context")
-
+		a.log.WithError(err).Error("failed to get user from context")
 		ape.RenderErr(w, problems.Unauthorized("failed to get user from context"))
+
 		return
 	}
 
-	blockID, err := uuid.Parse(chi.URLParam(r, "block_id"))
+	distributorID, err := uuid.Parse(chi.URLParam(r, "distributor_id"))
 	if err != nil {
-		s.Log(r).WithError(err).Errorf("invalid distributor id: %s", chi.URLParam(r, "block_id"))
+		a.log.WithError(err).Error("invalid distributor_id")
+		ape.RenderErr(w, problems.InvalidParameter("distributor_id", err))
 
-		ape.RenderErr(w, problems.InvalidParameter("block_id", err))
 		return
 	}
 
 	if initiator.Role != roles.Admin && initiator.Role != roles.SuperUser {
-		s.Log(r).Warnf("user %s with role %s attempted to canceled block %s", initiator.ID, initiator.Role, blockID)
-
+		a.log.Warnf("user %s with role %s attempted to canceled block %s", initiator.ID, initiator.Role, distributorID)
 		ape.RenderErr(w, problems.Forbidden("only admin and superuser can unblock distributor"))
+
 		return
 	}
 
-	block, err := s.app.UnblockDistributor(r.Context(), blockID)
+	dis, err := a.app.UnblockDistributor(r.Context(), distributorID)
 	if err != nil {
-		s.Log(r).WithError(err).Errorf("failed to canceled block distributor")
-
+		a.log.WithError(err).Errorf("failed to canceled block distributor")
 		switch {
-		case errors.Is(err, errx.DistributorBlockNotFound):
-			ape.RenderErr(w, problems.NotFound("distributor block not found"))
+		case errors.Is(err, errx.ErrorDistributorNotFound):
+			ape.RenderErr(w, problems.NotFound("distributor not found"))
+		case errors.Is(err, errx.ErrorNoActiveBlockForDistributor):
+			ape.RenderErr(w, problems.Conflict("no active block for distributor"))
 		default:
 			ape.RenderErr(w, problems.InternalError())
 		}
+
 		return
 	}
 
-	s.Log(r).Infof("distributor block %s canceled successfully by user %s", blockID, initiator.ID)
+	a.log.Infof("distributor block %s canceled successfully by user %s", distributorID, initiator.ID)
 
-	ape.Render(w, http.StatusOK, responses.DistributorBlock(block))
+	ape.Render(w, http.StatusOK, responses.Distributor(dis))
 }

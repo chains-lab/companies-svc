@@ -13,11 +13,11 @@ import (
 )
 
 func (d Distributor) GetActiveDistributorBlock(ctx context.Context, distributorID uuid.UUID) (models.Block, error) {
-	block, err := d.block.New().FilterDistributorID(distributorID).FilterStatus(enum.BlockStatusActive).Get(ctx)
+	block, err := d.block.New().FilterDistributorID(distributorID).FilterStatus(enum.DistributorBlockStatusActive).Get(ctx)
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
-			return models.Block{}, errx.DistributorBlockNotFound.Raise(
+			return models.Block{}, errx.ErrorNoActiveBlockForDistributor.Raise(
 				fmt.Errorf("active block for distributor with ID %s not found, cause: %w", distributorID, err),
 			)
 		default:

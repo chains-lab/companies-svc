@@ -17,21 +17,13 @@ func (d Distributor) SetStatusInactive(
 	ctx context.Context,
 	distributorID uuid.UUID,
 ) (models.Distributor, error) {
-	distributor, err := d.distributor.New().FilterID(distributorID).Get(ctx)
+	distributor, err := d.GetDistributor(ctx, distributorID)
 	if err != nil {
-		switch {
-		case errors.Is(err, sql.ErrNoRows):
-			return models.Distributor{}, errx.ErrorDistributorNotFound.Raise(
-				fmt.Errorf("distributor %s not found: %w", distributorID, err),
-			)
-		default:
-			return models.Distributor{}, errx.ErrorInternal.Raise(
-				fmt.Errorf("internal error: %w", err),
-			)
-		}
+		return models.Distributor{}, err
 	}
+
 	if distributor.Status == enum.DistributorStatusBlocked {
-		return models.Distributor{}, errx.DistributorStatusBlocked.Raise(
+		return models.Distributor{}, errx.ErrorDistributorIsBlocked.Raise(
 			fmt.Errorf("distributor %s is blocked", distributorID),
 		)
 	}
@@ -78,7 +70,7 @@ func (d Distributor) SetStatusActive(
 		}
 	}
 	if distributor.Status == enum.DistributorStatusBlocked {
-		return models.Distributor{}, errx.DistributorStatusBlocked.Raise(
+		return models.Distributor{}, errx.ErrorDistributorIsBlocked.Raise(
 			fmt.Errorf("distributor %s is block", distributorID),
 		)
 	}

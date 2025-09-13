@@ -13,7 +13,7 @@ import (
 	"github.com/chains-lab/pagi"
 )
 
-func (s Service) ListDistributors(w http.ResponseWriter, r *http.Request) {
+func (a Adapter) ListDistributors(w http.ResponseWriter, r *http.Request) {
 	filters := app.FilterDistributorList{}
 	q := r.URL.Query()
 
@@ -30,16 +30,17 @@ func (s Service) ListDistributors(w http.ResponseWriter, r *http.Request) {
 
 	pagReq, sort := pagi.GetPagination(r)
 
-	distributors, pag, err := s.app.ListDistributors(r.Context(), filters, pagReq, sort)
+	distributors, pag, err := a.app.ListDistributors(r.Context(), filters, pagReq, sort)
 	if err != nil {
-		s.Log(r).WithError(err).Error("failed to select distributors")
-
+		a.log.WithError(err).Error("failed to select distributors")
 		switch {
-		case errors.Is(err, errx.InvalidDistributorStatus):
+		case errors.Is(err, errx.ErrorInvalidDistributorStatus):
 			ape.RenderErr(w, problems.InvalidParameter("status", err))
 		default:
 			ape.RenderErr(w, problems.InternalError())
 		}
+
+		return
 	}
 
 	ape.Render(w, http.StatusOK, responses.DistributorCollection(distributors, pag))

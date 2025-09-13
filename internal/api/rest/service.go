@@ -9,7 +9,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type Rest struct {
+type Service struct {
 	server *http.Server
 	router *chi.Mux
 
@@ -17,7 +17,7 @@ type Rest struct {
 	cfg config.Config
 }
 
-func NewRest(cfg config.Config, log logium.Logger) Rest {
+func NewRest(cfg config.Config, log logium.Logger) Service {
 	logger := log.WithField("module", "api")
 	router := chi.NewRouter()
 	server := &http.Server{
@@ -29,7 +29,7 @@ func NewRest(cfg config.Config, log logium.Logger) Rest {
 		IdleTimeout:       60 * time.Second,
 	}
 
-	return Rest{
+	return Service{
 		router: router,
 		server: server,
 		log:    logger,

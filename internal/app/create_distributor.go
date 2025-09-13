@@ -19,7 +19,7 @@ func (a App) CreateDistributor(ctx context.Context, initiatorID uuid.UUID, name,
 		return models.Distributor{}, err
 	}
 	if err == nil {
-		return models.Distributor{}, errx.ErrorCurrentEmployeeCanCreateDistributor.Raise(
+		return models.Distributor{}, errx.ErrorCurrentEmployeeCannotCreateDistributor.Raise(
 			fmt.Errorf("current employee %s can not create distributor", initiatorID),
 		)
 	}

@@ -7,12 +7,12 @@ import (
 	"github.com/google/uuid"
 )
 
-func (a App) UnblockDistributor(ctx context.Context, distributorID uuid.UUID) (models.Block, error) {
-	var block models.Block
+func (a App) UnblockDistributor(ctx context.Context, distributorID uuid.UUID) (models.Distributor, error) {
+	var dis models.Distributor
 	var err error
 
 	trErt := a.transaction(func(ctx context.Context) error {
-		block, err = a.distributor.Unblock(ctx, distributorID)
+		dis, err = a.distributor.Unblock(ctx, distributorID)
 		if err != nil {
 			return err
 		}
@@ -20,10 +20,10 @@ func (a App) UnblockDistributor(ctx context.Context, distributorID uuid.UUID) (m
 		return nil
 	})
 	if trErt != nil {
-		return models.Block{}, trErt
+		return models.Distributor{}, trErt
 	}
 
 	//TODO Kafka event maybe? Maybe will be better if user unblock his places by own
 
-	return block, nil
+	return dis, nil
 }

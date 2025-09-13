@@ -10,12 +10,12 @@ import (
 	"github.com/google/uuid"
 )
 
-const invitesTable = "invites"
+const invitesTable = "employee_invites"
 
 // Invite — модель строки из invites.
 type Invite struct {
 	ID            uuid.UUID     `db:"id"`
-	Status        string        `db:"status"` // 'sent' | 'accepted' | 'rejected'
+	Status        string        `db:"status"` // 'sent' | 'accepted' |
 	Role          string        `db:"role"`   // enum employee_roles
 	DistributorID uuid.UUID     `db:"distributor_id"`
 	UserID        uuid.NullUUID `db:"user_id"`     // может быть NULL до акцепта
@@ -53,11 +53,11 @@ func (q InviteQ) New() InviteQ { return NewInviteQ(q.db) }
 // created_at/updated_at можно не заполнять — если в схеме стоят DEFAULT, но ты их явно задаёшь в других местах.
 func (q InviteQ) Insert(ctx context.Context, input Invite) error {
 	values := map[string]interface{}{
-		"id":         input.ID,
-		"status":     input.Status,
-		"role":       input.Role,
-		"city_id":    input.DistributorID,
-		"expires_at": input.ExpiresAt,
+		"id":             input.ID,
+		"status":         input.Status,
+		"role":           input.Role,
+		"distributor_id": input.DistributorID,
+		"expires_at":     input.ExpiresAt,
 	}
 
 	if input.UserID.Valid {

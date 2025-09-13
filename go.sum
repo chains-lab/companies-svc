@@ -14,6 +14,8 @@ github.com/chains-lab/ape v0.4.12 h1:dCs1r0CL6JhN4lyTwlEsAVMXSZpgxtM5yrkfrMVfpIs
 github.com/chains-lab/ape v0.4.12/go.mod h1:1xFb/pocztb1NW6ghAMJxuez/nausXgnHs+68pCzolI=
 github.com/chains-lab/enum v0.1.2 h1:jRMTbxRo4PjJT/35ndqrKURCTgi6DcvdWCrv4Yqc7XM=
 github.com/chains-lab/enum v0.1.2/go.mod h1:SoV+p/9AlKSfYbq+wxBwA8fEQNwrAwBXIz+YjtDqQ/U=
+github.com/chains-lab/enum v0.1.4 h1:moKdL9VtQ3f3vmC/w1cb1ipvmZdpUFgp3Bl2Jr2WWdc=
+github.com/chains-lab/enum v0.1.4/go.mod h1:SoV+p/9AlKSfYbq+wxBwA8fEQNwrAwBXIz+YjtDqQ/U=
 github.com/chains-lab/gatekit v0.2.2 h1:66/FWy6QRm99ITRste4wVycv8Sks50BTcFJCnm4g5m4=
 github.com/chains-lab/gatekit v0.2.2/go.mod h1:VG2r14E8Y4AP3KBX85MwtZ3+XJorVm5P9kJqdfDoevQ=
 github.com/chains-lab/gatekit v0.2.3 h1:1kCRESBVO1rT/iHpf3ynKKh2WAL4yceydFxSrG+6SgU=

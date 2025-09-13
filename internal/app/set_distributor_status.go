@@ -55,7 +55,7 @@ func (a App) SetDistributorStatus(ctx context.Context, initiatorID, distributorI
 		}
 
 	default:
-		return models.Distributor{}, errx.UnexpectedDistributorSetStatus.Raise(
+		return models.Distributor{}, errx.ErrorUnexpectedDistributorSetStatus.Raise(
 			fmt.Errorf("unexpected status: %s", status),
 		)
 	}

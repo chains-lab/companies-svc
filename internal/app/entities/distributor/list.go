@@ -30,7 +30,7 @@ func (d Distributor) List(
 		for _, status := range filters.Statuses {
 			err := enum.CheckDistributorStatus(status)
 			if err != nil {
-				return nil, pagi.Response{}, errx.InvalidDistributorStatus.Raise(err)
+				return nil, pagi.Response{}, errx.ErrorInvalidDistributorStatus.Raise(err)
 			}
 		}
 		query = query.FilterStatus(filters.Statuses...)

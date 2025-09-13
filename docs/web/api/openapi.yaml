@@ -44,6 +44,13 @@ components:
       required:
       - data
       type: object
+    UpdateDistributorStatus:
+      properties:
+        data:
+          $ref: '#/components/schemas/UpdateDistributorStatus_data'
+      required:
+      - data
+      type: object
     PaginationData:
       properties:
         page_number:
@@ -197,13 +204,6 @@ components:
       properties:
         data:
           $ref: '#/components/schemas/SentInvite_data'
-      required:
-      - data
-      type: object
-    AnswerToInvite:
-      properties:
-        data:
-          $ref: '#/components/schemas/AnswerToInvite_data'
       required:
       - data
       type: object
@@ -452,6 +452,34 @@ components:
       - id
       - type
       type: object
+    UpdateDistributorStatus_data_attributes:
+      properties:
+        status:
+          description: The new status of the distributor.
+          enum:
+          - active
+          - inactive
+          type: string
+      required:
+      - status
+      type: object
+    UpdateDistributorStatus_data:
+      properties:
+        id:
+          description: The UUID of the distributor to be updated.
+          format: uuid
+          type: string
+        type:
+          enum:
+          - update_distributor_status
+          type: string
+        attributes:
+          $ref: '#/components/schemas/UpdateDistributorStatus_data_attributes'
+      required:
+      - attributes
+      - id
+      - type
+      type: object
     Errors_errors_inner:
       properties:
         title:
@@ -503,34 +531,6 @@ components:
           type: string
         attributes:
           $ref: '#/components/schemas/SentInvite_data_attributes'
-      required:
-      - attributes
-      - id
-      - type
-      type: object
-    AnswerToInvite_data_attributes:
-      properties:
-        answer:
-          description: answer to the invite
-          enum:
-          - accepted
-          - declined
-          type: string
-      required:
-      - answer
-      type: object
-    AnswerToInvite_data:
-      properties:
-        id:
-          description: invite id
-          format: uuid
-          type: string
-        type:
-          enum:
-          - answer_to_invite
-          type: string
-        attributes:
-          $ref: '#/components/schemas/AnswerToInvite_data_attributes'
       required:
       - attributes
       - id

@@ -5,7 +5,7 @@ import (
 	"github.com/chains-lab/distributors-svc/resources"
 )
 
-func EmployeeInvites(m models.Invite) resources.Invite {
+func Invites(m models.Invite) resources.Invite {
 	resp := resources.Invite{
 		Data: resources.InviteData{
 			Id:   m.ID.String(),

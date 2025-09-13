@@ -16,41 +16,41 @@ import (
 	"fmt"
 )
 
-// checks if the AnswerToInviteData type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &AnswerToInviteData{}
+// checks if the UpdateDistributorStatusData type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &UpdateDistributorStatusData{}
 
-// AnswerToInviteData struct for AnswerToInviteData
-type AnswerToInviteData struct {
-	// invite id
+// UpdateDistributorStatusData struct for UpdateDistributorStatusData
+type UpdateDistributorStatusData struct {
+	// The UUID of the distributor to be updated.
 	Id string `json:"id"`
 	Type string `json:"type"`
-	Attributes AnswerToInviteDataAttributes `json:"attributes"`
+	Attributes UpdateDistributorStatusDataAttributes `json:"attributes"`
 }
 
-type _AnswerToInviteData AnswerToInviteData
+type _UpdateDistributorStatusData UpdateDistributorStatusData
 
-// NewAnswerToInviteData instantiates a new AnswerToInviteData object
+// NewUpdateDistributorStatusData instantiates a new UpdateDistributorStatusData object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewAnswerToInviteData(id string, type_ string, attributes AnswerToInviteDataAttributes) *AnswerToInviteData {
-	this := AnswerToInviteData{}
+func NewUpdateDistributorStatusData(id string, type_ string, attributes UpdateDistributorStatusDataAttributes) *UpdateDistributorStatusData {
+	this := UpdateDistributorStatusData{}
 	this.Id = id
 	this.Type = type_
 	this.Attributes = attributes
 	return &this
 }
 
-// NewAnswerToInviteDataWithDefaults instantiates a new AnswerToInviteData object
+// NewUpdateDistributorStatusDataWithDefaults instantiates a new UpdateDistributorStatusData object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewAnswerToInviteDataWithDefaults() *AnswerToInviteData {
-	this := AnswerToInviteData{}
+func NewUpdateDistributorStatusDataWithDefaults() *UpdateDistributorStatusData {
+	this := UpdateDistributorStatusData{}
 	return &this
 }
 
 // GetId returns the Id field value
-func (o *AnswerToInviteData) GetId() string {
+func (o *UpdateDistributorStatusData) GetId() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -61,7 +61,7 @@ func (o *AnswerToInviteData) GetId() string {
 
 // GetIdOk returns a tuple with the Id field value
 // and a boolean to check if the value has been set.
-func (o *AnswerToInviteData) GetIdOk() (*string, bool) {
+func (o *UpdateDistributorStatusData) GetIdOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -69,12 +69,12 @@ func (o *AnswerToInviteData) GetIdOk() (*string, bool) {
 }
 
 // SetId sets field value
-func (o *AnswerToInviteData) SetId(v string) {
+func (o *UpdateDistributorStatusData) SetId(v string) {
 	o.Id = v
 }
 
 // GetType returns the Type field value
-func (o *AnswerToInviteData) GetType() string {
+func (o *UpdateDistributorStatusData) GetType() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -85,7 +85,7 @@ func (o *AnswerToInviteData) GetType() string {
 
 // GetTypeOk returns a tuple with the Type field value
 // and a boolean to check if the value has been set.
-func (o *AnswerToInviteData) GetTypeOk() (*string, bool) {
+func (o *UpdateDistributorStatusData) GetTypeOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -93,14 +93,14 @@ func (o *AnswerToInviteData) GetTypeOk() (*string, bool) {
 }
 
 // SetType sets field value
-func (o *AnswerToInviteData) SetType(v string) {
+func (o *UpdateDistributorStatusData) SetType(v string) {
 	o.Type = v
 }
 
 // GetAttributes returns the Attributes field value
-func (o *AnswerToInviteData) GetAttributes() AnswerToInviteDataAttributes {
+func (o *UpdateDistributorStatusData) GetAttributes() UpdateDistributorStatusDataAttributes {
 	if o == nil {
-		var ret AnswerToInviteDataAttributes
+		var ret UpdateDistributorStatusDataAttributes
 		return ret
 	}
 
@@ -109,7 +109,7 @@ func (o *AnswerToInviteData) GetAttributes() AnswerToInviteDataAttributes {
 
 // GetAttributesOk returns a tuple with the Attributes field value
 // and a boolean to check if the value has been set.
-func (o *AnswerToInviteData) GetAttributesOk() (*AnswerToInviteDataAttributes, bool) {
+func (o *UpdateDistributorStatusData) GetAttributesOk() (*UpdateDistributorStatusDataAttributes, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -117,11 +117,11 @@ func (o *AnswerToInviteData) GetAttributesOk() (*AnswerToInviteDataAttributes, b
 }
 
 // SetAttributes sets field value
-func (o *AnswerToInviteData) SetAttributes(v AnswerToInviteDataAttributes) {
+func (o *UpdateDistributorStatusData) SetAttributes(v UpdateDistributorStatusDataAttributes) {
 	o.Attributes = v
 }
 
-func (o AnswerToInviteData) MarshalJSON() ([]byte, error) {
+func (o UpdateDistributorStatusData) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -129,7 +129,7 @@ func (o AnswerToInviteData) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-func (o AnswerToInviteData) ToMap() (map[string]interface{}, error) {
+func (o UpdateDistributorStatusData) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["id"] = o.Id
 	toSerialize["type"] = o.Type
@@ -137,7 +137,7 @@ func (o AnswerToInviteData) ToMap() (map[string]interface{}, error) {
 	return toSerialize, nil
 }
 
-func (o *AnswerToInviteData) UnmarshalJSON(data []byte) (err error) {
+func (o *UpdateDistributorStatusData) UnmarshalJSON(data []byte) (err error) {
 	// This validates that all required properties are included in the JSON object
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
@@ -161,53 +161,53 @@ func (o *AnswerToInviteData) UnmarshalJSON(data []byte) (err error) {
 		}
 	}
 
-	varAnswerToInviteData := _AnswerToInviteData{}
+	varUpdateDistributorStatusData := _UpdateDistributorStatusData{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
 	decoder.DisallowUnknownFields()
-	err = decoder.Decode(&varAnswerToInviteData)
+	err = decoder.Decode(&varUpdateDistributorStatusData)
 
 	if err != nil {
 		return err
 	}
 
-	*o = AnswerToInviteData(varAnswerToInviteData)
+	*o = UpdateDistributorStatusData(varUpdateDistributorStatusData)
 
 	return err
 }
 
-type NullableAnswerToInviteData struct {
-	value *AnswerToInviteData
+type NullableUpdateDistributorStatusData struct {
+	value *UpdateDistributorStatusData
 	isSet bool
 }
 
-func (v NullableAnswerToInviteData) Get() *AnswerToInviteData {
+func (v NullableUpdateDistributorStatusData) Get() *UpdateDistributorStatusData {
 	return v.value
 }
 
-func (v *NullableAnswerToInviteData) Set(val *AnswerToInviteData) {
+func (v *NullableUpdateDistributorStatusData) Set(val *UpdateDistributorStatusData) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableAnswerToInviteData) IsSet() bool {
+func (v NullableUpdateDistributorStatusData) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableAnswerToInviteData) Unset() {
+func (v *NullableUpdateDistributorStatusData) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableAnswerToInviteData(val *AnswerToInviteData) *NullableAnswerToInviteData {
-	return &NullableAnswerToInviteData{value: val, isSet: true}
+func NewNullableUpdateDistributorStatusData(val *UpdateDistributorStatusData) *NullableUpdateDistributorStatusData {
+	return &NullableUpdateDistributorStatusData{value: val, isSet: true}
 }
 
-func (v NullableAnswerToInviteData) MarshalJSON() ([]byte, error) {
+func (v NullableUpdateDistributorStatusData) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableAnswerToInviteData) UnmarshalJSON(src []byte) error {
+func (v *NullableUpdateDistributorStatusData) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

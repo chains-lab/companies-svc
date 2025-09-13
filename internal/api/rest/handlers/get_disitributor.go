@@ -11,25 +11,25 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s Service) GetDistributor(w http.ResponseWriter, r *http.Request) {
+func (a Adapter) GetDistributor(w http.ResponseWriter, r *http.Request) {
 	distributorID, err := uuid.Parse(chi.URLParam(r, "distributor_id"))
 	if err != nil {
-		s.Log(r).WithError(err).Errorf("invalid distributor ID format")
-
+		a.log.WithError(err).Errorf("invalid distributor ID format")
 		ape.RenderErr(w, problems.InvalidParameter("distributor_id", err))
+
 		return
 	}
 
-	distributor, err := s.app.GetDistributor(r.Context(), distributorID)
+	distributor, err := a.app.GetDistributor(r.Context(), distributorID)
 	if err != nil {
-		s.Log(r).WithError(err).Error("failed to get distributor")
-
+		a.log.WithError(err).Error("failed to get distributor")
 		switch {
 		case errors.Is(err, errx.ErrorDistributorNotFound):
 			ape.RenderErr(w, problems.NotFound("Distributor not found"))
 		default:
 			ape.RenderErr(w, problems.InternalError())
 		}
+
 		return
 	}
 

@@ -1,27 +1,21 @@
 package handlers
 
 import (
-	"net/http"
-
 	"github.com/chains-lab/distributors-svc/internal/app"
 	"github.com/chains-lab/distributors-svc/internal/config"
 	"github.com/chains-lab/logium"
 )
 
-type Service struct {
+type Adapter struct {
 	app *app.App
 	log logium.Logger
 	cfg config.Config
 }
 
-func NewAdaptrer(cfg config.Config, log logium.Logger, a *app.App) Service {
-	return Service{
+func NewAdapter(cfg config.Config, log logium.Logger, a *app.App) Adapter {
+	return Adapter{
 		app: a,
 		cfg: cfg,
 		log: log,
 	}
-}
-
-func (s Service) Log(r *http.Request) logium.Logger {
-	return s.log
 }

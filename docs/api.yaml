@@ -43,6 +43,8 @@ components:
       $ref: './spec/components/schemas/CreateEmployeeInvite.yaml'
     UpdateDistributor:
       $ref: './spec/components/schemas/UpdateDistributor.yaml'
+    UpdateDistributorStatus:
+      $ref: './spec/components/schemas/UpdateDistributorStatus.yaml'
 
 
     #responses
@@ -66,8 +68,6 @@ components:
       $ref: './spec/components/schemas/InviteAttributes.yaml'
     SentInvite:
       $ref: './spec/components/schemas/SentInvite.yaml'
-    AnswerToInvite:
-      $ref: './spec/components/schemas/AnswerToInvite.yaml'
     Distributor:
         $ref: './spec/components/schemas/Distributor.yaml'
     DistributorData:

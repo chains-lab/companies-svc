@@ -2,13 +2,12 @@ package distributor
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 	"fmt"
 	"time"
 
 	"github.com/chains-lab/distributors-svc/internal/app/models"
 	"github.com/chains-lab/distributors-svc/internal/errx"
+	"github.com/chains-lab/enum"
 	"github.com/google/uuid"
 )
 
@@ -21,43 +20,34 @@ func (d Distributor) Update(ctx context.Context,
 	distributorID uuid.UUID,
 	params UpdateParams,
 ) (models.Distributor, error) {
+	distributor, err := d.GetDistributor(ctx, distributorID)
+	if err != nil {
+		return models.Distributor{}, err
+	}
+
+	if distributor.Status == enum.DistributorStatusBlocked {
+		return models.Distributor{}, errx.ErrorDistributorIsBlocked.Raise(
+			fmt.Errorf("distributor %s is blocked", distributorID),
+		)
+	}
+
 	update := map[string]any{}
 
 	if params.Name != nil {
 		update["name"] = *params.Name
+		distributor.Name = *params.Name
 	}
 	if params.Icon != nil {
 		update["icon"] = *params.Icon
+		distributor.Icon = *params.Icon
 	}
-	update["updated_at"] = time.Now().UTC()
+	distributor.UpdatedAt = time.Now().UTC()
+	update["updated_at"] = distributor.UpdatedAt
 
-	distributorQ := d.distributor.New().FilterID(distributorID)
-
-	err := distributorQ.Update(ctx, update)
+	err = d.distributor.New().FilterID(distributorID).Update(ctx, update)
 	if err != nil {
 		return models.Distributor{}, errx.ErrorInternal.Raise(fmt.Errorf("updating distributor name: %w", err))
 	}
 
-	distributor, err := distributorQ.Get(ctx)
-	if err != nil {
-		switch {
-		case errors.Is(err, sql.ErrNoRows):
-			return models.Distributor{}, errx.ErrorDistributorNotFound.Raise(
-				fmt.Errorf("distributor %s not found: %w", distributorID, err),
-			)
-		default:
-			return models.Distributor{}, errx.ErrorInternal.Raise(
-				fmt.Errorf("internal error: %w", err),
-			)
-		}
-	}
-
-	return models.Distributor{
-		ID:        distributor.ID,
-		Name:      distributor.Name,
-		Icon:      distributor.Icon,
-		Status:    distributor.Status,
-		UpdatedAt: distributor.UpdatedAt,
-		CreatedAt: distributor.CreatedAt,
-	}, nil
+	return distributor, nil
 }

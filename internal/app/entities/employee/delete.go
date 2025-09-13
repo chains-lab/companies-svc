@@ -15,6 +15,12 @@ func (e Employee) Delete(
 	ctx context.Context,
 	initiatorID, userID, distributorID uuid.UUID,
 ) error {
+	if initiatorID == userID {
+		return errx.ErrorCannotDeleteYourself.Raise(
+			fmt.Errorf("initiatorID and userID are the same: %s", initiatorID),
+		)
+	}
+
 	initiator, err := e.GetInitiator(ctx, initiatorID)
 	if err != nil {
 		return err
@@ -25,14 +31,14 @@ func (e Employee) Delete(
 	}
 
 	if initiator.DistributorID != user.DistributorID || initiator.DistributorID != distributorID {
-		return errx.InitiatorAndUserHaveDifferentDistributors.Raise(
+		return errx.ErrorInitiatorAndUserHaveDifferentDistributors.Raise(
 			fmt.Errorf("employee with userID %s not found in distributor %s", userID, initiator.DistributorID),
 		)
 	}
 
-	allowed, err := enum.ComparisonEmployeeRoles(initiator.Role, user.Role)
+	allowed, err := enum.CompareEmployeeRoles(initiator.Role, user.Role)
 	if err != nil {
-		return errx.EmployeeRoleNotSupported.Raise(
+		return errx.EmployeeInvalidRole.Raise(
 			fmt.Errorf("new role is invalid: %w", err),
 		)
 	}

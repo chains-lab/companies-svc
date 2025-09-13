@@ -12,7 +12,7 @@ import (
 // Manager подписывает/проверяет инвайт-JWT.
 type Manager struct {
 	iss string
-	sk  string
+	sk  []byte
 }
 
 type InviteData struct {
@@ -33,6 +33,6 @@ type inviteClaims struct {
 func NewManager(cfg config.Config) Manager {
 	return Manager{
 		iss: enum.CitiesSVC,
-		sk:  cfg.JWT.Invites.SecretKey,
+		sk:  []byte(cfg.JWT.Invites.SecretKey),
 	}
 }

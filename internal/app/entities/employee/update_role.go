@@ -34,9 +34,9 @@ func (e Employee) UpdateEmployeeRole(
 		)
 	}
 
-	allowed, err := enum.ComparisonEmployeeRoles(initiator.Role, user.Role)
+	allowed, err := enum.CompareEmployeeRoles(initiator.Role, user.Role)
 	if err != nil {
-		return models.Employee{}, errx.EmployeeRoleNotSupported.Raise(
+		return models.Employee{}, errx.EmployeeInvalidRole.Raise(
 			fmt.Errorf("new role is invalid: %w", err),
 		)
 	}
@@ -46,9 +46,9 @@ func (e Employee) UpdateEmployeeRole(
 		)
 	}
 
-	allowed, err = enum.ComparisonEmployeeRoles(initiator.Role, newRole)
+	allowed, err = enum.CompareEmployeeRoles(initiator.Role, newRole)
 	if err != nil {
-		return models.Employee{}, errx.EmployeeRoleNotSupported.Raise(
+		return models.Employee{}, errx.EmployeeInvalidRole.Raise(
 			fmt.Errorf("new role is invalid: %w", err),
 		)
 	}

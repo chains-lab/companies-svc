@@ -6,8 +6,10 @@ import (
 
 var ErrorDistributorNotFound = ape.DeclareError("DISTRIBUTOR_NOT_FOUND")
 
-var DistributorStatusBlocked = ape.DeclareError("DISTRIBUTOR_STATUS_BLOCKED")
+var ErrorDistributorIsBlocked = ape.DeclareError("DISTRIBUTOR_STATUS_BLOCKED")
 
-var UnexpectedDistributorSetStatus = ape.DeclareError("UNEXPECTED_DISTRIBUTOR_SET_STATUS")
+var ErrorInvalidDistributorStatus = ape.DeclareError("INVALID_DISTRIBUTOR_STATUS")
 
-var InvalidDistributorStatus = ape.DeclareError("INVALID_DISTRIBUTOR_STATUS")
+var ErrorUnexpectedDistributorSetStatus = ape.DeclareError("UNEXPECTED_DISTRIBUTOR_SET_STATUS")
+
+var ErrorAnswerToInviteForNotActiveDistributor = ape.DeclareError("ANSWER_TO_INVITE_FOR_NOT_ACTIVE_DISTRIBUTOR")

@@ -83,9 +83,6 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Models
 
- - [AnswerToInvite](docs/AnswerToInvite.md)
- - [AnswerToInviteData](docs/AnswerToInviteData.md)
- - [AnswerToInviteDataAttributes](docs/AnswerToInviteDataAttributes.md)
  - [CreateDistributor](docs/CreateDistributor.md)
  - [CreateDistributorBlock](docs/CreateDistributorBlock.md)
  - [CreateDistributorBlockData](docs/CreateDistributorBlockData.md)
@@ -119,6 +116,9 @@ Class | Method | HTTP request | Description
  - [UpdateDistributor](docs/UpdateDistributor.md)
  - [UpdateDistributorData](docs/UpdateDistributorData.md)
  - [UpdateDistributorDataAttributes](docs/UpdateDistributorDataAttributes.md)
+ - [UpdateDistributorStatus](docs/UpdateDistributorStatus.md)
+ - [UpdateDistributorStatusData](docs/UpdateDistributorStatusData.md)
+ - [UpdateDistributorStatusDataAttributes](docs/UpdateDistributorStatusDataAttributes.md)
 
 
 ## Documentation For Authorization

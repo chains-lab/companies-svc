@@ -11,7 +11,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (d Distributor) GetByID(ctx context.Context, ID uuid.UUID) (models.Distributor, error) {
+func (d Distributor) GetDistributor(ctx context.Context, ID uuid.UUID) (models.Distributor, error) {
 	distributor, err := d.distributor.New().FilterID(ID).Get(ctx)
 	if err != nil {
 		switch {

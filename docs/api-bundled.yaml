@@ -136,6 +136,37 @@ components:
                 name:
                   type: string
                   description: The name of the distributor.
+    UpdateDistributorStatus:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: object
+          required:
+            - id
+            - type
+            - attributes
+          properties:
+            id:
+              type: string
+              format: uuid
+              description: The UUID of the distributor to be updated.
+            type:
+              type: string
+              enum:
+                - update_distributor_status
+            attributes:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - active
+                    - inactive
+                  description: The new status of the distributor.
     PaginationData:
       type: object
       required:
@@ -339,37 +370,6 @@ components:
                 role:
                   type: string
                   description: Role assigned to the invited user
-    AnswerToInvite:
-      type: object
-      required:
-        - data
-      properties:
-        data:
-          type: object
-          required:
-            - id
-            - type
-            - attributes
-          properties:
-            id:
-              type: string
-              format: uuid
-              description: invite id
-            type:
-              type: string
-              enum:
-                - answer_to_invite
-            attributes:
-              type: object
-              required:
-                - answer
-              properties:
-                answer:
-                  type: string
-                  description: answer to the invite
-                  enum:
-                    - accepted
-                    - declined
     Distributor:
       type: object
       required:

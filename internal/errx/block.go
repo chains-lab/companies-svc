@@ -6,4 +6,6 @@ import (
 
 var DistributorBlockNotFound = ape.DeclareError("BLOCK_NOT_FOUND")
 
+var ErrorNoActiveBlockForDistributor = ape.DeclareError("NO_ACTIVE_BLOCK_FOR_DISTRIBUTOR")
+
 var DistributorHaveAlreadyActiveBlock = ape.DeclareError("DISTRIBUTOR_HAVE_ALREADY_ACTIVE_BLOCK")

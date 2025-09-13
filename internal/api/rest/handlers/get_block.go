@@ -12,27 +12,27 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s Service) GetBlock(w http.ResponseWriter, r *http.Request) {
+func (a Adapter) GetBlock(w http.ResponseWriter, r *http.Request) {
 	blockID, err := uuid.Parse(chi.URLParam(r, "block_id"))
 	if err != nil {
-		s.Log(r).WithError(err).Errorf("invalid block ID format")
-
+		a.log.WithError(err).Errorf("invalid block ID format")
 		ape.RenderErr(w, problems.InvalidParameter("block_id", err))
+
 		return
 	}
 
-	block, err := s.app.GetBlock(r.Context(), blockID)
+	block, err := a.app.GetBlock(r.Context(), blockID)
 	if err != nil {
-		s.Log(r).WithError(err).Errorf("failed to get block, ID: %s", blockID)
-
+		a.log.WithError(err).Errorf("failed to get block, ID: %s", blockID)
 		switch {
 		case errors.Is(err, errx.DistributorBlockNotFound):
 			ape.RenderErr(w, problems.NotFound("Block not found"))
 		default:
 			ape.RenderErr(w, problems.InternalError())
 		}
+
+		return
 	}
 
 	ape.Render(w, http.StatusOK, responses.DistributorBlock(block))
-	return
 }

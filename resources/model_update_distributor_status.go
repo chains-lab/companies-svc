@@ -16,38 +16,38 @@ import (
 	"fmt"
 )
 
-// checks if the AnswerToInvite type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &AnswerToInvite{}
+// checks if the UpdateDistributorStatus type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &UpdateDistributorStatus{}
 
-// AnswerToInvite struct for AnswerToInvite
-type AnswerToInvite struct {
-	Data AnswerToInviteData `json:"data"`
+// UpdateDistributorStatus struct for UpdateDistributorStatus
+type UpdateDistributorStatus struct {
+	Data UpdateDistributorStatusData `json:"data"`
 }
 
-type _AnswerToInvite AnswerToInvite
+type _UpdateDistributorStatus UpdateDistributorStatus
 
-// NewAnswerToInvite instantiates a new AnswerToInvite object
+// NewUpdateDistributorStatus instantiates a new UpdateDistributorStatus object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewAnswerToInvite(data AnswerToInviteData) *AnswerToInvite {
-	this := AnswerToInvite{}
+func NewUpdateDistributorStatus(data UpdateDistributorStatusData) *UpdateDistributorStatus {
+	this := UpdateDistributorStatus{}
 	this.Data = data
 	return &this
 }
 
-// NewAnswerToInviteWithDefaults instantiates a new AnswerToInvite object
+// NewUpdateDistributorStatusWithDefaults instantiates a new UpdateDistributorStatus object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewAnswerToInviteWithDefaults() *AnswerToInvite {
-	this := AnswerToInvite{}
+func NewUpdateDistributorStatusWithDefaults() *UpdateDistributorStatus {
+	this := UpdateDistributorStatus{}
 	return &this
 }
 
 // GetData returns the Data field value
-func (o *AnswerToInvite) GetData() AnswerToInviteData {
+func (o *UpdateDistributorStatus) GetData() UpdateDistributorStatusData {
 	if o == nil {
-		var ret AnswerToInviteData
+		var ret UpdateDistributorStatusData
 		return ret
 	}
 
@@ -56,7 +56,7 @@ func (o *AnswerToInvite) GetData() AnswerToInviteData {
 
 // GetDataOk returns a tuple with the Data field value
 // and a boolean to check if the value has been set.
-func (o *AnswerToInvite) GetDataOk() (*AnswerToInviteData, bool) {
+func (o *UpdateDistributorStatus) GetDataOk() (*UpdateDistributorStatusData, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -64,11 +64,11 @@ func (o *AnswerToInvite) GetDataOk() (*AnswerToInviteData, bool) {
 }
 
 // SetData sets field value
-func (o *AnswerToInvite) SetData(v AnswerToInviteData) {
+func (o *UpdateDistributorStatus) SetData(v UpdateDistributorStatusData) {
 	o.Data = v
 }
 
-func (o AnswerToInvite) MarshalJSON() ([]byte, error) {
+func (o UpdateDistributorStatus) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -76,13 +76,13 @@ func (o AnswerToInvite) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-func (o AnswerToInvite) ToMap() (map[string]interface{}, error) {
+func (o UpdateDistributorStatus) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["data"] = o.Data
 	return toSerialize, nil
 }
 
-func (o *AnswerToInvite) UnmarshalJSON(data []byte) (err error) {
+func (o *UpdateDistributorStatus) UnmarshalJSON(data []byte) (err error) {
 	// This validates that all required properties are included in the JSON object
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
@@ -104,53 +104,53 @@ func (o *AnswerToInvite) UnmarshalJSON(data []byte) (err error) {
 		}
 	}
 
-	varAnswerToInvite := _AnswerToInvite{}
+	varUpdateDistributorStatus := _UpdateDistributorStatus{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
 	decoder.DisallowUnknownFields()
-	err = decoder.Decode(&varAnswerToInvite)
+	err = decoder.Decode(&varUpdateDistributorStatus)
 
 	if err != nil {
 		return err
 	}
 
-	*o = AnswerToInvite(varAnswerToInvite)
+	*o = UpdateDistributorStatus(varUpdateDistributorStatus)
 
 	return err
 }
 
-type NullableAnswerToInvite struct {
-	value *AnswerToInvite
+type NullableUpdateDistributorStatus struct {
+	value *UpdateDistributorStatus
 	isSet bool
 }
 
-func (v NullableAnswerToInvite) Get() *AnswerToInvite {
+func (v NullableUpdateDistributorStatus) Get() *UpdateDistributorStatus {
 	return v.value
 }
 
-func (v *NullableAnswerToInvite) Set(val *AnswerToInvite) {
+func (v *NullableUpdateDistributorStatus) Set(val *UpdateDistributorStatus) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableAnswerToInvite) IsSet() bool {
+func (v NullableUpdateDistributorStatus) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableAnswerToInvite) Unset() {
+func (v *NullableUpdateDistributorStatus) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableAnswerToInvite(val *AnswerToInvite) *NullableAnswerToInvite {
-	return &NullableAnswerToInvite{value: val, isSet: true}
+func NewNullableUpdateDistributorStatus(val *UpdateDistributorStatus) *NullableUpdateDistributorStatus {
+	return &NullableUpdateDistributorStatus{value: val, isSet: true}
 }
 
-func (v NullableAnswerToInvite) MarshalJSON() ([]byte, error) {
+func (v NullableUpdateDistributorStatus) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableAnswerToInvite) UnmarshalJSON(src []byte) error {
+func (v *NullableUpdateDistributorStatus) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

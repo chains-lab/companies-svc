@@ -14,24 +14,31 @@ import (
 )
 
 type SentInviteParams struct {
-	InitiatorID uuid.UUID
-	Role        string
+	InitiatorID   uuid.UUID
+	DistributorID uuid.UUID
+	Role          string
 }
 
-func (e Employee) SentInvite(ctx context.Context, params SentInviteParams) (models.Invite, error) {
+func (e Employee) CreateInvite(ctx context.Context, params SentInviteParams) (models.Invite, error) {
 	initiator, err := e.GetInitiator(ctx, params.InitiatorID)
 	if err != nil {
 		return models.Invite{}, err
 	}
 
-	access, err := enum.CompareCityGovRoles(params.Role, initiator.Role)
+	if initiator.DistributorID != params.DistributorID {
+		return models.Invite{}, errx.ErrorInitiatorIsNotThisDistributorEmployee.Raise(
+			fmt.Errorf("initiator distributor_id %s not equal to params distributor_id %s", initiator.DistributorID, params.DistributorID),
+		)
+	}
+
+	access, err := enum.CompareEmployeeRoles(initiator.Role, params.Role)
 	if err != nil {
 		return models.Invite{}, errx.ErrorInvalidEmployeeRole.Raise(
 			fmt.Errorf("compare city gov roles: %w", err),
 		)
 	}
 	if access <= 0 {
-		return models.Invite{}, errx.ErrorInitiatorRoleHaveNotEnoughRights.Raise(
+		return models.Invite{}, errx.ErrorInitiatorEmployeeHaveNotEnoughRights.Raise(
 			fmt.Errorf("initiator have not enough rights to invite role %s", params.Role),
 		)
 	}

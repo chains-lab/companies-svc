@@ -8,5 +8,5 @@ import (
 )
 
 func (a App) GetDistributor(ctx context.Context, distributorID uuid.UUID) (models.Distributor, error) {
-	return a.distributor.GetByID(ctx, distributorID)
+	return a.distributor.GetDistributor(ctx, distributorID)
 }

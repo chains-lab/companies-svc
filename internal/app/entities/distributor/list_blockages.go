@@ -33,9 +33,9 @@ func (d Distributor) ListBlockages(
 	}
 	if filters.Statuses != nil {
 		for _, status := range filters.Statuses {
-			err := enum.CheckBlockStatus(status)
+			err := enum.CheckDistributorBlockStatus(status)
 			if err != nil {
-				return nil, pagi.Response{}, errx.ErrorInvalidBlockStatus.Raise(err)
+				return nil, pagi.Response{}, errx.ErrorInvalidDistributorBlockStatus.Raise(err)
 			}
 		}
 		query = query.FilterStatus(filters.Statuses...)

@@ -14,7 +14,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s Service) ListBlockages(w http.ResponseWriter, r *http.Request) {
+func (a Adapter) ListBlockages(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	filters := app.FilterBlockagesList{}
 
@@ -23,7 +23,7 @@ func (s Service) ListBlockages(w http.ResponseWriter, r *http.Request) {
 		for _, raw := range ids {
 			v, err := uuid.Parse(strings.TrimSpace(raw))
 			if err != nil {
-				s.Log(r).WithError(err).Errorf("invalid distributor ID format: %s", raw)
+				a.log.WithError(err).Errorf("invalid distributor ID format: %s", raw)
 				ape.RenderErr(w, problems.InvalidParameter("distributor_id", err))
 				return
 			}
@@ -36,7 +36,7 @@ func (s Service) ListBlockages(w http.ResponseWriter, r *http.Request) {
 		for _, raw := range ids {
 			v, err := uuid.Parse(strings.TrimSpace(raw))
 			if err != nil {
-				s.Log(r).WithError(err).Errorf("invalid initator ID format: %s", raw)
+				a.log.WithError(err).Errorf("invalid initator ID format: %s", raw)
 				ape.RenderErr(w, problems.InvalidParameter("initiator_id", err))
 				return
 			}
@@ -53,11 +53,11 @@ func (s Service) ListBlockages(w http.ResponseWriter, r *http.Request) {
 
 	pagReq, sort := pagi.GetPagination(r)
 
-	blocks, pag, err := s.app.ListBlockages(r.Context(), filters, pagReq, sort)
+	blocks, pag, err := a.app.ListBlockages(r.Context(), filters, pagReq, sort)
 	if err != nil {
-		s.Log(r).WithError(err).Error("failed to select distributor blocks")
+		a.log.WithError(err).Error("failed to select distributor blocks")
 		switch {
-		case errors.Is(err, errx.ErrorInvalidBlockStatus):
+		case errors.Is(err, errx.ErrorInvalidDistributorBlockStatus):
 			ape.RenderErr(w, problems.InvalidParameter("status", err))
 		default:
 			ape.RenderErr(w, problems.InternalError())

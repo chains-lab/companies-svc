@@ -13,13 +13,8 @@ import (
 	"github.com/google/uuid"
 )
 
-type AnsweredInviteParams struct {
-	Token  string
-	Status string
-}
-
-func (e Employee) AnsweredInvite(ctx context.Context, userID uuid.UUID, params AnsweredInviteParams) (models.Invite, error) {
-	data, err := e.jwt.DecryptInviteToken(params.Token)
+func (e Employee) AcceptInvite(ctx context.Context, userID uuid.UUID, token string) (models.Invite, error) {
+	data, err := e.jwt.DecryptInviteToken(token)
 	if err != nil {
 		return models.Invite{}, errx.ErrorInvalidInviteToken.Raise(
 			fmt.Errorf("invalid or expired token: %w", err),
@@ -42,41 +37,31 @@ func (e Employee) AnsweredInvite(ctx context.Context, userID uuid.UUID, params A
 		return models.Invite{}, errx.ErrorInviteExpired.Raise(fmt.Errorf("invite expired"))
 	}
 	if data.DistributorID != inv.DistributorID {
-		return models.Invite{}, errx.ErrorInvalidInviteToken.Raise(fmt.Errorf("token city_id mismatch"))
+		return models.Invite{}, errx.ErrorInvalidInviteToken.Raise(fmt.Errorf("token distributor_id mismatch"))
 	}
 
-	switch params.Status {
-	case enum.InviteStatusAccepted:
-		_, err = e.CreateEmployee(ctx, CreateParams{
-			UserID:        userID,
-			DistributorID: inv.DistributorID,
-			Role:          inv.Role,
-		})
-		if err != nil {
-			return models.Invite{}, err
-		}
-	case enum.InviteStatusRejected:
-		// nothing to do
-	default:
-		return models.Invite{}, errx.ErrorInvalidInviteStatus.Raise(
-			fmt.Errorf("invalid invite status: %s", params.Status),
-		)
+	_, err = e.CreateEmployee(ctx, CreateParams{
+		UserID:        userID,
+		DistributorID: inv.DistributorID,
+		Role:          inv.Role,
+	})
+	if err != nil {
+		return models.Invite{}, err
 	}
 
-	upd := dbx.UpdateInviteParams{
-		Status:     &params.Status,
+	inv.Status = enum.InviteStatusAccepted
+	inv.UserID = &userID
+	inv.AnsweredAt = &now
+
+	if err = e.invite.New().FilterID(inv.ID).Update(ctx, dbx.UpdateInviteParams{
+		Status:     &inv.Status,
 		UserID:     &uuid.NullUUID{UUID: userID, Valid: true},
 		AnsweredAt: &sql.NullTime{Time: now, Valid: true},
-	}
-
-	if err = e.invite.New().FilterID(inv.ID).Update(ctx, upd); err != nil {
+	}); err != nil {
 		return models.Invite{}, errx.ErrorInternal.Raise(
 			fmt.Errorf("update invite status: %w", err),
 		)
 	}
 
-	inv.Status = params.Status
-	inv.UserID = &userID
-	inv.AnsweredAt = &now
 	return inv, nil
 }

@@ -23,7 +23,7 @@ func Start(ctx context.Context, cfg config.Config, log logium.Logger, wg *sync.W
 	restSVC := rest.NewRest(cfg, log)
 
 	run(func() {
-		handl := handlers.NewAdaptrer(cfg, log, app)
+		handl := handlers.NewAdapter(cfg, log, app)
 
 		restSVC.Router(ctx, cfg, handl)
 	})

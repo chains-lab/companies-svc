@@ -23,7 +23,7 @@ func (a App) UpdateDistributor(ctx context.Context, initiatorID, distributorID u
 	}
 
 	if initiator.Role != enum.EmployeeRoleAdmin && initiator.Role != enum.EmployeeRoleOwner {
-		return models.Distributor{}, errx.ErrorInitiatorRoleHaveNotEnoughRights.Raise(
+		return models.Distributor{}, errx.ErrorInitiatorEmployeeHaveNotEnoughRights.Raise(
 			fmt.Errorf("initiator role has not enough rights only %s or %s can update distributor, got %s",
 				enum.EmployeeRoleAdmin, enum.EmployeeRoleOwner, initiator.Role,
 			),

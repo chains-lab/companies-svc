@@ -12,35 +12,27 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s Service) GetActiveDistributorBlock(w http.ResponseWriter, r *http.Request) {
-	//blockID, err := uuid.Parse(chi.URLParam(r, "block_id"))
-	//if err != nil {
-	//	s.Log(r).WithError(err).Errorf("invalid block ID format")
-	//
-	//	ape.RenderErr(w, problems.InvalidParameter("block_id", err))
-	//	return
-	//}
-
+func (a Adapter) GetActiveDistributorBlock(w http.ResponseWriter, r *http.Request) {
 	distributorID, err := uuid.Parse(chi.URLParam(r, "distributor_id"))
 	if err != nil {
-		s.Log(r).WithError(err).Errorf("invalid distributor ID format")
+		a.log.WithError(err).Errorf("invalid distributor ID format")
 		ape.RenderErr(w, problems.InvalidParameter("distributor_id", err))
 
 		return
 	}
 
-	block, err := s.app.GetActiveDistributorBlock(r.Context(), distributorID)
+	block, err := a.app.GetActiveDistributorBlock(r.Context(), distributorID)
 	if err != nil {
-		s.Log(r).WithError(err).Errorf("failed to get distributor %s active block", distributorID)
-
+		a.log.WithError(err).Errorf("failed to get distributor %s active block", distributorID)
 		switch {
-		case errors.Is(err, errx.DistributorBlockNotFound):
-			ape.RenderErr(w, problems.NotFound("Block not found"))
+		case errors.Is(err, errx.ErrorNoActiveBlockForDistributor):
+			ape.RenderErr(w, problems.NotFound("no active block for distributor"))
 		default:
 			ape.RenderErr(w, problems.InternalError())
 		}
+
+		return
 	}
 
 	ape.Render(w, http.StatusOK, responses.DistributorBlock(block))
-	return
 }

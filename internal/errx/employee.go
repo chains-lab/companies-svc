@@ -8,14 +8,18 @@ var ErrorEmployeeNotFound = ape.DeclareError("EMPLOYEE_NOT_FOUND")
 
 var ErrorEmployeeAlreadyExists = ape.DeclareError("EMPLOYEE_ALREADY_EXISTS")
 
-var EmployeeRoleNotSupported = ape.DeclareError("EMPLOYEE_ROLE_NOT_SUPPORTED")
+var EmployeeInvalidRole = ape.DeclareError("INVALID_EMPLOYEE_ROLE")
 
 var ErrorInitiatorNotEmployee = ape.DeclareError("INITIATOR_NOT_EMPLOYEE")
 
 var ErrorInitiatorIsAlreadyEmployee = ape.DeclareError("INITIATOR_IS_ALREADY_EMPLOYEE")
 
+var ErrorCannotDeleteYourself = ape.DeclareError("CANNOT_DELETE_YOURSELF")
+
 var ErrorInitiatorEmployeeHaveNotEnoughRights = ape.DeclareError("INITIATOR_HAVE_NOT_ENOUGH_PERMISSIONS")
 
-var ErrorCurrentEmployeeCanCreateDistributor = ape.DeclareError("CURRENT_EMPLOYEE_CAN_CREATE_DISTRIBUTOR")
+var ErrorInitiatorAndUserHaveDifferentDistributors = ape.DeclareError("INITIATOR_AND_USER_HAVE_DIFFERENT_DISTRIBUTORS")
 
-var InitiatorAndUserHaveDifferentDistributors = ape.DeclareError("INITIATOR_AND_USER_HAVE_DIFFERENT_DISTRIBUTORS")
+var ErrorInitiatorIsNotThisDistributorEmployee = ape.DeclareError("INITIATOR_IS_NOT_THIS_DISTRIBUTOR_EMPLOYEE")
+
+var ErrorCurrentEmployeeCannotCreateDistributor = ape.DeclareError("CURRENT_EMPLOYEE_CANNOT_CREATE_DISTRIBUTOR")
