@@ -7,11 +7,11 @@ toolchain go1.24.7
 require (
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/alecthomas/kingpin v2.2.6+incompatible
-	github.com/chains-lab/ape v0.4.12
+	github.com/chains-lab/ape v0.4.14
 	github.com/chains-lab/enum v0.1.4
-	github.com/chains-lab/gatekit v0.2.3
-	github.com/chains-lab/logium v0.1.1
-	github.com/chains-lab/pagi v0.1.4
+	github.com/chains-lab/gatekit v0.2.5
+	github.com/chains-lab/logium v0.1.2
+	github.com/chains-lab/pagi v0.1.6
 	github.com/go-chi/chi/v5 v5.2.2
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/golang-jwt/jwt/v5 v5.2.2
@@ -21,12 +21,12 @@ require (
 	github.com/rubenv/sql-migrate v1.8.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/viper v1.20.1
+	golang.org/x/crypto v0.37.0
 )
 
 require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 // indirect
 	github.com/alecthomas/units v0.0.0-20240927000941-0f3dac36c52b // indirect
-	github.com/chains-lab/svc-errors v0.3.1 // indirect
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/go-gorp/gorp/v3 v3.1.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect

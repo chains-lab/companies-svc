@@ -8,15 +8,16 @@ import (
 	"syscall"
 
 	"github.com/alecthomas/kingpin"
+	cmd2 "github.com/chains-lab/distributors-svc/cmd"
+	"github.com/chains-lab/distributors-svc/cmd/migrations"
+	"github.com/chains-lab/distributors-svc/internal"
 	"github.com/chains-lab/distributors-svc/internal/app"
-	"github.com/chains-lab/distributors-svc/internal/config"
-	"github.com/chains-lab/distributors-svc/internal/dbx"
 	"github.com/chains-lab/logium"
 	"github.com/sirupsen/logrus"
 )
 
 func Run(args []string) bool {
-	cfg, err := config.LoadConfig()
+	cfg, err := internal.LoadConfig()
 	if err != nil {
 		logrus.Fatalf("failed to load config: %v", err)
 	}
@@ -53,11 +54,11 @@ func Run(args []string) bool {
 
 	switch cmd {
 	case serviceCmd.FullCommand():
-		Start(ctx, cfg, log, &wg, &application)
+		cmd2.Start(ctx, cfg, log, &wg, &application)
 	case migrateUpCmd.FullCommand():
-		err = dbx.MigrateUp(cfg.Database.SQL.URL)
+		err = migrations.MigrateUp(cfg.Database.SQL.URL)
 	case migrateDownCmd.FullCommand():
-		err = dbx.MigrateDown(cfg.Database.SQL.URL)
+		err = migrations.MigrateDown(cfg.Database.SQL.URL)
 	default:
 		log.Errorf("unknown command %s", cmd)
 		return false

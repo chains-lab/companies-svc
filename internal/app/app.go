@@ -5,20 +5,20 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/chains-lab/distributors-svc/internal/app/entities/distributor"
-	"github.com/chains-lab/distributors-svc/internal/app/entities/employee"
-	"github.com/chains-lab/distributors-svc/internal/config"
-	"github.com/chains-lab/distributors-svc/internal/dbx"
+	"github.com/chains-lab/distributors-svc/internal"
+	"github.com/chains-lab/distributors-svc/internal/data/pgdb"
+	"github.com/chains-lab/distributors-svc/internal/domain/service/distributor"
+	"github.com/chains-lab/distributors-svc/internal/domain/service/employee"
 )
 
 type App struct {
-	distributor distributor.Distributor
-	employee    employee.Employee
+	distributor distributor.Service
+	employee    employee.Service
 
 	db *sql.DB
 }
 
-func NewApp(cfg config.Config) (App, error) {
+func NewApp(cfg internal.Config) (App, error) {
 	pg, err := sql.Open("postgres", cfg.Database.SQL.URL)
 	if err != nil {
 		return App{}, err
@@ -40,7 +40,7 @@ func (a App) transaction(fn func(ctx context.Context) error) error {
 		return fmt.Errorf("failed to start transaction: %w", err)
 	}
 
-	ctxWithTx := context.WithValue(ctx, dbx.TxKey, tx)
+	ctxWithTx := context.WithValue(ctx, pgdb.TxKey, tx)
 
 	if err := fn(ctxWithTx); err != nil {
 		if rbErr := tx.Rollback(); rbErr != nil {
