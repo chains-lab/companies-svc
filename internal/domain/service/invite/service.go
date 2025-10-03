@@ -80,7 +80,7 @@ func (s Service) companyIsActive(ctx context.Context, companyID uuid.UUID) error
 			fmt.Errorf("company with ID %s not found", companyID),
 		)
 	}
-	if dis.Status != enum.DistributorStatusActive {
+	if dis.Status != enum.CompanyStatusActive {
 		return errx.ErrorcompanyIsNotActive.Raise(
 			fmt.Errorf("company with ID %s is not active", companyID),
 		)

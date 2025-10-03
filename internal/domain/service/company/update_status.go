@@ -16,14 +16,14 @@ func (s Service) UpdateStatus(
 	companyID uuid.UUID,
 	status string,
 ) (models.Company, error) {
-	err := enum.CheckDistributorStatus(status)
+	err := enum.CheckCompanyStatus(status)
 	if err != nil {
 		return models.Company{}, errx.ErrorInvalidCompanyBlockStatus.Raise(
 			fmt.Errorf("failed invalid status %s, cause: %w", status, err),
 		)
 	}
 
-	if status == enum.DistributorStatusBlocked {
+	if status == enum.CompanyStatusBlocked {
 		return models.Company{}, errx.ErrorCannotSetcompaniestatusBlocked.Raise(
 			fmt.Errorf("cannot set status to blocked"),
 		)
@@ -34,7 +34,7 @@ func (s Service) UpdateStatus(
 		return models.Company{}, err
 	}
 
-	if company.Status == enum.DistributorStatusBlocked {
+	if company.Status == enum.CompanyStatusBlocked {
 		return models.Company{}, errx.ErrorcompanyIsBlocked.Raise(
 			fmt.Errorf("company %s is blocked", companyID),
 		)
@@ -52,7 +52,7 @@ func (s Service) UpdateStatus(
 		ID:        company.ID,
 		Name:      company.Name,
 		Icon:      company.Icon,
-		Status:    enum.DistributorStatusInactive,
+		Status:    enum.CompanyStatusInactive,
 		UpdatedAt: now,
 		CreatedAt: company.CreatedAt,
 	}, nil

@@ -205,7 +205,7 @@ func TestInactiveCompany(t *testing.T) {
 	}
 
 	compID := comp.ID
-	comp, err = s.domain.company.UpdateStatus(ctx, compID, enum.DistributorStatusBlocked)
+	comp, err = s.domain.company.UpdateStatus(ctx, compID, enum.CompanyStatusBlocked)
 	if !errors.Is(err, errx.ErrorCannotSetcompaniestatusBlocked) {
 		t.Fatalf("expected error %v, got %v", errx.ErrorCannotSetcompaniestatusBlocked, err)
 	}
@@ -240,12 +240,12 @@ func TestInactiveCompany(t *testing.T) {
 		t.Fatalf("expected 3 employee, got %d", len(emps.Data))
 	}
 
-	comp, err = s.domain.company.UpdateStatus(ctx, compID, enum.DistributorStatusInactive)
+	comp, err = s.domain.company.UpdateStatus(ctx, compID, enum.CompanyStatusInactive)
 	if err != nil {
 		t.Fatalf("Setcompaniestatus: %v", err)
 	}
-	if comp.Status != enum.DistributorStatusInactive {
-		t.Errorf("expected company status '%s', got '%s'", enum.DistributorStatusInactive, comp.Status)
+	if comp.Status != enum.CompanyStatusInactive {
+		t.Errorf("expected company status '%s', got '%s'", enum.CompanyStatusInactive, comp.Status)
 	}
 
 	err = s.domain.employee.RefuseOwn(ctx, admin.UserID)

@@ -27,7 +27,7 @@ func (s Service) Create(
 		ID:        uuid.New(),
 		Name:      params.Name,
 		Icon:      params.Icon,
-		Status:    enum.DistributorStatusActive,
+		Status:    enum.CompanyStatusActive,
 		CreatedAt: now,
 		UpdatedAt: now,
 	}

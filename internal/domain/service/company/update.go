@@ -25,7 +25,7 @@ func (s Service) Update(ctx context.Context,
 		return models.Company{}, err
 	}
 
-	if company.Status == enum.DistributorStatusBlocked {
+	if company.Status == enum.CompanyStatusBlocked {
 		return models.Company{}, errx.ErrorcompanyIsBlocked.Raise(
 			fmt.Errorf("company with ID %s is blocked", companyID),
 		)

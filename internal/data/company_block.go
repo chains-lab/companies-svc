@@ -30,7 +30,7 @@ func (d *Database) GetCompanyBlockByID(ctx context.Context, ID uuid.UUID) (model
 }
 
 func (d *Database) GetActiveCompanyBlock(ctx context.Context, companyID uuid.UUID) (models.CompanyBlock, error) {
-	schema, err := d.sql.blockages.New().FiltercompanyID(companyID).FilterStatus(enum.DistributorStatusActive).Get(ctx)
+	schema, err := d.sql.blockages.New().FiltercompanyID(companyID).FilterStatus(enum.CompanyStatusActive).Get(ctx)
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
 		return models.CompanyBlock{}, nil
@@ -86,8 +86,8 @@ func (d *Database) FilterCompanyBlocks(
 func (d *Database) CancelActiveCompanyBlock(ctx context.Context, companyID uuid.UUID, canceledAt time.Time) error {
 	return d.sql.blockages.New().
 		FiltercompanyID(companyID).
-		FilterStatus(enum.DistributorStatusActive).
-		UpdateStatus(enum.DistributorBlockStatusActive).
+		FilterStatus(enum.CompanyStatusActive).
+		UpdateStatus(enum.CompanyBlockStatusActive).
 		UpdateCanceledAt(canceledAt).
 		Update(ctx)
 }

@@ -32,7 +32,7 @@ func (s Service) Cancel(ctx context.Context, companyID uuid.UUID) (models.Compan
 			)
 		}
 
-		err = s.db.UpdateCompaniesStatus(ctx, companyID, enum.DistributorStatusInactive, now)
+		err = s.db.UpdateCompaniesStatus(ctx, companyID, enum.CompanyStatusInactive, now)
 		if err != nil {
 			return errx.ErrorInternal.Raise(
 				fmt.Errorf("failed to updating company status, cause: %w", err),
@@ -44,7 +44,7 @@ func (s Service) Cancel(ctx context.Context, companyID uuid.UUID) (models.Compan
 		return models.Company{}, err
 	}
 
-	dis.Status = enum.DistributorStatusInactive
+	dis.Status = enum.CompanyStatusInactive
 	dis.UpdatedAt = now
 
 	return dis, nil

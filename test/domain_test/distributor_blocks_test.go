@@ -46,7 +46,7 @@ func TestCompanyBlocks(t *testing.T) {
 	if err != nil {
 		t.Fatalf("getCompany: %v", err)
 	}
-	if dis.Status != enum.DistributorStatusBlocked {
+	if dis.Status != enum.CompanyStatusBlocked {
 		t.Errorf("expected company to be blocked")
 	}
 }
@@ -85,7 +85,7 @@ func TestUpdateBlockedCompany(t *testing.T) {
 	if err != nil {
 		t.Fatalf("getCompany: %v", err)
 	}
-	if dis.Status != enum.DistributorStatusBlocked {
+	if dis.Status != enum.CompanyStatusBlocked {
 		t.Errorf("expected company to be blocked")
 	}
 
@@ -99,12 +99,12 @@ func TestUpdateBlockedCompany(t *testing.T) {
 		t.Fatalf("expected error %v, got %v", errx.ErrorcompanyIsBlocked, err)
 	}
 
-	_, err = s.domain.company.UpdateStatus(ctx, dis.ID, enum.DistributorStatusActive)
+	_, err = s.domain.company.UpdateStatus(ctx, dis.ID, enum.CompanyStatusActive)
 	if !errors.Is(err, errx.ErrorcompanyIsBlocked) {
 		t.Fatalf("expected error %v, got %v", errx.ErrorcompanyIsBlocked, err)
 	}
 
-	_, err = s.domain.company.UpdateStatus(ctx, dis.ID, enum.DistributorStatusInactive)
+	_, err = s.domain.company.UpdateStatus(ctx, dis.ID, enum.CompanyStatusInactive)
 	if !errors.Is(err, errx.ErrorcompanyIsBlocked) {
 		t.Fatalf("expected error %v, got %v", errx.ErrorcompanyIsBlocked, err)
 	}

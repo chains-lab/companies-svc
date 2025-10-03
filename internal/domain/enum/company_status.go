@@ -3,29 +3,29 @@ package enum
 import "fmt"
 
 const (
-	DistributorStatusActive   = "active"
-	DistributorStatusInactive = "inactive"
-	DistributorStatusBlocked  = "blocked"
+	CompanyStatusActive   = "active"
+	CompanyStatusInactive = "inactive"
+	CompanyStatusBlocked  = "blocked"
 )
 
-var distributorStatuses = []string{
-	DistributorStatusActive,
-	DistributorStatusInactive,
-	DistributorStatusBlocked,
+var companyStatuses = []string{
+	CompanyStatusActive,
+	CompanyStatusInactive,
+	CompanyStatusBlocked,
 }
 
-var ErrorDistributorStatusNotSupported = fmt.Errorf("distributor status not supported mus be one of: %v", GetAllDistributorStatuses())
+var ErrorCompanyStatusNotSupported = fmt.Errorf("company status not supported mus be one of: %v", GetAllCompanyStatuses())
 
-func CheckDistributorStatus(status string) error {
-	for _, s := range distributorStatuses {
+func CheckCompanyStatus(status string) error {
+	for _, s := range companyStatuses {
 		if s == status {
 			return nil
 		}
 	}
 
-	return fmt.Errorf("'%s', %w", status, ErrorDistributorStatusNotSupported)
+	return fmt.Errorf("'%s', %w", status, ErrorCompanyStatusNotSupported)
 }
 
-func GetAllDistributorStatuses() []string {
-	return distributorStatuses
+func GetAllCompanyStatuses() []string {
+	return companyStatuses
 }

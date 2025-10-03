@@ -28,7 +28,7 @@ func (s Service) Crete(
 		CompanyID:   companyID,
 		InitiatorID: initiatorID,
 		Reason:      reason,
-		Status:      enum.DistributorBlockStatusActive,
+		Status:      enum.CompanyBlockStatusActive,
 		BlockedAt:   now,
 	}
 
@@ -45,7 +45,7 @@ func (s Service) Crete(
 	}
 
 	if err = s.db.Transaction(ctx, func(ctx context.Context) error {
-		err = s.db.UpdateCompaniesStatus(ctx, companyID, enum.DistributorStatusBlocked, now)
+		err = s.db.UpdateCompaniesStatus(ctx, companyID, enum.CompanyStatusBlocked, now)
 		if err != nil {
 			return errx.ErrorInternal.Raise(
 				fmt.Errorf("failed to updating company status, cause: %w", err),

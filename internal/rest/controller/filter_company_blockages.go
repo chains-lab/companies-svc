@@ -31,7 +31,7 @@ func (a Service) FilterBlockages(w http.ResponseWriter, r *http.Request) {
 		filters.CompanyID = &id
 	}
 	if v := strings.TrimSpace(q.Get("status")); v != "" {
-		err := enum.CheckDistributorStatus(v)
+		err := enum.CheckCompanyStatus(v)
 		if err != nil {
 			a.log.WithError(err).Errorf("invalid company block status format")
 			ape.RenderErr(w, problems.BadRequest(validation.Errors{

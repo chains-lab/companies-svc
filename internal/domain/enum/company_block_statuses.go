@@ -3,27 +3,27 @@ package enum
 import "fmt"
 
 const (
-	DistributorBlockStatusActive   = "active"    // Distributor is active
-	DistributorBlockStatusCanceled = "cancelled" // Distributor is canceled
+	CompanyBlockStatusActive   = "active"    // Company is active
+	CompanyBlockStatusCanceled = "cancelled" // Company is canceled
 )
 
-var distributorBlockStatuses = []string{
-	DistributorBlockStatusActive,
-	DistributorBlockStatusCanceled,
+var companyBlockStatuses = []string{
+	CompanyBlockStatusActive,
+	CompanyBlockStatusCanceled,
 }
 
-var ErrorDistributorBlockStatusNotSupported = fmt.Errorf("block distributor status must be one of: %s", GetAllDistributorBlockStatuses())
+var ErrorCompanyBlockStatusNotSupported = fmt.Errorf("block company status must be one of: %s", GetAllCompanyBlockStatuses())
 
-func CheckDistributorBlockStatus(status string) error {
-	for _, s := range distributorBlockStatuses {
+func CheckCompanyBlockStatus(status string) error {
+	for _, s := range companyBlockStatuses {
 		if s == status {
 			return nil
 		}
 	}
 
-	return fmt.Errorf("'%s', %w", status, ErrorDistributorBlockStatusNotSupported)
+	return fmt.Errorf("'%s', %w", status, ErrorCompanyBlockStatusNotSupported)
 }
 
-func GetAllDistributorBlockStatuses() []string {
-	return distributorBlockStatuses
+func GetAllCompanyBlockStatuses() []string {
+	return companyBlockStatuses
 }
