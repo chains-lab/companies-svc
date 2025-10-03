@@ -2,9 +2,10 @@ package data
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"time"
 
-	"github.com/chains-lab/companies-svc/internal/data/pgdb"
 	"github.com/chains-lab/companies-svc/internal/domain/models"
 	"github.com/chains-lab/companies-svc/internal/domain/service/employee"
 	"github.com/chains-lab/pagi"
@@ -12,14 +13,85 @@ import (
 )
 
 func (d *Database) CreateEmployee(ctx context.Context, input models.Employee) error {
-	schema := employeeModelToSchema(input)
+	return d.sql.employees.New().Insert(ctx, employeeModelToSchema(input))
+}
 
-	return d.sql.employees.New().Insert(ctx, schema)
+func (d *Database) GetEmployeeByUserID(
+	ctx context.Context,
+	userID uuid.UUID,
+) (models.Employee, error) {
+	row, err := d.sql.employees.New().FilterUserID(userID).Get(ctx)
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		return models.Employee{}, nil
+	case err != nil:
+		return models.Employee{}, err
+	}
+
+	return employeeSchemaToModel(row), nil
+}
+
+func (d *Database) GetEmployeeByCompanyAndUser(
+	ctx context.Context,
+	companyID, userID uuid.UUID,
+) (models.Employee, error) {
+	row, err := d.sql.employees.New().FiltercompanyID(companyID).FilterUserID(userID).Get(ctx)
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		return models.Employee{}, nil
+	case err != nil:
+		return models.Employee{}, err
+	}
+
+	return employeeSchemaToModel(row), nil
+}
+
+func (d *Database) GetEmployeeByCompanyAndUserAndRole(
+	ctx context.Context,
+	companyID, userID uuid.UUID,
+	role string,
+) (models.Employee, error) {
+	row, err := d.sql.employees.New().FiltercompanyID(companyID).FilterUserID(userID).FilterRole(role).Get(ctx)
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		return models.Employee{}, nil
+	case err != nil:
+		return models.Employee{}, err
+	}
+
+	return employeeSchemaToModel(row), nil
+}
+
+func (d *Database) GetEmployee(
+	ctx context.Context,
+	params employee.GetParams,
+) (models.Employee, error) {
+	query := d.sql.employees.New()
+
+	if params.UserID != nil {
+		query = query.FilterUserID(*params.UserID)
+	}
+	if params.CompanyID != nil {
+		query = query.FiltercompanyID(*params.CompanyID)
+	}
+	if params.Role != nil {
+		query = query.FilterRole(*params.Role)
+	}
+
+	row, err := query.Get(ctx)
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		return models.Employee{}, nil
+	case err != nil:
+		return models.Employee{}, err
+	}
+
+	return employeeSchemaToModel(row), nil
 }
 
 func (d *Database) FilterEmployees(
 	ctx context.Context,
-	filter employee.Filter,
+	filter employee.FilterParams,
 	page, size uint64,
 ) (models.EmployeeCollection, error) {
 	limit, offset := pagi.PagConvert(page, size)
@@ -56,60 +128,20 @@ func (d *Database) FilterEmployees(
 	}, nil
 }
 
-func (d *Database) GetEmployee(ctx context.Context, filter employee.GetFilters) (models.Employee, error) {
-	query := d.sql.employees.New()
-
-	if filter.CompanyID != nil {
-		query = query.FiltercompanyID(*filter.CompanyID)
-	}
-	if filter.UserID != nil {
-		query = query.FilterUserID(*filter.UserID)
-	}
-	if filter.Role != nil {
-		query = query.FilterRole(*filter.Role)
-	}
-
-	row, err := query.Get(ctx)
+func (d *Database) UpdateEmployeeRole(
+	ctx context.Context,
+	userID uuid.UUID,
+	newRole string,
+	updatedAt time.Time,
+) error {
+	err := d.sql.employees.New().FilterUserID(userID).UpdateRole(newRole).Update(ctx, updatedAt)
 	if err != nil {
-		return models.Employee{}, err
+		return err
 	}
 
-	return employeeSchemaToModel(row), nil
-}
-
-func (d *Database) GetUserEmployee(ctx context.Context, userID uuid.UUID) (models.Employee, error) {
-	row, err := d.sql.employees.New().FilterUserID(userID).Get(ctx)
-	if err != nil {
-		return models.Employee{}, err
-	}
-
-	return employeeSchemaToModel(row), nil
-}
-
-func (d *Database) UpdateEmployeeRole(ctx context.Context, userID uuid.UUID, newRole string, updatedAt time.Time) error {
-	return d.sql.employees.New().FilterUserID(userID).UpdateRole(newRole).Update(ctx, updatedAt)
+	return nil
 }
 
 func (d *Database) DeleteEmployee(ctx context.Context, userID, companyID uuid.UUID) error {
 	return d.sql.employees.New().FilterUserID(userID).FiltercompanyID(companyID).Delete(ctx)
-}
-
-func employeeModelToSchema(input models.Employee) pgdb.Employee {
-	return pgdb.Employee{
-		UserID:    input.UserID,
-		CompanyID: input.CompanyID,
-		Role:      input.Role,
-		UpdatedAt: input.UpdatedAt,
-		CreatedAt: input.CreatedAt,
-	}
-}
-
-func employeeSchemaToModel(input pgdb.Employee) models.Employee {
-	return models.Employee{
-		UserID:    input.UserID,
-		CompanyID: input.CompanyID,
-		Role:      input.Role,
-		UpdatedAt: input.UpdatedAt,
-		CreatedAt: input.CreatedAt,
-	}
 }

@@ -24,12 +24,12 @@ func (a Service) GetBlock(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	block, err := a.domain.company.GetBlock(r.Context(), blockID)
+	block, err := a.domain.block.Get(r.Context(), blockID)
 	if err != nil {
 		a.log.WithError(err).Errorf("failed to get block, ID: %s", blockID)
 		switch {
 		case errors.Is(err, errx.ErrorcompanyBlockNotFound):
-			ape.RenderErr(w, problems.NotFound("CreteBlock not found"))
+			ape.RenderErr(w, problems.NotFound("Crete not found"))
 		default:
 			ape.RenderErr(w, problems.InternalError())
 		}

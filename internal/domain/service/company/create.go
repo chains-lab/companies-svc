@@ -5,20 +5,20 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/chains-lab/companies-svc/internal/domain/enum"
 	"github.com/chains-lab/companies-svc/internal/domain/errx"
 	"github.com/chains-lab/companies-svc/internal/domain/models"
-	"github.com/chains-lab/enum"
 	"github.com/google/uuid"
 )
 
 type CreateParams struct {
-	InitiatorID uuid.UUID
-	Name        string
-	Icon        string
+	Name string
+	Icon string
 }
 
 func (s Service) Create(
 	ctx context.Context,
+	initiatorID uuid.UUID,
 	params CreateParams,
 ) (models.Company, error) {
 	now := time.Now().UTC()
@@ -32,10 +32,10 @@ func (s Service) Create(
 		UpdatedAt: now,
 	}
 
-	user, err := s.db.GetUserEmployee(ctx, params.InitiatorID)
+	user, err := s.db.GetEmployeeByUserID(ctx, initiatorID)
 	if err != nil {
 		return models.Company{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("failed to get user employee: %w", err),
+			fmt.Errorf("failed to get user employee, cause: %w", err),
 		)
 	}
 	if !user.IsNil() {
@@ -44,32 +44,31 @@ func (s Service) Create(
 		)
 	}
 
-	txErr := s.db.Transaction(ctx, func(ctx context.Context) error {
+	if err = s.db.Transaction(ctx, func(ctx context.Context) error {
 		_, err = s.db.CreateCompany(ctx, dis)
 		if err != nil {
 			return errx.ErrorInternal.Raise(
-				fmt.Errorf("internal error: %w", err),
+				fmt.Errorf("failed to create company, cause: %w", err),
 			)
 		}
 
 		emp := models.Employee{
-			UserID:    params.InitiatorID,
+			UserID:    initiatorID,
 			CompanyID: dis.ID,
-			Role:      enum.EmployeeRoleAdmin,
+			Role:      enum.EmployeeRoleOwner,
 			CreatedAt: now,
 			UpdatedAt: now,
 		}
 		err = s.db.CreateEmployee(ctx, emp)
 		if err != nil {
 			return errx.ErrorInternal.Raise(
-				fmt.Errorf("failed to create employee for company: %w", err),
+				fmt.Errorf("failed to create employee for company, cause: %w", err),
 			)
 		}
 
 		return nil
-	})
-	if txErr != nil {
-		return models.Company{}, txErr
+	}); err != nil {
+		return models.Company{}, err
 	}
 
 	return dis, err

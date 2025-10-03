@@ -2,8 +2,11 @@ package company
 
 import (
 	"context"
+	"fmt"
 	"time"
 
+	"github.com/chains-lab/companies-svc/internal/domain/enum"
+	"github.com/chains-lab/companies-svc/internal/domain/errx"
 	"github.com/chains-lab/companies-svc/internal/domain/models"
 	"github.com/google/uuid"
 )
@@ -22,6 +25,12 @@ func (s Service) Update(ctx context.Context,
 		return models.Company{}, err
 	}
 
+	if company.Status == enum.DistributorStatusBlocked {
+		return models.Company{}, errx.ErrorcompanyIsBlocked.Raise(
+			fmt.Errorf("company with ID %s is blocked", companyID),
+		)
+	}
+
 	mow := time.Now().UTC()
 
 	if params.Name != nil {
@@ -34,7 +43,9 @@ func (s Service) Update(ctx context.Context,
 
 	err = s.db.UpdateCompany(ctx, companyID, params, mow)
 	if err != nil {
-		return models.Company{}, err
+		return models.Company{}, errx.ErrorInternal.Raise(
+			fmt.Errorf("failed to update company status, cause: %w", err),
+		)
 	}
 
 	return company, nil

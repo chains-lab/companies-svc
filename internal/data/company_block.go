@@ -2,25 +2,27 @@ package data
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"time"
 
-	"github.com/chains-lab/companies-svc/internal/data/pgdb"
+	"github.com/chains-lab/companies-svc/internal/domain/enum"
 	"github.com/chains-lab/companies-svc/internal/domain/models"
-	"github.com/chains-lab/companies-svc/internal/domain/service/company"
-	"github.com/chains-lab/enum"
+	"github.com/chains-lab/companies-svc/internal/domain/service/block"
 	"github.com/chains-lab/pagi"
 	"github.com/google/uuid"
 )
 
 func (d *Database) CreateCompanyBlock(ctx context.Context, input models.CompanyBlock) error {
-	schema := blockModelToSchema(input)
-
-	return d.sql.blockages.New().Insert(ctx, schema)
+	return d.sql.blockages.New().Insert(ctx, blockModelToSchema(input))
 }
 
 func (d *Database) GetCompanyBlockByID(ctx context.Context, ID uuid.UUID) (models.CompanyBlock, error) {
 	schema, err := d.sql.blockages.New().FilterID(ID).Get(ctx)
-	if err != nil {
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		return models.CompanyBlock{}, nil
+	case err != nil:
 		return models.CompanyBlock{}, err
 	}
 
@@ -29,14 +31,21 @@ func (d *Database) GetCompanyBlockByID(ctx context.Context, ID uuid.UUID) (model
 
 func (d *Database) GetActiveCompanyBlock(ctx context.Context, companyID uuid.UUID) (models.CompanyBlock, error) {
 	schema, err := d.sql.blockages.New().FiltercompanyID(companyID).FilterStatus(enum.DistributorStatusActive).Get(ctx)
-	if err != nil {
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		return models.CompanyBlock{}, nil
+	case err != nil:
 		return models.CompanyBlock{}, err
 	}
 
 	return companyBlockSchemaToModel(schema), nil
 }
 
-func (d *Database) FilterCompanyBlocks(ctx context.Context, filters company.FilterBlockages, page, size uint64) (models.CompanyBlockCollection, error) {
+func (d *Database) FilterCompanyBlocks(
+	ctx context.Context,
+	filters block.FilterParams,
+	page, size uint64,
+) (models.CompanyBlockCollection, error) {
 	limit, offset := pagi.PagConvert(page, size)
 
 	query := d.sql.blockages.New()
@@ -81,36 +90,4 @@ func (d *Database) CancelActiveCompanyBlock(ctx context.Context, companyID uuid.
 		UpdateStatus(enum.DistributorBlockStatusActive).
 		UpdateCanceledAt(canceledAt).
 		Update(ctx)
-}
-
-func blockModelToSchema(m models.CompanyBlock) pgdb.CompanyBlock {
-	block := pgdb.CompanyBlock{
-		ID:          m.ID,
-		CompanyID:   m.CompanyID,
-		InitiatorID: m.InitiatorID,
-		Reason:      m.Reason,
-		Status:      m.Status,
-		BlockedAt:   m.BlockedAt,
-	}
-	if m.CanceledAt != nil {
-		block.CanceledAt = m.CanceledAt
-	}
-
-	return block
-}
-
-func companyBlockSchemaToModel(s pgdb.CompanyBlock) models.CompanyBlock {
-	block := models.CompanyBlock{
-		ID:          s.ID,
-		CompanyID:   s.CompanyID,
-		InitiatorID: s.InitiatorID,
-		Reason:      s.Reason,
-		Status:      s.Status,
-		BlockedAt:   s.BlockedAt,
-	}
-	if s.CanceledAt != nil {
-		block.CanceledAt = s.CanceledAt
-	}
-
-	return block
 }

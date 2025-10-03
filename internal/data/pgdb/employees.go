@@ -7,7 +7,7 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/chains-lab/enum"
+	"github.com/chains-lab/companies-svc/internal/domain/enum"
 	"github.com/google/uuid"
 )
 

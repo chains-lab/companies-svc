@@ -1,14 +1,20 @@
-package controller
+package domain_test
 
 import (
 	"context"
+	"database/sql"
+	"log"
+	"testing"
 
+	"github.com/chains-lab/companies-svc/internal"
+	"github.com/chains-lab/companies-svc/internal/data"
 	"github.com/chains-lab/companies-svc/internal/domain/models"
 	"github.com/chains-lab/companies-svc/internal/domain/service/block"
 	"github.com/chains-lab/companies-svc/internal/domain/service/company"
 	"github.com/chains-lab/companies-svc/internal/domain/service/employee"
 	"github.com/chains-lab/companies-svc/internal/domain/service/invite"
-	"github.com/chains-lab/logium"
+	"github.com/chains-lab/companies-svc/internal/infra/jwtmanager"
+	"github.com/chains-lab/companies-svc/test"
 	"github.com/google/uuid"
 )
 
@@ -77,25 +83,52 @@ type blockSvc interface {
 }
 
 type domain struct {
-	employee employeeSvc
 	company  companySvc
+	employee employeeSvc
 	invite   inviteSvc
 	block    blockSvc
 }
-
-type Service struct {
+type Setup struct {
 	domain domain
-	log    logium.Logger
 }
 
-func New(log logium.Logger, dis companySvc, emp employeeSvc, inv inviteSvc, blc blockSvc) Service {
-	return Service{
-		log: log,
-		domain: domain{
-			employee: emp,
-			company:  dis,
-			invite:   inv,
-			block:    blc,
+func newSetup(t *testing.T) (Setup, error) {
+	cfg := internal.Config{
+		JWT: internal.JWTConfig{
+			Invites: struct {
+				SecretKey string `mapstructure:"secret_key"`
+			}{
+				SecretKey: "invitesuperkey", // тут подставь ключ для тестов
+			},
+		},
+		Database: internal.DatabaseConfig{
+			SQL: struct {
+				URL string `mapstructure:"url"`
+			}{
+				URL: test.TestDatabaseURL,
+			},
 		},
 	}
+
+	pg, err := sql.Open("postgres", cfg.Database.SQL.URL)
+	if err != nil {
+		log.Fatal("failed to connect to database", "error", err)
+	}
+
+	database := data.NewDatabase(pg)
+
+	jwtInviteManager := jwtmanager.NewManager(cfg)
+	companiesSvc := company.NewService(database)
+	employeeSvc := employee.NewService(database, jwtInviteManager)
+	inviteSvc := invite.NewService(database, jwtInviteManager)
+	blockSvc := block.NewService(database)
+
+	return Setup{
+		domain: domain{
+			company:  companiesSvc,
+			employee: employeeSvc,
+			invite:   inviteSvc,
+			block:    blockSvc,
+		},
+	}, nil
 }

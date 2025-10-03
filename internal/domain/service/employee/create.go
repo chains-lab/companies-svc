@@ -2,13 +2,12 @@ package employee
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
+	"github.com/chains-lab/companies-svc/internal/domain/enum"
 	"github.com/chains-lab/companies-svc/internal/domain/errx"
 	"github.com/chains-lab/companies-svc/internal/domain/models"
-	"github.com/chains-lab/enum"
 	"github.com/google/uuid"
 )
 
@@ -19,12 +18,10 @@ type CreateParams struct {
 }
 
 func (s Service) Create(ctx context.Context, params CreateParams) (models.Employee, error) {
-	emp, err := s.db.GetEmployee(ctx, GetFilters{
-		UserID: &params.UserID,
-	})
+	emp, err := s.db.GetEmployeeByUserID(ctx, params.UserID)
 	if err != nil {
 		return models.Employee{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("check existing employee: %w", err),
+			fmt.Errorf("falied to check existing employee, cause: %w", err),
 		)
 	}
 
@@ -38,7 +35,7 @@ func (s Service) Create(ctx context.Context, params CreateParams) (models.Employ
 	err = enum.CheckEmployeeRole(params.Role)
 	if err != nil {
 		return models.Employee{}, errx.ErrorInvalidEmployeeRole.Raise(
-			errors.New("invalid employee role"),
+			fmt.Errorf("failed to check employee role, cause: %w", err),
 		)
 	}
 

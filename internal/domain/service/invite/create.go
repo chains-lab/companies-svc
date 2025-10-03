@@ -1,25 +1,32 @@
-package employee
+package invite
 
 import (
 	"context"
 	"fmt"
 	"time"
 
+	"github.com/chains-lab/companies-svc/internal/domain/enum"
 	"github.com/chains-lab/companies-svc/internal/domain/errx"
 	"github.com/chains-lab/companies-svc/internal/domain/models"
-	"github.com/chains-lab/enum"
 	"github.com/google/uuid"
 )
 
-type SentInviteParams struct {
+type CreateParams struct {
 	CompanyID uuid.UUID
 	Role      string
 }
 
-func (s Service) CreateInvite(ctx context.Context, InitiatorID uuid.UUID, params SentInviteParams) (models.Invite, error) {
-	initiator, err := s.GetInitiator(ctx, InitiatorID)
+func (s Service) Create(ctx context.Context, InitiatorID uuid.UUID, params CreateParams) (models.Invite, error) {
+	initiator, err := s.db.GetEmployeeByUserID(ctx, InitiatorID)
 	if err != nil {
-		return models.Invite{}, err
+		return models.Invite{}, errx.ErrorInternal.Raise(
+			fmt.Errorf("failed to get initiator employee by user id %s, cause: %w", InitiatorID, err),
+		)
+	}
+	if initiator.IsNil() {
+		return models.Invite{}, errx.ErrorInitiatorIsNotEmployee.Raise(
+			fmt.Errorf("initiator employee with user id %s not found", InitiatorID),
+		)
 	}
 
 	if initiator.CompanyID != params.CompanyID {
@@ -51,14 +58,14 @@ func (s Service) CreateInvite(ctx context.Context, InitiatorID uuid.UUID, params
 	token, err := s.jwt.CreateInviteToken(inviteID, params.Role, params.CompanyID, exAt)
 	if err != nil {
 		return models.Invite{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("create invite token: %w", err),
+			fmt.Errorf("failed to create invite token, cause: %w", err),
 		)
 	}
 
 	hash, err := s.jwt.HashInviteToken(token)
 	if err != nil {
 		return models.Invite{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("hash invite token: %w", err),
+			fmt.Errorf("failed to hash invite token, cause: %w", err),
 		)
 	}
 
@@ -75,9 +82,11 @@ func (s Service) CreateInvite(ctx context.Context, InitiatorID uuid.UUID, params
 	err = s.db.CreateInvite(ctx, invite)
 	if err != nil {
 		return models.Invite{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("create invite: %w", err),
+			fmt.Errorf("failed to create invite in db, cause: %w", err),
 		)
 	}
+
+	invite.Token = token
 
 	return invite, nil
 }

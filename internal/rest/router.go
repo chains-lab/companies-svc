@@ -6,7 +6,6 @@ import (
 
 	"github.com/chains-lab/companies-svc/internal"
 	"github.com/chains-lab/companies-svc/internal/rest/meta"
-	"github.com/chains-lab/enum"
 	"github.com/chains-lab/gatekit/mdlv"
 	"github.com/chains-lab/gatekit/roles"
 	"github.com/chains-lab/logium"
@@ -21,8 +20,8 @@ type Handlers interface {
 	GetActiveCompanyBlock(w http.ResponseWriter, r *http.Request)
 	GetCompany(w http.ResponseWriter, r *http.Request)
 	GetEmployee(w http.ResponseWriter, r *http.Request)
-	ListBlockages(w http.ResponseWriter, r *http.Request)
-	ListCompanies(w http.ResponseWriter, r *http.Request)
+	FilterBlockages(w http.ResponseWriter, r *http.Request)
+	FilterCompanies(w http.ResponseWriter, r *http.Request)
 	ListEmployees(w http.ResponseWriter, r *http.Request)
 	CreateInvite(w http.ResponseWriter, r *http.Request)
 	UpdateCompany(w http.ResponseWriter, r *http.Request)
@@ -32,7 +31,7 @@ type Handlers interface {
 }
 
 func Run(ctx context.Context, cfg internal.Config, log logium.Logger, h Handlers) {
-	svc := mdlv.ServiceGrant(enum.CitiesSVC, cfg.JWT.Service.SecretKey)
+	svc := mdlv.ServiceGrant(cfg.Service.Name, cfg.JWT.Service.SecretKey)
 	auth := mdlv.Auth(meta.UserCtxKey, cfg.JWT.User.AccessToken.SecretKey)
 	sysadmin := mdlv.RoleGrant(meta.UserCtxKey, map[string]bool{
 		roles.Admin: true,
@@ -50,7 +49,7 @@ func Run(ctx context.Context, cfg internal.Config, log logium.Logger, h Handlers
 
 		r.Route("/v1", func(r chi.Router) {
 			r.Route("/companies", func(r chi.Router) {
-				r.Get("/", h.ListCompanies)
+				r.Get("/", h.FilterCompanies)
 				r.With(auth, user).Post("/", h.CreateCompany)
 
 				r.Route("/{company_id}", func(r chi.Router) {
@@ -79,7 +78,7 @@ func Run(ctx context.Context, cfg internal.Config, log logium.Logger, h Handlers
 			})
 
 			r.Route("/blocks", func(r chi.Router) {
-				r.Get("/", h.ListBlockages)
+				r.Get("/", h.FilterBlockages)
 				r.With(auth, sysadmin).Post("/", h.CreateCompanyBlock)
 				r.Get("/active", h.GetActiveCompanyBlock)
 

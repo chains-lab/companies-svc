@@ -33,7 +33,7 @@ func (a Service) CanceledCompanyBlock(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dis, err := a.domain.company.CancelBlock(r.Context(), companyID)
+	dis, err := a.domain.block.Cancel(r.Context(), companyID)
 	if err != nil {
 		a.log.WithError(err).Errorf("failed to canceled block company")
 		switch {

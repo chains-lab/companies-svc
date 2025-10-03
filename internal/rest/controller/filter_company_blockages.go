@@ -6,17 +6,17 @@ import (
 
 	"github.com/chains-lab/ape"
 	"github.com/chains-lab/ape/problems"
-	"github.com/chains-lab/companies-svc/internal/domain/service/company"
+	"github.com/chains-lab/companies-svc/internal/domain/enum"
+	"github.com/chains-lab/companies-svc/internal/domain/service/block"
 	"github.com/chains-lab/companies-svc/internal/rest/responses"
-	"github.com/chains-lab/enum"
 	"github.com/chains-lab/pagi"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/google/uuid"
 )
 
-func (a Service) ListBlockages(w http.ResponseWriter, r *http.Request) {
+func (a Service) FilterBlockages(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
-	filters := company.FilterBlockages{}
+	filters := block.FilterParams{}
 
 	if v := strings.TrimSpace(q.Get("company_id")); v != "" {
 		id, err := uuid.Parse(v)
@@ -27,6 +27,7 @@ func (a Service) ListBlockages(w http.ResponseWriter, r *http.Request) {
 			})...)
 			return
 		}
+
 		filters.CompanyID = &id
 	}
 	if v := strings.TrimSpace(q.Get("status")); v != "" {
@@ -56,7 +57,7 @@ func (a Service) ListBlockages(w http.ResponseWriter, r *http.Request) {
 
 	page, size := pagi.GetPagination(r)
 
-	blocks, err := a.domain.company.FilterBlockages(r.Context(), filters, page, size)
+	blocks, err := a.domain.block.Filter(r.Context(), filters, page, size)
 	if err != nil {
 		a.log.WithError(err).Error("failed to select company blocks")
 		switch {

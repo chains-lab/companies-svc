@@ -25,7 +25,7 @@ func (a Service) GetEmployee(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	emp, err := a.domain.employee.Get(r.Context(), employee.GetFilters{
+	emp, err := a.domain.employee.Get(r.Context(), employee.GetParams{
 		UserID: &userID,
 	})
 	if err != nil {

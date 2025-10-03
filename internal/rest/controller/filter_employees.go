@@ -16,7 +16,7 @@ import (
 
 func (a Service) ListEmployees(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
-	filters := employee.Filter{}
+	filters := employee.FilterParams{}
 
 	if v := strings.TrimSpace(q.Get("company_id")); v != "" {
 		id, err := uuid.Parse(v)

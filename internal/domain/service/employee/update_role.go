@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/chains-lab/companies-svc/internal/domain/enum"
 	"github.com/chains-lab/companies-svc/internal/domain/errx"
 	"github.com/chains-lab/companies-svc/internal/domain/models"
-	"github.com/chains-lab/enum"
 	"github.com/google/uuid"
 )
 
@@ -22,7 +22,7 @@ func (s Service) UpdateEmployeeRole(
 		return models.Employee{}, err
 	}
 
-	user, err := s.Get(ctx, GetFilters{
+	user, err := s.Get(ctx, GetParams{
 		UserID: &userID,
 	})
 	if err != nil {
@@ -64,7 +64,7 @@ func (s Service) UpdateEmployeeRole(
 	err = s.db.UpdateEmployeeRole(ctx, userID, newRole, now)
 	if err != nil {
 		return models.Employee{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("internal error: %w", err),
+			fmt.Errorf("failed to update employee role, cause: %w", err),
 		)
 	}
 

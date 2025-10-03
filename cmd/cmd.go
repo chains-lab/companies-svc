@@ -7,8 +7,10 @@ import (
 
 	"github.com/chains-lab/companies-svc/internal"
 	"github.com/chains-lab/companies-svc/internal/data"
+	"github.com/chains-lab/companies-svc/internal/domain/service/block"
 	"github.com/chains-lab/companies-svc/internal/domain/service/company"
 	"github.com/chains-lab/companies-svc/internal/domain/service/employee"
+	"github.com/chains-lab/companies-svc/internal/domain/service/invite"
 	"github.com/chains-lab/companies-svc/internal/infra/jwtmanager"
 	"github.com/chains-lab/companies-svc/internal/rest"
 	"github.com/chains-lab/companies-svc/internal/rest/controller"
@@ -32,10 +34,12 @@ func Start(ctx context.Context, cfg internal.Config, log logium.Logger, wg *sync
 	database := data.NewDatabase(pg)
 
 	jwtInviteManager := jwtmanager.NewManager(cfg)
-	companiesvc := company.NewService(database)
+	companiesSvc := company.NewService(database)
 	employeeSvc := employee.NewService(database, jwtInviteManager)
+	inviteSvc := invite.NewService(database, jwtInviteManager)
+	blockSvc := block.NewService(database)
 
-	ctrl := controller.New(log, companiesvc, employeeSvc)
+	ctrl := controller.New(log, companiesSvc, employeeSvc, inviteSvc, blockSvc)
 
 	run(func() { rest.Run(ctx, cfg, log, ctrl) })
 }

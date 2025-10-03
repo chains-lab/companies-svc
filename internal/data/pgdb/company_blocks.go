@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-const blockagesTable = "company_blockages"
+const blocksTable = "company_blocks"
 
 type CompanyBlock struct {
 	ID          uuid.UUID  `db:"id"`
@@ -22,7 +22,7 @@ type CompanyBlock struct {
 	CanceledAt  *time.Time `db:"canceled_at"`
 }
 
-type BlockagesQ struct {
+type BlocksQ struct {
 	db       *sql.DB
 	selector sq.SelectBuilder
 	updater  sq.UpdateBuilder
@@ -31,16 +31,16 @@ type BlockagesQ struct {
 	counter  sq.SelectBuilder
 }
 
-func NewBlockagesQ(db *sql.DB) BlockagesQ {
+func NewBlocksQ(db *sql.DB) BlocksQ {
 	builder := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 
-	return BlockagesQ{
+	return BlocksQ{
 		db:       db,
-		selector: builder.Select("*").From(blockagesTable),
-		updater:  builder.Update(blockagesTable),
-		inserter: builder.Insert(blockagesTable),
-		deleter:  builder.Delete(blockagesTable),
-		counter:  builder.Select("COUNT(*) AS count").From(blockagesTable),
+		selector: builder.Select("*").From(blocksTable),
+		updater:  builder.Update(blocksTable),
+		inserter: builder.Insert(blocksTable),
+		deleter:  builder.Delete(blocksTable),
+		counter:  builder.Select("COUNT(*) AS count").From(blocksTable),
 	}
 }
 
@@ -67,11 +67,11 @@ func scanBlock(scanner interface{ Scan(dest ...any) error }) (CompanyBlock, erro
 	return s, nil
 }
 
-func (q BlockagesQ) New() BlockagesQ {
-	return NewBlockagesQ(q.db)
+func (q BlocksQ) New() BlocksQ {
+	return NewBlocksQ(q.db)
 }
 
-func (q BlockagesQ) Insert(ctx context.Context, input CompanyBlock) error {
+func (q BlocksQ) Insert(ctx context.Context, input CompanyBlock) error {
 	values := map[string]interface{}{
 		"id":           input.ID,
 		"company_id":   input.CompanyID,
@@ -84,7 +84,7 @@ func (q BlockagesQ) Insert(ctx context.Context, input CompanyBlock) error {
 
 	query, args, err := q.inserter.SetMap(values).ToSql()
 	if err != nil {
-		return fmt.Errorf("building inserter query for table: %s input: %w", blockagesTable, err)
+		return fmt.Errorf("building inserter query for table: %s input: %w", blocksTable, err)
 	}
 
 	if tx, ok := TxFromCtx(ctx); ok {
@@ -96,10 +96,10 @@ func (q BlockagesQ) Insert(ctx context.Context, input CompanyBlock) error {
 	return err
 }
 
-func (q BlockagesQ) Get(ctx context.Context) (CompanyBlock, error) {
+func (q BlocksQ) Get(ctx context.Context) (CompanyBlock, error) {
 	query, args, err := q.selector.Limit(1).ToSql()
 	if err != nil {
-		return CompanyBlock{}, fmt.Errorf("building selector query for table %s: %w", blockagesTable, err)
+		return CompanyBlock{}, fmt.Errorf("building selector query for table %s: %w", blocksTable, err)
 	}
 
 	var row *sql.Row
@@ -111,15 +111,15 @@ func (q BlockagesQ) Get(ctx context.Context) (CompanyBlock, error) {
 
 	s, err := scanBlock(row)
 	if err != nil {
-		return CompanyBlock{}, fmt.Errorf("scanning row for table %s: %w", blockagesTable, err)
+		return CompanyBlock{}, fmt.Errorf("scanning row for table %s: %w", blocksTable, err)
 	}
 	return s, nil
 }
 
-func (q BlockagesQ) Select(ctx context.Context) ([]CompanyBlock, error) {
+func (q BlocksQ) Select(ctx context.Context) ([]CompanyBlock, error) {
 	query, args, err := q.selector.ToSql()
 	if err != nil {
-		return nil, fmt.Errorf("building selector query for table %s: %w", blockagesTable, err)
+		return nil, fmt.Errorf("building selector query for table %s: %w", blocksTable, err)
 	}
 
 	var rows *sql.Rows
@@ -129,7 +129,7 @@ func (q BlockagesQ) Select(ctx context.Context) ([]CompanyBlock, error) {
 		rows, err = q.db.QueryContext(ctx, query, args...)
 	}
 	if err != nil {
-		return nil, fmt.Errorf("executing query for table %s: %w", blockagesTable, err)
+		return nil, fmt.Errorf("executing query for table %s: %w", blocksTable, err)
 	}
 	defer rows.Close()
 
@@ -137,14 +137,14 @@ func (q BlockagesQ) Select(ctx context.Context) ([]CompanyBlock, error) {
 	for rows.Next() {
 		s, err := scanBlock(rows)
 		if err != nil {
-			return nil, fmt.Errorf("scanning row for table %s: %w", blockagesTable, err)
+			return nil, fmt.Errorf("scanning row for table %s: %w", blocksTable, err)
 		}
 		res = append(res, s)
 	}
 	return res, nil
 }
 
-func (q BlockagesQ) Update(ctx context.Context) error {
+func (q BlocksQ) Update(ctx context.Context) error {
 	query, args, err := q.updater.ToSql()
 	if err != nil {
 		return fmt.Errorf("building update query for %s: %w", companiesTable, err)
@@ -158,20 +158,20 @@ func (q BlockagesQ) Update(ctx context.Context) error {
 	return err
 }
 
-func (q BlockagesQ) UpdateStatus(status string) BlockagesQ {
+func (q BlocksQ) UpdateStatus(status string) BlocksQ {
 	q.updater = q.updater.Set("status", status)
 	return q
 }
 
-func (q BlockagesQ) UpdateCanceledAt(canceledAt time.Time) BlockagesQ {
+func (q BlocksQ) UpdateCanceledAt(canceledAt time.Time) BlocksQ {
 	q.updater = q.updater.Set("canceled_at", canceledAt)
 	return q
 }
 
-func (q BlockagesQ) Delete(ctx context.Context) error {
+func (q BlocksQ) Delete(ctx context.Context) error {
 	query, args, err := q.deleter.ToSql()
 	if err != nil {
-		return fmt.Errorf("building deleter query for table: %s: %w", blockagesTable, err)
+		return fmt.Errorf("building deleter query for table: %s: %w", blocksTable, err)
 	}
 
 	if tx, ok := TxFromCtx(ctx); ok {
@@ -183,7 +183,7 @@ func (q BlockagesQ) Delete(ctx context.Context) error {
 	return err
 }
 
-func (q BlockagesQ) FilterID(id uuid.UUID) BlockagesQ {
+func (q BlocksQ) FilterID(id uuid.UUID) BlocksQ {
 	q.selector = q.selector.Where(sq.Eq{"id": id})
 	q.counter = q.counter.Where(sq.Eq{"id": id})
 	q.updater = q.updater.Where(sq.Eq{"id": id})
@@ -191,7 +191,7 @@ func (q BlockagesQ) FilterID(id uuid.UUID) BlockagesQ {
 	return q
 }
 
-func (q BlockagesQ) FiltercompanyID(companyID ...uuid.UUID) BlockagesQ {
+func (q BlocksQ) FiltercompanyID(companyID ...uuid.UUID) BlocksQ {
 	q.selector = q.selector.Where(sq.Eq{"company_id": companyID})
 	q.counter = q.counter.Where(sq.Eq{"company_id": companyID})
 	q.updater = q.updater.Where(sq.Eq{"company_id": companyID})
@@ -199,7 +199,7 @@ func (q BlockagesQ) FiltercompanyID(companyID ...uuid.UUID) BlockagesQ {
 	return q
 }
 
-func (q BlockagesQ) FilterInitiatorID(initiatorID ...uuid.UUID) BlockagesQ {
+func (q BlocksQ) FilterInitiatorID(initiatorID ...uuid.UUID) BlocksQ {
 	q.selector = q.selector.Where(sq.Eq{"initiator_id": initiatorID})
 	q.counter = q.counter.Where(sq.Eq{"initiator_id": initiatorID})
 	q.updater = q.updater.Where(sq.Eq{"initiator_id": initiatorID})
@@ -207,7 +207,7 @@ func (q BlockagesQ) FilterInitiatorID(initiatorID ...uuid.UUID) BlockagesQ {
 	return q
 }
 
-func (q BlockagesQ) FilterStatus(status ...string) BlockagesQ {
+func (q BlocksQ) FilterStatus(status ...string) BlocksQ {
 	q.selector = q.selector.Where(sq.Eq{"status": status})
 	q.counter = q.counter.Where(sq.Eq{"status": status})
 	q.updater = q.updater.Where(sq.Eq{"status": status})
@@ -215,7 +215,7 @@ func (q BlockagesQ) FilterStatus(status ...string) BlockagesQ {
 	return q
 }
 
-func (q BlockagesQ) OrderByBlockedAt(ascending bool) BlockagesQ {
+func (q BlocksQ) OrderByBlockedAt(ascending bool) BlocksQ {
 	if ascending {
 		q.selector = q.selector.OrderBy("blocked_at ASC")
 	} else {
@@ -224,17 +224,17 @@ func (q BlockagesQ) OrderByBlockedAt(ascending bool) BlockagesQ {
 	return q
 }
 
-func (q BlockagesQ) Page(limit, offset uint64) BlockagesQ {
+func (q BlocksQ) Page(limit, offset uint64) BlocksQ {
 	q.selector = q.selector.Limit(limit).Offset(offset)
 	q.counter = q.counter.Limit(1) // For counting, we don't need to limit the results
 
 	return q
 }
 
-func (q BlockagesQ) Count(ctx context.Context) (uint64, error) {
+func (q BlocksQ) Count(ctx context.Context) (uint64, error) {
 	query, args, err := q.counter.ToSql()
 	if err != nil {
-		return 0, fmt.Errorf("building count query for table %s: %w", blockagesTable, err)
+		return 0, fmt.Errorf("building count query for table %s: %w", blocksTable, err)
 	}
 
 	var count uint64
@@ -245,7 +245,7 @@ func (q BlockagesQ) Count(ctx context.Context) (uint64, error) {
 	}
 
 	if err != nil {
-		return 0, fmt.Errorf("executing count query for table %s: %w", blockagesTable, err)
+		return 0, fmt.Errorf("executing count query for table %s: %w", blocksTable, err)
 	}
 
 	return count, nil

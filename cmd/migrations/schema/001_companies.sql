@@ -21,7 +21,7 @@ CREATE TYPE blocked_company_status AS ENUM (
     'cancelled' -- suspension has been cancelled
 );
 
-CREATE TABLE company_blockages (
+CREATE TABLE company_blocks (
     id             UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     company_id UUID NOT NULL REFERENCES companies("id") ON DELETE CASCADE,
     initiator_id   UUID NOT NULL,
@@ -32,12 +32,12 @@ CREATE TABLE company_blockages (
 );
 
 CREATE UNIQUE INDEX blocked_companies_one_active_per_dist
-    ON company_blockages(company_id)
+    ON company_blocks(company_id)
     WHERE status = 'active';
 
 -- +migrate Down
 DROP TABLE IF EXISTS companies CASCADE;
-DROP TABLE IF EXISTS company_blockages CASCADE;
+DROP TABLE IF EXISTS company_blocks CASCADE;
 
 DROP TYPE IF EXISTS companies_status CASCADE;
 DROP TYPE IF EXISTS blocked_company_status CASCADE;

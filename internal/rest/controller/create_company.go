@@ -31,10 +31,9 @@ func (a Service) CreateCompany(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := a.domain.company.Create(r.Context(), company.CreateParams{
-		InitiatorID: initiator.ID,
-		Name:        req.Data.Attributes.Name,
-		Icon:        req.Data.Attributes.Icon,
+	res, err := a.domain.company.Create(r.Context(), initiator.ID, company.CreateParams{
+		Name: req.Data.Attributes.Name,
+		Icon: req.Data.Attributes.Icon,
 	})
 	if err != nil {
 		a.log.WithError(err).Errorf("failed to create company")

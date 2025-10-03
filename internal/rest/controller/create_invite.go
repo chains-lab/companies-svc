@@ -7,7 +7,7 @@ import (
 	"github.com/chains-lab/ape"
 	"github.com/chains-lab/ape/problems"
 	"github.com/chains-lab/companies-svc/internal/domain/errx"
-	"github.com/chains-lab/companies-svc/internal/domain/service/employee"
+	"github.com/chains-lab/companies-svc/internal/domain/service/invite"
 	"github.com/chains-lab/companies-svc/internal/rest/meta"
 	"github.com/chains-lab/companies-svc/internal/rest/requests"
 	"github.com/chains-lab/companies-svc/internal/rest/responses"
@@ -30,7 +30,7 @@ func (a Service) CreateInvite(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	invite, err := a.domain.employee.CreateInvite(r.Context(), initiator.ID, employee.SentInviteParams{
+	res, err := a.domain.invite.Create(r.Context(), initiator.ID, invite.CreateParams{
 		CompanyID: req.Data.Attributes.CompanyId,
 		Role:      req.Data.Attributes.Role,
 	})
@@ -48,5 +48,5 @@ func (a Service) CreateInvite(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ape.Render(w, http.StatusCreated, responses.Invites(invite))
+	ape.Render(w, http.StatusCreated, responses.Invites(res))
 }

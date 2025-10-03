@@ -9,14 +9,14 @@ import (
 	"github.com/google/uuid"
 )
 
-type Filter struct {
+type FilterParams struct {
 	CompanyID *uuid.UUID
 	Roles     []string
 }
 
 func (s Service) Filter(
 	ctx context.Context,
-	filters Filter,
+	filters FilterParams,
 	page, size uint64,
 ) (models.EmployeeCollection, error) {
 	res, err := s.db.FilterEmployees(ctx, filters, page, size)

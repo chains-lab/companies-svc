@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/chains-lab/companies-svc/internal/domain/enum"
 	"github.com/chains-lab/companies-svc/internal/domain/errx"
-	"github.com/chains-lab/enum"
 	"github.com/google/uuid"
 )
 

@@ -1,9 +1,12 @@
-package employee
+package invite
 
 import (
 	"context"
+	"fmt"
 	"time"
 
+	"github.com/chains-lab/companies-svc/internal/domain/enum"
+	"github.com/chains-lab/companies-svc/internal/domain/errx"
 	"github.com/chains-lab/companies-svc/internal/domain/models"
 	"github.com/google/uuid"
 )
@@ -40,7 +43,6 @@ type database interface {
 	GetCompanyByID(ctx context.Context, ID uuid.UUID) (models.Company, error)
 
 	CreateEmployee(ctx context.Context, input models.Employee) error
-	FilterEmployees(ctx context.Context, filters FilterParams, page, size uint64) (models.EmployeeCollection, error)
 
 	GetEmployeeByUserID(
 		ctx context.Context,
@@ -58,15 +60,31 @@ type database interface {
 		role string,
 	) (models.Employee, error)
 
-	GetEmployee(
-		ctx context.Context,
-		params GetParams,
-	) (models.Employee, error)
-
 	UpdateEmployeeRole(ctx context.Context, userID uuid.UUID, newRole string, updatedAt time.Time) error
 	DeleteEmployee(ctx context.Context, userID, companyID uuid.UUID) error
 
 	CreateInvite(ctx context.Context, input models.Invite) error
 	GetInvite(ctx context.Context, ID uuid.UUID) (models.Invite, error)
 	UpdateInviteStatus(ctx context.Context, ID, UserID uuid.UUID, status string, acceptedAt time.Time) error
+}
+
+func (s Service) companyIsActive(ctx context.Context, companyID uuid.UUID) error {
+	dis, err := s.db.GetCompanyByID(ctx, companyID)
+	if err != nil {
+		return errx.ErrorInternal.Raise(
+			fmt.Errorf("failed to get company by ID, cause: %w", err),
+		)
+	}
+	if dis.IsNil() {
+		return errx.ErrorcompanyNotFound.Raise(
+			fmt.Errorf("company with ID %s not found", companyID),
+		)
+	}
+	if dis.Status != enum.DistributorStatusActive {
+		return errx.ErrorcompanyIsNotActive.Raise(
+			fmt.Errorf("company with ID %s is not active", companyID),
+		)
+	}
+
+	return nil
 }

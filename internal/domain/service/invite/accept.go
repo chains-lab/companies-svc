@@ -1,22 +1,21 @@
-package employee
+package invite
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
+	"github.com/chains-lab/companies-svc/internal/domain/enum"
 	"github.com/chains-lab/companies-svc/internal/domain/errx"
 	"github.com/chains-lab/companies-svc/internal/domain/models"
-	"github.com/chains-lab/enum"
 	"github.com/google/uuid"
 )
 
-func (s Service) AcceptInvite(ctx context.Context, userID uuid.UUID, token string) (models.Invite, error) {
+func (s Service) Accept(ctx context.Context, userID uuid.UUID, token string) (models.Invite, error) {
 	data, err := s.jwt.DecryptInviteToken(token)
 	if err != nil {
 		return models.Invite{}, errx.ErrorInvalidInviteToken.Raise(
-			fmt.Errorf("invalid or expired token: %w", err),
+			fmt.Errorf("failed invalid or expired token, cause: %w", err),
 		)
 	}
 
@@ -43,16 +42,16 @@ func (s Service) AcceptInvite(ctx context.Context, userID uuid.UUID, token strin
 		)
 	}
 
-	_, err = s.Get(ctx, GetFilters{
-		UserID: &userID,
-	})
-	if err == nil {
-		return models.Invite{}, errx.ErrorEmployeeAlreadyExists.Raise(
-			fmt.Errorf("user is already an employee"),
+	emp, err := s.db.GetEmployeeByUserID(ctx, userID)
+	if err != nil {
+		return models.Invite{}, errx.ErrorInternal.Raise(
+			fmt.Errorf("failed to get employee by user_id %s, cause: %w", userID, err),
 		)
 	}
-	if !errors.Is(err, errx.ErrorEmployeeNotFound) {
-		return models.Invite{}, err
+	if !emp.IsNil() {
+		return models.Invite{}, errx.ErrorEmployeeAlreadyExists.Raise(
+			fmt.Errorf("employee with user_id %s already exists", userID),
+		)
 	}
 
 	err = s.companyIsActive(ctx, inv.CompanyID)
@@ -60,11 +59,13 @@ func (s Service) AcceptInvite(ctx context.Context, userID uuid.UUID, token strin
 		return models.Invite{}, err
 	}
 
-	txErr := s.db.Transaction(ctx, func(ctx context.Context) error {
-		_, err = s.Create(ctx, CreateParams{
+	if err = s.db.Transaction(ctx, func(ctx context.Context) error {
+		err = s.db.CreateEmployee(ctx, models.Employee{
 			UserID:    userID,
 			CompanyID: inv.CompanyID,
 			Role:      inv.Role,
+			CreatedAt: now,
+			UpdatedAt: now,
 		})
 		if err != nil {
 			return err
@@ -72,14 +73,13 @@ func (s Service) AcceptInvite(ctx context.Context, userID uuid.UUID, token strin
 
 		if err = s.db.UpdateInviteStatus(ctx, inv.ID, userID, enum.InviteStatusAccepted, now); err != nil {
 			return errx.ErrorInternal.Raise(
-				fmt.Errorf("update invite status: %w", err),
+				fmt.Errorf("failed to update invite status, cause: %w", err),
 			)
 		}
 
 		return nil
-	})
-	if txErr != nil {
-		return models.Invite{}, txErr
+	}); err != nil {
+		return models.Invite{}, err
 	}
 
 	inv.Status = enum.InviteStatusAccepted

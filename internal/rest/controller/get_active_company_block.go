@@ -24,7 +24,7 @@ func (a Service) GetActiveCompanyBlock(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	block, err := a.domain.company.GetActivecompanyBlock(r.Context(), companyID)
+	block, err := a.domain.block.GetActiveCompanyBlock(r.Context(), companyID)
 	if err != nil {
 		a.log.WithError(err).Errorf("failed to get company %s active block", companyID)
 		switch {

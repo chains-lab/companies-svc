@@ -2,9 +2,10 @@ package data
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"time"
 
-	"github.com/chains-lab/companies-svc/internal/data/pgdb"
 	"github.com/chains-lab/companies-svc/internal/domain/models"
 	"github.com/chains-lab/companies-svc/internal/domain/service/company"
 	"github.com/chains-lab/pagi"
@@ -24,7 +25,10 @@ func (d *Database) CreateCompany(ctx context.Context, model models.Company) (mod
 
 func (d *Database) GetCompanyByID(ctx context.Context, ID uuid.UUID) (models.Company, error) {
 	schema, err := d.sql.companies.New().FilterID(ID).Get(ctx)
-	if err != nil {
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		return models.Company{}, nil
+	case err != nil:
 		return models.Company{}, err
 	}
 
@@ -33,7 +37,7 @@ func (d *Database) GetCompanyByID(ctx context.Context, ID uuid.UUID) (models.Com
 
 func (d *Database) FilterCompanies(
 	ctx context.Context,
-	filters company.Filters,
+	filters company.FiltersParams,
 	page, size uint64,
 ) (models.CompanyCollection, error) {
 	limit, offset := pagi.PagConvert(page, size)
@@ -98,27 +102,10 @@ func (d *Database) UpdateCompaniesStatus(
 	status string,
 	updatedAt time.Time,
 ) error {
-	return d.sql.companies.New().FilterID(ID).UpdateStatus(status).Update(ctx, updatedAt)
-}
-
-func companyModelToSchema(model models.Company) pgdb.Company {
-	return pgdb.Company{
-		ID:        model.ID,
-		Name:      model.Name,
-		Icon:      model.Icon,
-		Status:    model.Status,
-		CreatedAt: model.CreatedAt,
-		UpdatedAt: model.UpdatedAt,
+	err := d.sql.companies.New().FilterID(ID).UpdateStatus(status).Update(ctx, updatedAt)
+	if err != nil {
+		return err
 	}
-}
 
-func companiesSchemaToModel(schema pgdb.Company) models.Company {
-	return models.Company{
-		ID:        schema.ID,
-		Name:      schema.Name,
-		Icon:      schema.Icon,
-		Status:    schema.Status,
-		CreatedAt: schema.CreatedAt,
-		UpdatedAt: schema.UpdatedAt,
-	}
+	return nil
 }

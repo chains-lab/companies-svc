@@ -1,4 +1,4 @@
-package company
+package block
 
 import (
 	"context"
@@ -9,21 +9,21 @@ import (
 	"github.com/google/uuid"
 )
 
-type FilterBlockages struct {
+type FilterParams struct {
 	CompanyID   *uuid.UUID
 	InitiatorID *uuid.UUID
 	Status      *string
 }
 
-func (s Service) FilterBlockages(
+func (s Service) Filter(
 	ctx context.Context,
-	filters FilterBlockages,
+	filters FilterParams,
 	page, size uint64,
 ) (models.CompanyBlockCollection, error) {
 	res, err := s.db.FilterCompanyBlocks(ctx, filters, page, size)
 	if err != nil {
 		return models.CompanyBlockCollection{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("failed filter company blocks, cause: %w", err),
+			fmt.Errorf("failed to filter company blocks, cause: %w", err),
 		)
 	}
 

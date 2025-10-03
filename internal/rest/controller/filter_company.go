@@ -11,8 +11,8 @@ import (
 	"github.com/chains-lab/pagi"
 )
 
-func (a Service) ListCompanies(w http.ResponseWriter, r *http.Request) {
-	filters := company.Filters{}
+func (a Service) FilterCompanies(w http.ResponseWriter, r *http.Request) {
+	filters := company.FiltersParams{}
 	q := r.URL.Query()
 
 	if sts := q["status"]; len(sts) > 0 {

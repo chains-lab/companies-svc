@@ -48,7 +48,7 @@ func (a Service) CreateCompanyBlock(w http.ResponseWriter, r *http.Request) {
 	//	return
 	//}
 
-	block, err := a.domain.company.CreteBlock(r.Context(), initiator.ID, req.Data.Attributes.CompanyId, req.Data.Attributes.Reason)
+	block, err := a.domain.block.Crete(r.Context(), initiator.ID, req.Data.Attributes.CompanyId, req.Data.Attributes.Reason)
 	if err != nil {
 		a.log.WithError(err).Errorf("failed to block company")
 		switch {

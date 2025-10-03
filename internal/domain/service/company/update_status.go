@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/chains-lab/companies-svc/internal/domain/enum"
 	"github.com/chains-lab/companies-svc/internal/domain/errx"
 	"github.com/chains-lab/companies-svc/internal/domain/models"
-	"github.com/chains-lab/enum"
 	"github.com/google/uuid"
 )
 
@@ -18,8 +18,8 @@ func (s Service) UpdateStatus(
 ) (models.Company, error) {
 	err := enum.CheckDistributorStatus(status)
 	if err != nil {
-		return models.Company{}, errx.ErrorInvalidcompanyBlockStatus.Raise(
-			fmt.Errorf("invalid status %s: %w", status, err),
+		return models.Company{}, errx.ErrorInvalidCompanyBlockStatus.Raise(
+			fmt.Errorf("failed invalid status %s, cause: %w", status, err),
 		)
 	}
 
@@ -44,7 +44,7 @@ func (s Service) UpdateStatus(
 	err = s.db.UpdateCompaniesStatus(ctx, companyID, status, now)
 	if err != nil {
 		return models.Company{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("internal error: %w", err),
+			fmt.Errorf("failed to update company status, cause: %w", err),
 		)
 	}
 
