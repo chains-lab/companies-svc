@@ -1,4 +1,4 @@
-package handlers
+package controller
 
 import (
 	"errors"
@@ -9,19 +9,22 @@ import (
 	"github.com/chains-lab/distributors-svc/internal/domain/errx"
 	"github.com/chains-lab/distributors-svc/internal/rest/responses"
 	"github.com/go-chi/chi/v5"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/google/uuid"
 )
 
-func (a Adapter) GetBlock(w http.ResponseWriter, r *http.Request) {
+func (a Service) GetBlock(w http.ResponseWriter, r *http.Request) {
 	blockID, err := uuid.Parse(chi.URLParam(r, "block_id"))
 	if err != nil {
 		a.log.WithError(err).Errorf("invalid block ID format")
-		ape.RenderErr(w, problems.InvalidParameter("block_id", err))
+		ape.RenderErr(w, problems.BadRequest(validation.Errors{
+			"block_id": err,
+		})...)
 
 		return
 	}
 
-	block, err := a.app.GetBlock(r.Context(), blockID)
+	block, err := a.domain.distributor.GetBlock(r.Context(), blockID)
 	if err != nil {
 		a.log.WithError(err).Errorf("failed to get block, ID: %s", blockID)
 		switch {

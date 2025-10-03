@@ -3,17 +3,16 @@ package responses
 import (
 	"github.com/chains-lab/distributors-svc/internal/domain/models"
 	"github.com/chains-lab/distributors-svc/resources"
-	"github.com/chains-lab/pagi"
 )
 
 func DistributorBlock(m models.DistributorBlock) resources.DistributorBlock {
 	resp := resources.DistributorBlock{
 		Data: resources.DistributorBlockData{
-			Id:   m.ID.String(),
+			Id:   m.ID,
 			Type: resources.DistributorBlockType,
 			Attributes: resources.DistributorBlockAttributes{
-				DistributorId: m.DistributorID.String(),
-				InitiatorId:   m.InitiatorID.String(),
+				DistributorId: m.DistributorID,
+				InitiatorId:   m.InitiatorID,
 				Reason:        m.Reason,
 				Status:        m.Status,
 				BlockedAt:     m.BlockedAt,
@@ -28,18 +27,18 @@ func DistributorBlock(m models.DistributorBlock) resources.DistributorBlock {
 	return resp
 }
 
-func DistributorBlockCollection(ms []models.DistributorBlock, pag pagi.Response) resources.DistributorBlocksCollection {
-	items := make([]resources.DistributorBlockData, 0, len(ms))
-	for _, m := range ms {
+func DistributorBlockCollection(ms models.DistributorBlockCollection) resources.DistributorBlocksCollection {
+	items := make([]resources.DistributorBlockData, 0, len(ms.Data))
+	for _, m := range ms.Data {
 		items = append(items, DistributorBlock(m).Data)
 	}
 
 	return resources.DistributorBlocksCollection{
 		Data: items,
 		Links: resources.PaginationData{
-			PageNumber: int64(pag.Page),
-			PageSize:   int64(pag.Size),
-			TotalItems: int64(pag.Total),
+			PageNumber: int64(ms.Page),
+			PageSize:   int64(ms.Size),
+			TotalItems: int64(ms.Total),
 		},
 	}
 }

@@ -21,7 +21,7 @@ type Employee struct {
 	CreatedAt     time.Time `db:"created_at"`
 }
 
-type EmployeeQ struct {
+type EmployeesQ struct {
 	db       *sql.DB
 	selector sq.SelectBuilder
 	updater  sq.UpdateBuilder
@@ -30,10 +30,10 @@ type EmployeeQ struct {
 	counter  sq.SelectBuilder
 }
 
-func NewEmployeesQ(db *sql.DB) EmployeeQ {
+func NewEmployeesQ(db *sql.DB) EmployeesQ {
 	builder := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 
-	return EmployeeQ{
+	return EmployeesQ{
 		db:       db,
 		selector: builder.Select("*").From(employeesTable),
 		updater:  builder.Update(employeesTable),
@@ -43,11 +43,11 @@ func NewEmployeesQ(db *sql.DB) EmployeeQ {
 	}
 }
 
-func (q EmployeeQ) New() EmployeeQ {
+func (q EmployeesQ) New() EmployeesQ {
 	return NewEmployeesQ(q.db)
 }
 
-func (q EmployeeQ) Insert(ctx context.Context, in Employee) error {
+func (q EmployeesQ) Insert(ctx context.Context, in Employee) error {
 	qry, args, err := q.inserter.
 		Columns("user_id", "distributor_id", "role", "updated_at", "created_at").
 		Values(in.UserID, in.DistributorID, in.Role, in.UpdatedAt, in.CreatedAt).
@@ -56,7 +56,7 @@ func (q EmployeeQ) Insert(ctx context.Context, in Employee) error {
 		return fmt.Errorf("build insert %s: %w", employeesTable, err)
 	}
 
-	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
+	if tx, ok := TxFromCtx(ctx); ok {
 		_, err = tx.ExecContext(ctx, qry, args...)
 	} else {
 		_, err = q.db.ExecContext(ctx, qry, args...)
@@ -64,14 +64,14 @@ func (q EmployeeQ) Insert(ctx context.Context, in Employee) error {
 	return err
 }
 
-func (q EmployeeQ) Get(ctx context.Context) (Employee, error) {
+func (q EmployeesQ) Get(ctx context.Context) (Employee, error) {
 	query, args, err := q.selector.Limit(1).ToSql()
 	if err != nil {
 		return Employee{}, err
 	}
 
 	var row *sql.Row
-	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
+	if tx, ok := TxFromCtx(ctx); ok {
 		row = tx.QueryRowContext(ctx, query, args...)
 	} else {
 		row = q.db.QueryRowContext(ctx, query, args...)
@@ -92,14 +92,14 @@ func (q EmployeeQ) Get(ctx context.Context) (Employee, error) {
 	return emp, nil
 }
 
-func (q EmployeeQ) Select(ctx context.Context) ([]Employee, error) {
+func (q EmployeesQ) Select(ctx context.Context) ([]Employee, error) {
 	query, args, err := q.selector.ToSql()
 	if err != nil {
 		return nil, err
 	}
 
 	var rows *sql.Rows
-	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
+	if tx, ok := TxFromCtx(ctx); ok {
 		rows, err = tx.QueryContext(ctx, query, args...)
 	} else {
 		rows, err = q.db.QueryContext(ctx, query, args...)
@@ -127,39 +127,34 @@ func (q EmployeeQ) Select(ctx context.Context) ([]Employee, error) {
 	return employees, nil
 }
 
-func (q EmployeeQ) Update(ctx context.Context, input map[string]any) error {
-	values := map[string]any{}
+func (q EmployeesQ) Update(ctx context.Context, updatedAt time.Time) error {
+	q.updater = q.updater.Set("updated_at", updatedAt)
 
-	if role, ok := input["role"]; ok {
-		values["role"] = role
-	}
-	if updatedAt, ok := input["updated_at"]; ok {
-		values["updated_at"] = updatedAt
-	} else {
-		values["updated_at"] = time.Now().UTC()
-	}
-
-	query, args, err := q.updater.SetMap(values).ToSql()
+	query, args, err := q.updater.ToSql()
 	if err != nil {
-		return fmt.Errorf("building update query for table %s: %w", employeesTable, err)
+		return fmt.Errorf("building update query for %s: %w", employeesTable, err)
 	}
 
-	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
+	if tx, ok := TxFromCtx(ctx); ok {
 		_, err = tx.ExecContext(ctx, query, args...)
 	} else {
 		_, err = q.db.ExecContext(ctx, query, args...)
 	}
-
 	return err
 }
 
-func (q EmployeeQ) Delete(ctx context.Context) error {
+func (q EmployeesQ) UpdateRole(role string) EmployeesQ {
+	q.updater = q.updater.Set("role", role)
+	return q
+}
+
+func (q EmployeesQ) Delete(ctx context.Context) error {
 	query, args, err := q.deleter.ToSql()
 	if err != nil {
 		return fmt.Errorf("building delete query for table %s: %w", employeesTable, err)
 	}
 
-	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
+	if tx, ok := TxFromCtx(ctx); ok {
 		_, err = tx.ExecContext(ctx, query, args...)
 	} else {
 		_, err = q.db.ExecContext(ctx, query, args...)
@@ -168,7 +163,7 @@ func (q EmployeeQ) Delete(ctx context.Context) error {
 	return err
 }
 
-func (q EmployeeQ) FilterUserID(userID uuid.UUID) EmployeeQ {
+func (q EmployeesQ) FilterUserID(userID uuid.UUID) EmployeesQ {
 	q.selector = q.selector.Where(sq.Eq{"user_id": userID})
 	q.counter = q.counter.Where(sq.Eq{"user_id": userID})
 	q.updater = q.updater.Where(sq.Eq{"user_id": userID})
@@ -176,7 +171,7 @@ func (q EmployeeQ) FilterUserID(userID uuid.UUID) EmployeeQ {
 	return q
 }
 
-func (q EmployeeQ) FilterDistributorID(distributorID ...uuid.UUID) EmployeeQ {
+func (q EmployeesQ) FilterDistributorID(distributorID ...uuid.UUID) EmployeesQ {
 	q.selector = q.selector.Where(sq.Eq{"distributor_id": distributorID})
 	q.counter = q.counter.Where(sq.Eq{"distributor_id": distributorID})
 	q.updater = q.updater.Where(sq.Eq{"distributor_id": distributorID})
@@ -184,7 +179,7 @@ func (q EmployeeQ) FilterDistributorID(distributorID ...uuid.UUID) EmployeeQ {
 	return q
 }
 
-func (q EmployeeQ) FilterRole(role ...string) EmployeeQ {
+func (q EmployeesQ) FilterRole(role ...string) EmployeesQ {
 	q.selector = q.selector.Where(sq.Eq{"role": role})
 	q.counter = q.counter.Where(sq.Eq{"role": role})
 	q.updater = q.updater.Where(sq.Eq{"role": role})
@@ -192,7 +187,7 @@ func (q EmployeeQ) FilterRole(role ...string) EmployeeQ {
 	return q
 }
 
-func (q EmployeeQ) OrderByRole(ascend bool) EmployeeQ {
+func (q EmployeesQ) OrderByRole(ascend bool) EmployeesQ {
 	dir := "DESC"
 	if ascend {
 		dir = "ASC"
@@ -208,14 +203,14 @@ func (q EmployeeQ) OrderByRole(ascend bool) EmployeeQ {
 	return q
 }
 
-func (q EmployeeQ) Count(ctx context.Context) (uint64, error) {
+func (q EmployeesQ) Count(ctx context.Context) (uint64, error) {
 	query, args, err := q.counter.ToSql()
 	if err != nil {
 		return 0, fmt.Errorf("building count query for table %s: %w", employeesTable, err)
 	}
 
 	var count uint64
-	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
+	if tx, ok := TxFromCtx(ctx); ok {
 		err = tx.QueryRowContext(ctx, query, args...).Scan(&count)
 	} else {
 		err = q.db.QueryRowContext(ctx, query, args...).Scan(&count)
@@ -228,32 +223,8 @@ func (q EmployeeQ) Count(ctx context.Context) (uint64, error) {
 	return count, nil
 }
 
-func (q EmployeeQ) Page(limit, offset uint64) EmployeeQ {
+func (q EmployeesQ) Page(limit, offset uint64) EmployeesQ {
 	q.selector = q.selector.Limit(limit).Offset(offset)
 
 	return q
-}
-
-func (q EmployeeQ) Transaction(fn func(ctx context.Context) error) error {
-	ctx := context.Background()
-
-	tx, err := q.db.BeginTx(ctx, nil)
-	if err != nil {
-		return fmt.Errorf("failed to start transaction: %w", err)
-	}
-
-	ctxWithTx := context.WithValue(ctx, TxKey, tx)
-
-	if err := fn(ctxWithTx); err != nil {
-		if rbErr := tx.Rollback(); rbErr != nil {
-			return fmt.Errorf("transaction failed: %v, rollback error: %v", err, rbErr)
-		}
-		return fmt.Errorf("transaction failed: %w", err)
-	}
-
-	if err := tx.Commit(); err != nil {
-		return fmt.Errorf("failed to commit transaction: %w", err)
-	}
-
-	return nil
 }

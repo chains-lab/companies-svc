@@ -5,16 +5,22 @@ import (
 	"fmt"
 
 	"github.com/chains-lab/distributors-svc/internal/domain/errx"
+	"github.com/chains-lab/enum"
 	"github.com/google/uuid"
 )
 
 func (s Service) RefuseOwn(ctx context.Context, initiatorID uuid.UUID) error {
-	_, err := s.GetInitiator(ctx, initiatorID)
+	own, err := s.GetInitiator(ctx, initiatorID)
 	if err != nil {
 		return err
 	}
 
-	err = s.employee.New().FilterUserID(initiatorID).Delete(ctx)
+	if own.Role == enum.EmployeeRoleOwner {
+		return errx.ErrorOwnerCannotRefuseSelf.Raise(
+			fmt.Errorf("owner cannot refuse self"),
+		)
+	}
+	err = s.db.DeleteEmployee(ctx, own.UserID, own.DistributorID)
 	if err != nil {
 		return errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to refuse own employee, cause: %w", err),

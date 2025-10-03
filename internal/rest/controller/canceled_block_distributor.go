@@ -1,4 +1,4 @@
-package handlers
+package controller
 
 import (
 	"errors"
@@ -10,12 +10,11 @@ import (
 	"github.com/chains-lab/distributors-svc/internal/rest/meta"
 	"github.com/chains-lab/distributors-svc/internal/rest/responses"
 	"github.com/go-chi/chi/v5"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/google/uuid"
-
-	"github.com/chains-lab/gatekit/roles"
 )
 
-func (a Adapter) CanceledDistributorBlock(w http.ResponseWriter, r *http.Request) {
+func (a Service) CanceledDistributorBlock(w http.ResponseWriter, r *http.Request) {
 	initiator, err := meta.User(r.Context())
 	if err != nil {
 		a.log.WithError(err).Error("failed to get user from context")
@@ -27,26 +26,19 @@ func (a Adapter) CanceledDistributorBlock(w http.ResponseWriter, r *http.Request
 	distributorID, err := uuid.Parse(chi.URLParam(r, "distributor_id"))
 	if err != nil {
 		a.log.WithError(err).Error("invalid distributor_id")
-		ape.RenderErr(w, problems.InvalidParameter("distributor_id", err))
+		ape.RenderErr(w, problems.BadRequest(validation.Errors{
+			"distributor_id": err,
+		})...)
 
 		return
 	}
 
-	if initiator.Role != roles.Admin && initiator.Role != roles.SuperUser {
-		a.log.Warnf("user %s with role %s attempted to canceled block %s", initiator.ID, initiator.Role, distributorID)
-		ape.RenderErr(w, problems.Forbidden("only admin and superuser can unblock distributor"))
-
-		return
-	}
-
-	dis, err := a.app.UnblockDistributor(r.Context(), distributorID)
+	dis, err := a.domain.distributor.CancelBlock(r.Context(), distributorID)
 	if err != nil {
 		a.log.WithError(err).Errorf("failed to canceled block distributor")
 		switch {
 		case errors.Is(err, errx.ErrorDistributorNotFound):
 			ape.RenderErr(w, problems.NotFound("distributor not found"))
-		case errors.Is(err, errx.ErrorNoActiveBlockForDistributor):
-			ape.RenderErr(w, problems.Conflict("no active block for distributor"))
 		default:
 			ape.RenderErr(w, problems.InternalError())
 		}

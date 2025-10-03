@@ -8,12 +8,12 @@ import (
 func Invites(m models.Invite) resources.Invite {
 	resp := resources.Invite{
 		Data: resources.InviteData{
-			Id:   m.ID.String(),
+			Id:   m.ID,
 			Type: resources.InviteType,
 			Attributes: resources.InviteAttributes{
 				Status:        m.Status,
 				Role:          m.Role,
-				DistributorId: m.DistributorID.String(),
+				DistributorId: m.DistributorID,
 				Token:         m.Token,
 				ExpiresAt:     m.ExpiresAt,
 				CreatedAt:     m.CreatedAt,

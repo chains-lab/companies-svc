@@ -12,6 +12,7 @@ package resources
 
 import (
 	"encoding/json"
+	"github.com/google/uuid"
 	"bytes"
 	"fmt"
 )
@@ -22,7 +23,7 @@ var _ MappedNullable = &SentInviteDataAttributes{}
 // SentInviteDataAttributes struct for SentInviteDataAttributes
 type SentInviteDataAttributes struct {
 	// ID of the distributor the invite is for
-	DistributorId string `json:"distributor_id"`
+	DistributorId uuid.UUID `json:"distributor_id"`
 	// Role assigned to the invited user
 	Role string `json:"role"`
 }
@@ -33,7 +34,7 @@ type _SentInviteDataAttributes SentInviteDataAttributes
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewSentInviteDataAttributes(distributorId string, role string) *SentInviteDataAttributes {
+func NewSentInviteDataAttributes(distributorId uuid.UUID, role string) *SentInviteDataAttributes {
 	this := SentInviteDataAttributes{}
 	this.DistributorId = distributorId
 	this.Role = role
@@ -49,9 +50,9 @@ func NewSentInviteDataAttributesWithDefaults() *SentInviteDataAttributes {
 }
 
 // GetDistributorId returns the DistributorId field value
-func (o *SentInviteDataAttributes) GetDistributorId() string {
+func (o *SentInviteDataAttributes) GetDistributorId() uuid.UUID {
 	if o == nil {
-		var ret string
+		var ret uuid.UUID
 		return ret
 	}
 
@@ -60,7 +61,7 @@ func (o *SentInviteDataAttributes) GetDistributorId() string {
 
 // GetDistributorIdOk returns a tuple with the DistributorId field value
 // and a boolean to check if the value has been set.
-func (o *SentInviteDataAttributes) GetDistributorIdOk() (*string, bool) {
+func (o *SentInviteDataAttributes) GetDistributorIdOk() (*uuid.UUID, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -68,7 +69,7 @@ func (o *SentInviteDataAttributes) GetDistributorIdOk() (*string, bool) {
 }
 
 // SetDistributorId sets field value
-func (o *SentInviteDataAttributes) SetDistributorId(v string) {
+func (o *SentInviteDataAttributes) SetDistributorId(v uuid.UUID) {
 	o.DistributorId = v
 }
 

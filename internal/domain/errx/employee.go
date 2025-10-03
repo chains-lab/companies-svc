@@ -4,22 +4,18 @@ import (
 	"github.com/chains-lab/ape"
 )
 
+var EmployeeInvalidRole = ape.DeclareError("INVALID_EMPLOYEE_ROLE")
+
 var ErrorEmployeeNotFound = ape.DeclareError("EMPLOYEE_NOT_FOUND")
 
 var ErrorEmployeeAlreadyExists = ape.DeclareError("EMPLOYEE_ALREADY_EXISTS")
 
-var EmployeeInvalidRole = ape.DeclareError("INVALID_EMPLOYEE_ROLE")
-
-var ErrorInitiatorNotEmployee = ape.DeclareError("INITIATOR_NOT_EMPLOYEE")
-
-var ErrorInitiatorIsAlreadyEmployee = ape.DeclareError("INITIATOR_IS_ALREADY_EMPLOYEE")
-
 var ErrorCannotDeleteYourself = ape.DeclareError("CANNOT_DELETE_YOURSELF")
 
-var ErrorInitiatorEmployeeHaveNotEnoughRights = ape.DeclareError("INITIATOR_HAVE_NOT_ENOUGH_PERMISSIONS")
+var ErrorOwnerCannotRefuseSelf = ape.DeclareError("OWNER_CANNOT_REFUSE_SELF")
 
-var ErrorInitiatorAndUserHaveDifferentDistributors = ape.DeclareError("INITIATOR_AND_USER_HAVE_DIFFERENT_DISTRIBUTORS")
+var ErrorInitiatorHaveNotEnoughRights = ape.DeclareError("INITIATOR_HAVE_NOT_ENOUGH_PERMISSIONS")
 
-var ErrorInitiatorIsNotThisDistributorEmployee = ape.DeclareError("INITIATOR_IS_NOT_THIS_DISTRIBUTOR_EMPLOYEE")
+var ErrorInitiatorIsNotEmployee = ape.DeclareError("INITIATOR_NOT_EMPLOYEE")
 
-var ErrorCurrentEmployeeCannotCreateDistributor = ape.DeclareError("CURRENT_EMPLOYEE_CANNOT_CREATE_DISTRIBUTOR")
+var ErrorInitiatorIsNotEmployeeOfThisDistributor = ape.DeclareError("INITIATOR_NOT_EMPLOYEE_OF_THIS_DISTRIBUTOR")

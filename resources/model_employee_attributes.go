@@ -12,6 +12,7 @@ package resources
 
 import (
 	"encoding/json"
+	"github.com/google/uuid"
 	"time"
 	"bytes"
 	"fmt"
@@ -23,7 +24,7 @@ var _ MappedNullable = &EmployeeAttributes{}
 // EmployeeAttributes struct for EmployeeAttributes
 type EmployeeAttributes struct {
 	// The unique identifier for the distributor associated with the employee.
-	DistributorId string `json:"distributor_id"`
+	DistributorId uuid.UUID `json:"distributor_id"`
 	// The role of the employee within the distributor's organization (e.g., manager, staff).
 	Role string `json:"role"`
 	// The timestamp when the employee record was created.
@@ -38,7 +39,7 @@ type _EmployeeAttributes EmployeeAttributes
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewEmployeeAttributes(distributorId string, role string, createdAt time.Time, updatedAt time.Time) *EmployeeAttributes {
+func NewEmployeeAttributes(distributorId uuid.UUID, role string, createdAt time.Time, updatedAt time.Time) *EmployeeAttributes {
 	this := EmployeeAttributes{}
 	this.DistributorId = distributorId
 	this.Role = role
@@ -56,9 +57,9 @@ func NewEmployeeAttributesWithDefaults() *EmployeeAttributes {
 }
 
 // GetDistributorId returns the DistributorId field value
-func (o *EmployeeAttributes) GetDistributorId() string {
+func (o *EmployeeAttributes) GetDistributorId() uuid.UUID {
 	if o == nil {
-		var ret string
+		var ret uuid.UUID
 		return ret
 	}
 
@@ -67,7 +68,7 @@ func (o *EmployeeAttributes) GetDistributorId() string {
 
 // GetDistributorIdOk returns a tuple with the DistributorId field value
 // and a boolean to check if the value has been set.
-func (o *EmployeeAttributes) GetDistributorIdOk() (*string, bool) {
+func (o *EmployeeAttributes) GetDistributorIdOk() (*uuid.UUID, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -75,7 +76,7 @@ func (o *EmployeeAttributes) GetDistributorIdOk() (*string, bool) {
 }
 
 // SetDistributorId sets field value
-func (o *EmployeeAttributes) SetDistributorId(v string) {
+func (o *EmployeeAttributes) SetDistributorId(v uuid.UUID) {
 	o.DistributorId = v
 }
 

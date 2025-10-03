@@ -8,14 +8,14 @@ import (
 	"github.com/chains-lab/distributors-svc/internal/domain/models"
 )
 
-type FilterList struct {
+type Filters struct {
 	Name     *string
 	Statuses []string
 }
 
-func (s Service) List(
+func (s Service) Filter(
 	ctx context.Context,
-	filters FilterList,
+	filters Filters,
 	page, size uint64,
 ) (models.DistributorCollection, error) {
 	res, err := s.db.FilterDistributors(ctx, filters, page, size)

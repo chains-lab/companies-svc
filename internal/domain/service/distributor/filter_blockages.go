@@ -9,15 +9,15 @@ import (
 	"github.com/google/uuid"
 )
 
-type FilterBlockagesList struct {
-	Distributors []uuid.UUID
-	Initiators   []uuid.UUID
-	Statuses     []string
+type FilterBlockages struct {
+	DistributorID *uuid.UUID
+	InitiatorID   *uuid.UUID
+	Status        *string
 }
 
-func (s Service) ListBlockages(
+func (s Service) FilterBlockages(
 	ctx context.Context,
-	filters FilterBlockagesList,
+	filters FilterBlockages,
 	page, size uint64,
 ) (models.DistributorBlockCollection, error) {
 	res, err := s.db.FilterDistributorBlocks(ctx, filters, page, size)

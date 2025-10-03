@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | **string** | distributor block id | 
+**Id** | [**uuid.UUID**](uuid.UUID.md) | distributor block id | 
 **Type** | **string** |  | 
 **Attributes** | [**DistributorBlockAttributes**](DistributorBlockAttributes.md) |  | 
 
@@ -12,7 +12,7 @@ Name | Type | Description | Notes
 
 ### NewDistributorBlockData
 
-`func NewDistributorBlockData(id string, type_ string, attributes DistributorBlockAttributes, ) *DistributorBlockData`
+`func NewDistributorBlockData(id uuid.UUID, type_ string, attributes DistributorBlockAttributes, ) *DistributorBlockData`
 
 NewDistributorBlockData instantiates a new DistributorBlockData object
 This constructor will assign default values to properties that have it defined,
@@ -29,20 +29,20 @@ but it doesn't guarantee that properties required by API are set
 
 ### GetId
 
-`func (o *DistributorBlockData) GetId() string`
+`func (o *DistributorBlockData) GetId() uuid.UUID`
 
 GetId returns the Id field if non-nil, zero value otherwise.
 
 ### GetIdOk
 
-`func (o *DistributorBlockData) GetIdOk() (*string, bool)`
+`func (o *DistributorBlockData) GetIdOk() (*uuid.UUID, bool)`
 
 GetIdOk returns a tuple with the Id field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetId
 
-`func (o *DistributorBlockData) SetId(v string)`
+`func (o *DistributorBlockData) SetId(v uuid.UUID)`
 
 SetId sets Id field to given value.
 

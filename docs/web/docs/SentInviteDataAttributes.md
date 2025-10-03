@@ -4,14 +4,14 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**DistributorId** | **string** | ID of the distributor the invite is for | 
+**DistributorId** | [**uuid.UUID**](uuid.UUID.md) | ID of the distributor the invite is for | 
 **Role** | **string** | Role assigned to the invited user | 
 
 ## Methods
 
 ### NewSentInviteDataAttributes
 
-`func NewSentInviteDataAttributes(distributorId string, role string, ) *SentInviteDataAttributes`
+`func NewSentInviteDataAttributes(distributorId uuid.UUID, role string, ) *SentInviteDataAttributes`
 
 NewSentInviteDataAttributes instantiates a new SentInviteDataAttributes object
 This constructor will assign default values to properties that have it defined,
@@ -28,20 +28,20 @@ but it doesn't guarantee that properties required by API are set
 
 ### GetDistributorId
 
-`func (o *SentInviteDataAttributes) GetDistributorId() string`
+`func (o *SentInviteDataAttributes) GetDistributorId() uuid.UUID`
 
 GetDistributorId returns the DistributorId field if non-nil, zero value otherwise.
 
 ### GetDistributorIdOk
 
-`func (o *SentInviteDataAttributes) GetDistributorIdOk() (*string, bool)`
+`func (o *SentInviteDataAttributes) GetDistributorIdOk() (*uuid.UUID, bool)`
 
 GetDistributorIdOk returns a tuple with the DistributorId field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetDistributorId
 
-`func (o *SentInviteDataAttributes) SetDistributorId(v string)`
+`func (o *SentInviteDataAttributes) SetDistributorId(v uuid.UUID)`
 
 SetDistributorId sets DistributorId field to given value.
 

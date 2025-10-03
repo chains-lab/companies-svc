@@ -20,7 +20,7 @@ func (d Distributor) IsNil() bool {
 }
 
 type DistributorCollection struct {
-	Items []Distributor `json:"items"`
+	Data  []Distributor `json:"data"`
 	Page  uint64        `json:"page"`
 	Size  uint64        `json:"size"`
 	Total uint64        `json:"total"`

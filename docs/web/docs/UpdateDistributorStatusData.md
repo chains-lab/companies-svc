@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | **string** | The UUID of the distributor to be updated. | 
+**Id** | [**uuid.UUID**](uuid.UUID.md) | The UUID of the distributor to be updated. | 
 **Type** | **string** |  | 
 **Attributes** | [**UpdateDistributorStatusDataAttributes**](UpdateDistributorStatusDataAttributes.md) |  | 
 
@@ -12,7 +12,7 @@ Name | Type | Description | Notes
 
 ### NewUpdateDistributorStatusData
 
-`func NewUpdateDistributorStatusData(id string, type_ string, attributes UpdateDistributorStatusDataAttributes, ) *UpdateDistributorStatusData`
+`func NewUpdateDistributorStatusData(id uuid.UUID, type_ string, attributes UpdateDistributorStatusDataAttributes, ) *UpdateDistributorStatusData`
 
 NewUpdateDistributorStatusData instantiates a new UpdateDistributorStatusData object
 This constructor will assign default values to properties that have it defined,
@@ -29,20 +29,20 @@ but it doesn't guarantee that properties required by API are set
 
 ### GetId
 
-`func (o *UpdateDistributorStatusData) GetId() string`
+`func (o *UpdateDistributorStatusData) GetId() uuid.UUID`
 
 GetId returns the Id field if non-nil, zero value otherwise.
 
 ### GetIdOk
 
-`func (o *UpdateDistributorStatusData) GetIdOk() (*string, bool)`
+`func (o *UpdateDistributorStatusData) GetIdOk() (*uuid.UUID, bool)`
 
 GetIdOk returns a tuple with the Id field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetId
 
-`func (o *UpdateDistributorStatusData) SetId(v string)`
+`func (o *UpdateDistributorStatusData) SetId(v uuid.UUID)`
 
 SetId sets Id field to given value.
 

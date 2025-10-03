@@ -19,7 +19,7 @@ func (e Employee) IsNil() bool {
 }
 
 type EmployeeCollection struct {
-	Items []Employee `json:"items"`
+	Data  []Employee `json:"data"`
 	Page  uint64     `json:"page"`
 	Size  uint64     `json:"size"`
 	Total uint64     `json:"total"`

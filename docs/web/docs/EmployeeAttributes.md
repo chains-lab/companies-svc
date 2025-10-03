@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**DistributorId** | **string** | The unique identifier for the distributor associated with the employee. | 
+**DistributorId** | [**uuid.UUID**](uuid.UUID.md) | The unique identifier for the distributor associated with the employee. | 
 **Role** | **string** | The role of the employee within the distributor&#39;s organization (e.g., manager, staff). | 
 **CreatedAt** | **time.Time** | The timestamp when the employee record was created. | 
 **UpdatedAt** | **time.Time** | The timestamp when the employee record was last updated. | 
@@ -13,7 +13,7 @@ Name | Type | Description | Notes
 
 ### NewEmployeeAttributes
 
-`func NewEmployeeAttributes(distributorId string, role string, createdAt time.Time, updatedAt time.Time, ) *EmployeeAttributes`
+`func NewEmployeeAttributes(distributorId uuid.UUID, role string, createdAt time.Time, updatedAt time.Time, ) *EmployeeAttributes`
 
 NewEmployeeAttributes instantiates a new EmployeeAttributes object
 This constructor will assign default values to properties that have it defined,
@@ -30,20 +30,20 @@ but it doesn't guarantee that properties required by API are set
 
 ### GetDistributorId
 
-`func (o *EmployeeAttributes) GetDistributorId() string`
+`func (o *EmployeeAttributes) GetDistributorId() uuid.UUID`
 
 GetDistributorId returns the DistributorId field if non-nil, zero value otherwise.
 
 ### GetDistributorIdOk
 
-`func (o *EmployeeAttributes) GetDistributorIdOk() (*string, bool)`
+`func (o *EmployeeAttributes) GetDistributorIdOk() (*uuid.UUID, bool)`
 
 GetDistributorIdOk returns a tuple with the DistributorId field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetDistributorId
 
-`func (o *EmployeeAttributes) SetDistributorId(v string)`
+`func (o *EmployeeAttributes) SetDistributorId(v uuid.UUID)`
 
 SetDistributorId sets DistributorId field to given value.
 

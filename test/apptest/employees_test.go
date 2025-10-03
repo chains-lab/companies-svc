@@ -5,7 +5,6 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/chains-lab/distributors-svc/internal/app"
 	"github.com/chains-lab/distributors-svc/internal/domain/errx"
 	"github.com/chains-lab/enum"
 	"github.com/google/uuid"
@@ -80,8 +79,8 @@ func TestErrorCreateEmployee(t *testing.T) {
 		DistributorID: owner.DistributorID,
 		Role:          enum.EmployeeRoleOwner,
 	})
-	if !errors.Is(err, errx.ErrorInitiatorEmployeeHaveNotEnoughRights) {
-		t.Fatalf("expected error %v, got %v", errx.ErrorInitiatorEmployeeHaveNotEnoughRights, err)
+	if !errors.Is(err, errx.ErrorInitiatorHaveNotEnoughRights) {
+		t.Fatalf("expected error %v, got %v", errx.ErrorInitiatorHaveNotEnoughRights, err)
 	}
 
 	_, err = s.app.CreateInvite(ctx, app.CreateInviteParams{
@@ -89,8 +88,8 @@ func TestErrorCreateEmployee(t *testing.T) {
 		DistributorID: owner.DistributorID,
 		Role:          enum.EmployeeRoleAdmin,
 	})
-	if !errors.Is(err, errx.ErrorInitiatorNotEmployee) {
-		t.Fatalf("expected error %v, got %v", errx.ErrorInitiatorNotEmployee, err)
+	if !errors.Is(err, errx.ErrorInitiatorIsNotEmployee) {
+		t.Fatalf("expected error %v, got %v", errx.ErrorInitiatorIsNotEmployee, err)
 	}
 
 	_, err = s.app.CreateInvite(ctx, app.CreateInviteParams{

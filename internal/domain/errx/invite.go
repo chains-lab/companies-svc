@@ -14,8 +14,4 @@ var ErrorInviteExpired = ape.DeclareError("INVITE_EXPIRED")
 
 var ErrorInvalidEmployeeRole = ape.DeclareError("INVALID_EMPLOYEE_ROLE")
 
-var ErrorInvalidInviteStatus = ape.DeclareError("INVALID_INVITE_STATUS")
-
-var ErrorInvalidDistributorBlockStatus = ape.DeclareError("INVALID_BLOCK_STATUS")
-
 var ErrorUnexpectedInviteStatus = ape.DeclareError("UNEXPECTED_INVITE_STATUS")

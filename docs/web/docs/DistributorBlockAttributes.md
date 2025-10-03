@@ -4,8 +4,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**DistributorId** | **string** | ID of the distributor being blocked | 
-**InitiatorId** | **string** | ID of the user who initiated the block | 
+**DistributorId** | [**uuid.UUID**](uuid.UUID.md) | ID of the distributor being blocked | 
+**InitiatorId** | [**uuid.UUID**](uuid.UUID.md) | ID of the user who initiated the block | 
 **Reason** | **string** | Reason for blocking the distributor | 
 **Status** | **string** | Current status of the block | 
 **BlockedAt** | **time.Time** | Timestamp when the block was initiated | 
@@ -15,7 +15,7 @@ Name | Type | Description | Notes
 
 ### NewDistributorBlockAttributes
 
-`func NewDistributorBlockAttributes(distributorId string, initiatorId string, reason string, status string, blockedAt time.Time, ) *DistributorBlockAttributes`
+`func NewDistributorBlockAttributes(distributorId uuid.UUID, initiatorId uuid.UUID, reason string, status string, blockedAt time.Time, ) *DistributorBlockAttributes`
 
 NewDistributorBlockAttributes instantiates a new DistributorBlockAttributes object
 This constructor will assign default values to properties that have it defined,
@@ -32,40 +32,40 @@ but it doesn't guarantee that properties required by API are set
 
 ### GetDistributorId
 
-`func (o *DistributorBlockAttributes) GetDistributorId() string`
+`func (o *DistributorBlockAttributes) GetDistributorId() uuid.UUID`
 
 GetDistributorId returns the DistributorId field if non-nil, zero value otherwise.
 
 ### GetDistributorIdOk
 
-`func (o *DistributorBlockAttributes) GetDistributorIdOk() (*string, bool)`
+`func (o *DistributorBlockAttributes) GetDistributorIdOk() (*uuid.UUID, bool)`
 
 GetDistributorIdOk returns a tuple with the DistributorId field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetDistributorId
 
-`func (o *DistributorBlockAttributes) SetDistributorId(v string)`
+`func (o *DistributorBlockAttributes) SetDistributorId(v uuid.UUID)`
 
 SetDistributorId sets DistributorId field to given value.
 
 
 ### GetInitiatorId
 
-`func (o *DistributorBlockAttributes) GetInitiatorId() string`
+`func (o *DistributorBlockAttributes) GetInitiatorId() uuid.UUID`
 
 GetInitiatorId returns the InitiatorId field if non-nil, zero value otherwise.
 
 ### GetInitiatorIdOk
 
-`func (o *DistributorBlockAttributes) GetInitiatorIdOk() (*string, bool)`
+`func (o *DistributorBlockAttributes) GetInitiatorIdOk() (*uuid.UUID, bool)`
 
 GetInitiatorIdOk returns a tuple with the InitiatorId field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetInitiatorId
 
-`func (o *DistributorBlockAttributes) SetInitiatorId(v string)`
+`func (o *DistributorBlockAttributes) SetInitiatorId(v uuid.UUID)`
 
 SetInitiatorId sets InitiatorId field to given value.
 

@@ -5,7 +5,6 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/chains-lab/distributors-svc/internal/app"
 	"github.com/chains-lab/distributors-svc/internal/domain/errx"
 	"github.com/chains-lab/enum"
 	"github.com/google/uuid"
@@ -41,7 +40,7 @@ func TestDistributorBlocks(t *testing.T) {
 
 	dis, err = s.app.GetDistributor(ctx, dis.ID)
 	if err != nil {
-		t.Fatalf("GetDistributor: %v", err)
+		t.Fatalf("Get: %v", err)
 	}
 	if dis.Status != enum.DistributorStatusBlocked {
 		t.Errorf("expected distributor to be blocked")
@@ -78,7 +77,7 @@ func TestUpdateBlockedDistributor(t *testing.T) {
 
 	dis, err = s.app.GetDistributor(ctx, dis.ID)
 	if err != nil {
-		t.Fatalf("GetDistributor: %v", err)
+		t.Fatalf("Get: %v", err)
 	}
 	if dis.Status != enum.DistributorStatusBlocked {
 		t.Errorf("expected distributor to be blocked")

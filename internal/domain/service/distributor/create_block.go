@@ -17,10 +17,12 @@ func (s Service) CreteBlock(
 	distributorID uuid.UUID,
 	reason string,
 ) (models.DistributorBlock, error) {
-	_, err := s.GetDistributor(ctx, distributorID)
+	_, err := s.Get(ctx, distributorID)
 	if err != nil {
 		return models.DistributorBlock{}, err
 	}
+
+	now := time.Now().UTC()
 
 	block := models.DistributorBlock{
 		ID:            uuid.New(),
@@ -28,7 +30,7 @@ func (s Service) CreteBlock(
 		InitiatorID:   initiatorID,
 		Reason:        reason,
 		Status:        enum.DistributorBlockStatusActive,
-		BlockedAt:     time.Now().UTC(),
+		BlockedAt:     now,
 	}
 
 	activeBlock, err := s.db.GetActiveDistributorBlock(ctx, block.ID)
@@ -38,13 +40,13 @@ func (s Service) CreteBlock(
 		)
 	}
 	if !activeBlock.IsNil() {
-		return models.DistributorBlock{}, errx.DistributorHaveAlreadyActiveBlock.Raise(
+		return models.DistributorBlock{}, errx.ErrorDistributorHaveAlreadyActiveBlock.Raise(
 			fmt.Errorf("distributor %s already has an active block", distributorID),
 		)
 	}
 
 	trErr := s.db.Transaction(ctx, func(ctx context.Context) error {
-		err = s.db.UpdateDistributorStatus(ctx, distributorID, enum.DistributorStatusBlocked)
+		err = s.db.UpdateDistributorStatus(ctx, distributorID, enum.DistributorStatusBlocked, now)
 		if err != nil {
 			return errx.ErrorInternal.Raise(
 				fmt.Errorf("updating distributor status: %w", err),

@@ -2,7 +2,7 @@ package employee
 
 import (
 	"context"
-	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
@@ -32,34 +32,59 @@ func (s Service) AcceptInvite(ctx context.Context, userID uuid.UUID, token strin
 		)
 	}
 	if now.After(inv.ExpiresAt) {
-		return models.Invite{}, errx.ErrorInviteExpired.Raise(fmt.Errorf("invite expired"))
-	}
-	if data.DistributorID != inv.DistributorID {
-		return models.Invite{}, errx.ErrorInvalidInviteToken.Raise(fmt.Errorf("token distributor_id mismatch"))
+		return models.Invite{}, errx.ErrorInviteExpired.Raise(
+			fmt.Errorf("invite expired"),
+		)
 	}
 
-	_, err = s.CreateEmployee(ctx, CreateParams{
-		UserID:        userID,
-		DistributorID: inv.DistributorID,
-		Role:          inv.Role,
+	if err = s.jwt.VerifyInviteToken(token, inv.Token); err != nil {
+		return models.Invite{}, errx.ErrorInvalidInviteToken.Raise(
+			fmt.Errorf("invite token mismatch"),
+		)
+	}
+
+	_, err = s.Get(ctx, GetFilters{
+		UserID: &userID,
 	})
+	if err == nil {
+		return models.Invite{}, errx.ErrorEmployeeAlreadyExists.Raise(
+			fmt.Errorf("user is already an employee"),
+		)
+	}
+	if !errors.Is(err, errx.ErrorEmployeeNotFound) {
+		return models.Invite{}, err
+	}
+
+	err = s.DistributorIsActive(ctx, inv.DistributorID)
 	if err != nil {
 		return models.Invite{}, err
+	}
+
+	txErr := s.db.Transaction(ctx, func(ctx context.Context) error {
+		_, err = s.Create(ctx, CreateParams{
+			UserID:        userID,
+			DistributorID: inv.DistributorID,
+			Role:          inv.Role,
+		})
+		if err != nil {
+			return err
+		}
+
+		if err = s.db.UpdateInviteStatus(ctx, inv.ID, userID, enum.InviteStatusAccepted, now); err != nil {
+			return errx.ErrorInternal.Raise(
+				fmt.Errorf("update invite status: %w", err),
+			)
+		}
+
+		return nil
+	})
+	if txErr != nil {
+		return models.Invite{}, txErr
 	}
 
 	inv.Status = enum.InviteStatusAccepted
 	inv.UserID = &userID
 	inv.AnsweredAt = &now
-
-	if err = s.invite.New().FilterID(inv.ID).Update(ctx, data.UpdateInviteParams{
-		Status:     &inv.Status,
-		UserID:     &uuid.NullUUID{UUID: userID, Valid: true},
-		AnsweredAt: &sql.NullTime{Time: now, Valid: true},
-	}); err != nil {
-		return models.Invite{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("update invite status: %w", err),
-		)
-	}
 
 	return inv, nil
 }

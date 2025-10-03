@@ -12,6 +12,7 @@ package resources
 
 import (
 	"encoding/json"
+	"github.com/google/uuid"
 	"time"
 	"bytes"
 	"fmt"
@@ -23,9 +24,9 @@ var _ MappedNullable = &DistributorBlockAttributes{}
 // DistributorBlockAttributes struct for DistributorBlockAttributes
 type DistributorBlockAttributes struct {
 	// ID of the distributor being blocked
-	DistributorId string `json:"distributor_id"`
+	DistributorId uuid.UUID `json:"distributor_id"`
 	// ID of the user who initiated the block
-	InitiatorId string `json:"initiator_id"`
+	InitiatorId uuid.UUID `json:"initiator_id"`
 	// Reason for blocking the distributor
 	Reason string `json:"reason"`
 	// Current status of the block
@@ -42,7 +43,7 @@ type _DistributorBlockAttributes DistributorBlockAttributes
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewDistributorBlockAttributes(distributorId string, initiatorId string, reason string, status string, blockedAt time.Time) *DistributorBlockAttributes {
+func NewDistributorBlockAttributes(distributorId uuid.UUID, initiatorId uuid.UUID, reason string, status string, blockedAt time.Time) *DistributorBlockAttributes {
 	this := DistributorBlockAttributes{}
 	this.DistributorId = distributorId
 	this.InitiatorId = initiatorId
@@ -61,9 +62,9 @@ func NewDistributorBlockAttributesWithDefaults() *DistributorBlockAttributes {
 }
 
 // GetDistributorId returns the DistributorId field value
-func (o *DistributorBlockAttributes) GetDistributorId() string {
+func (o *DistributorBlockAttributes) GetDistributorId() uuid.UUID {
 	if o == nil {
-		var ret string
+		var ret uuid.UUID
 		return ret
 	}
 
@@ -72,7 +73,7 @@ func (o *DistributorBlockAttributes) GetDistributorId() string {
 
 // GetDistributorIdOk returns a tuple with the DistributorId field value
 // and a boolean to check if the value has been set.
-func (o *DistributorBlockAttributes) GetDistributorIdOk() (*string, bool) {
+func (o *DistributorBlockAttributes) GetDistributorIdOk() (*uuid.UUID, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -80,14 +81,14 @@ func (o *DistributorBlockAttributes) GetDistributorIdOk() (*string, bool) {
 }
 
 // SetDistributorId sets field value
-func (o *DistributorBlockAttributes) SetDistributorId(v string) {
+func (o *DistributorBlockAttributes) SetDistributorId(v uuid.UUID) {
 	o.DistributorId = v
 }
 
 // GetInitiatorId returns the InitiatorId field value
-func (o *DistributorBlockAttributes) GetInitiatorId() string {
+func (o *DistributorBlockAttributes) GetInitiatorId() uuid.UUID {
 	if o == nil {
-		var ret string
+		var ret uuid.UUID
 		return ret
 	}
 
@@ -96,7 +97,7 @@ func (o *DistributorBlockAttributes) GetInitiatorId() string {
 
 // GetInitiatorIdOk returns a tuple with the InitiatorId field value
 // and a boolean to check if the value has been set.
-func (o *DistributorBlockAttributes) GetInitiatorIdOk() (*string, bool) {
+func (o *DistributorBlockAttributes) GetInitiatorIdOk() (*uuid.UUID, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -104,7 +105,7 @@ func (o *DistributorBlockAttributes) GetInitiatorIdOk() (*string, bool) {
 }
 
 // SetInitiatorId sets field value
-func (o *DistributorBlockAttributes) SetInitiatorId(v string) {
+func (o *DistributorBlockAttributes) SetInitiatorId(v uuid.UUID) {
 	o.InitiatorId = v
 }
 

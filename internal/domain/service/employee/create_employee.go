@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/chains-lab/distributors-svc/internal/data/pgdb"
 	"github.com/chains-lab/distributors-svc/internal/domain/errx"
 	"github.com/chains-lab/distributors-svc/internal/domain/models"
 	"github.com/chains-lab/enum"
@@ -19,14 +18,19 @@ type CreateParams struct {
 	Role          string
 }
 
-func (s Service) CreateEmployee(ctx context.Context, params CreateParams) (models.Employee, error) {
-	_, err := s.GetByUserID(ctx, params.UserID)
-	if err != nil && !errors.Is(err, errx.ErrorEmployeeNotFound) {
-		return models.Employee{}, err
+func (s Service) Create(ctx context.Context, params CreateParams) (models.Employee, error) {
+	emp, err := s.db.GetEmployee(ctx, GetFilters{
+		UserID: &params.UserID,
+	})
+	if err != nil {
+		return models.Employee{}, errx.ErrorInternal.Raise(
+			fmt.Errorf("check existing employee: %w", err),
+		)
 	}
-	if err == nil {
+
+	if !emp.IsNil() {
 		return models.Employee{}, errx.ErrorEmployeeAlreadyExists.Raise(
-			errors.New("employee already exists"),
+			fmt.Errorf("employee with user ID %s already exists", params.UserID),
 		)
 	}
 
@@ -38,24 +42,20 @@ func (s Service) CreateEmployee(ctx context.Context, params CreateParams) (model
 		)
 	}
 
-	err = s.employee.New().Insert(ctx, pgdb.Employee{
+	emp = models.Employee{
 		UserID:        params.UserID,
 		DistributorID: params.DistributorID,
 		Role:          params.Role,
 		CreatedAt:     now,
 		UpdatedAt:     now,
-	})
+	}
+
+	err = s.db.CreateEmployee(ctx, emp)
 	if err != nil {
 		return models.Employee{}, errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to create employee, cause: %w", err),
 		)
 	}
 
-	return models.Employee{
-		UserID:        params.UserID,
-		DistributorID: params.DistributorID,
-		Role:          params.Role,
-		CreatedAt:     now,
-		UpdatedAt:     now,
-	}, nil
+	return emp, nil
 }

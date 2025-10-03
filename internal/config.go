@@ -10,24 +10,28 @@ import (
 )
 
 type ServerConfig struct {
-	Name     string `mapstructure:"name"`
+	Name string `mapstructure:"name"`
+}
+
+type LogConfig struct {
+	Level  string `mapstructure:"level"`
+	Format string `mapstructure:"format"`
+}
+
+type RestConfig struct {
 	Port     string `mapstructure:"port"`
-	BasePath string `mapstructure:"base_path"`
-	TestMode bool   `mapstructure:"test_mode"`
-	Log      struct {
-		Level  string `mapstructure:"level"`
-		Format string `mapstructure:"format"`
-	} `mapstructure:"log"`
+	Timeouts struct {
+		Read       time.Duration `mapstructure:"read"`
+		ReadHeader time.Duration `mapstructure:"read_header"`
+		Write      time.Duration `mapstructure:"write"`
+		Idle       time.Duration `mapstructure:"idle"`
+	} `mapstructure:"timeouts"`
 }
 
 type DatabaseConfig struct {
 	SQL struct {
 		URL string `mapstructure:"url"`
 	} `mapstructure:"sql"`
-}
-
-type KafkaConfig struct {
-	Brokers []string `mapstructure:"brokers"`
 }
 
 type JWTConfig struct {
@@ -52,9 +56,11 @@ type SwaggerConfig struct {
 }
 
 type Config struct {
+	Service  ServerConfig   `mapstructure:"service"`
+	Log      LogConfig      `mapstructure:"log"`
+	Rest     RestConfig     `mapstructure:"rest"`
 	Server   ServerConfig   `mapstructure:"server"`
 	JWT      JWTConfig      `mapstructure:"jwt"`
-	Kafka    KafkaConfig    `mapstructure:"kafka"`
 	Database DatabaseConfig `mapstructure:"database"`
 	Swagger  SwaggerConfig  `mapstructure:"swagger"`
 }

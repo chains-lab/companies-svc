@@ -21,7 +21,7 @@ func (b DistributorBlock) IsNil() bool {
 }
 
 type DistributorBlockCollection struct {
-	Items []DistributorBlock `json:"items"`
+	Data  []DistributorBlock `json:"data"`
 	Page  uint64             `json:"page"`
 	Size  uint64             `json:"size"`
 	Total uint64             `json:"total"`

@@ -11,7 +11,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s Service) SetStatus(
+func (s Service) UpdateStatus(
 	ctx context.Context,
 	distributorID uuid.UUID,
 	status string,
@@ -29,7 +29,7 @@ func (s Service) SetStatus(
 		)
 	}
 
-	distributor, err := s.GetDistributor(ctx, distributorID)
+	distributor, err := s.Get(ctx, distributorID)
 	if err != nil {
 		return models.Distributor{}, err
 	}
@@ -41,7 +41,7 @@ func (s Service) SetStatus(
 	}
 
 	now := time.Now().UTC()
-	err = s.db.UpdateDistributorStatus(ctx, distributorID, status)
+	err = s.db.UpdateDistributorStatus(ctx, distributorID, status, now)
 	if err != nil {
 		return models.Distributor{}, errx.ErrorInternal.Raise(
 			fmt.Errorf("internal error: %w", err),

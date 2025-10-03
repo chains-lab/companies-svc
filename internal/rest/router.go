@@ -2,7 +2,6 @@ package rest
 
 import (
 	"context"
-	"errors"
 	"net/http"
 
 	"github.com/chains-lab/distributors-svc/internal"
@@ -10,6 +9,7 @@ import (
 	"github.com/chains-lab/enum"
 	"github.com/chains-lab/gatekit/mdlv"
 	"github.com/chains-lab/gatekit/roles"
+	"github.com/chains-lab/logium"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -31,20 +31,21 @@ type Handlers interface {
 	GetBlock(w http.ResponseWriter, r *http.Request)
 }
 
-func (s *Service) Router(ctx context.Context, cfg internal.Config, h Handlers) {
+func Run(ctx context.Context, cfg internal.Config, log logium.Logger, h Handlers) {
 	svc := mdlv.ServiceGrant(enum.CitiesSVC, cfg.JWT.Service.SecretKey)
 	auth := mdlv.Auth(meta.UserCtxKey, cfg.JWT.User.AccessToken.SecretKey)
 	sysadmin := mdlv.RoleGrant(meta.UserCtxKey, map[string]bool{
-		roles.Admin:     true,
-		roles.SuperUser: true,
+		roles.Admin: true,
 	})
 	user := mdlv.RoleGrant(meta.UserCtxKey, map[string]bool{
 		roles.User: true,
 	})
 
-	s.log.WithField("module", "api").Info("Starting API server")
+	r := chi.NewRouter()
 
-	s.router.Route("/distributor-svc/", func(r chi.Router) {
+	log.WithField("module", "api").Info("Starting API server")
+
+	r.Route("/distributor-svc/", func(r chi.Router) {
 		r.Use(svc)
 
 		r.Route("/v1", func(r chi.Router) {
@@ -90,24 +91,9 @@ func (s *Service) Router(ctx context.Context, cfg internal.Config, h Handlers) {
 		})
 	})
 
-	s.Start(ctx)
+	log.Infof("starting REST service on %s", cfg.Rest.Port)
 
 	<-ctx.Done()
-	s.Stop(ctx)
-}
 
-func (s *Service) Start(ctx context.Context) {
-	go func() {
-		s.log.Infof("Starting server on port %s", s.cfg.Server.Port)
-		if err := s.server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			s.log.Fatalf("Server failed to start: %v", err)
-		}
-	}()
-}
-
-func (s *Service) Stop(ctx context.Context) {
-	s.log.Info("Shutting down server...")
-	if err := s.server.Shutdown(ctx); err != nil {
-		s.log.Errorf("Server shutdown failed: %v", err)
-	}
+	log.Info("shutting down REST service")
 }

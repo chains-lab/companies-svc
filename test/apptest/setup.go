@@ -6,7 +6,7 @@ import (
 
 	"github.com/chains-lab/distributors-svc/cmd/migrations"
 	"github.com/chains-lab/distributors-svc/internal"
-	"github.com/chains-lab/distributors-svc/internal/app"
+
 	"github.com/chains-lab/logium"
 )
 

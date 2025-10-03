@@ -12,6 +12,7 @@ package resources
 
 import (
 	"encoding/json"
+	"github.com/google/uuid"
 	"bytes"
 	"fmt"
 )
@@ -22,9 +23,9 @@ var _ MappedNullable = &CreateEmployeeInviteDataAttributes{}
 // CreateEmployeeInviteDataAttributes struct for CreateEmployeeInviteDataAttributes
 type CreateEmployeeInviteDataAttributes struct {
 	// The UUID of the distributor to which the user is being invited.
-	DistributorId string `json:"distributor_id"`
+	DistributorId uuid.UUID `json:"distributor_id"`
 	// The UUID of the user being invited.
-	UserId string `json:"user_id"`
+	UserId uuid.UUID `json:"user_id"`
 	// The role assigned to the invited user within the distributor.
 	Role string `json:"role"`
 }
@@ -35,7 +36,7 @@ type _CreateEmployeeInviteDataAttributes CreateEmployeeInviteDataAttributes
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewCreateEmployeeInviteDataAttributes(distributorId string, userId string, role string) *CreateEmployeeInviteDataAttributes {
+func NewCreateEmployeeInviteDataAttributes(distributorId uuid.UUID, userId uuid.UUID, role string) *CreateEmployeeInviteDataAttributes {
 	this := CreateEmployeeInviteDataAttributes{}
 	this.DistributorId = distributorId
 	this.UserId = userId
@@ -52,9 +53,9 @@ func NewCreateEmployeeInviteDataAttributesWithDefaults() *CreateEmployeeInviteDa
 }
 
 // GetDistributorId returns the DistributorId field value
-func (o *CreateEmployeeInviteDataAttributes) GetDistributorId() string {
+func (o *CreateEmployeeInviteDataAttributes) GetDistributorId() uuid.UUID {
 	if o == nil {
-		var ret string
+		var ret uuid.UUID
 		return ret
 	}
 
@@ -63,7 +64,7 @@ func (o *CreateEmployeeInviteDataAttributes) GetDistributorId() string {
 
 // GetDistributorIdOk returns a tuple with the DistributorId field value
 // and a boolean to check if the value has been set.
-func (o *CreateEmployeeInviteDataAttributes) GetDistributorIdOk() (*string, bool) {
+func (o *CreateEmployeeInviteDataAttributes) GetDistributorIdOk() (*uuid.UUID, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -71,14 +72,14 @@ func (o *CreateEmployeeInviteDataAttributes) GetDistributorIdOk() (*string, bool
 }
 
 // SetDistributorId sets field value
-func (o *CreateEmployeeInviteDataAttributes) SetDistributorId(v string) {
+func (o *CreateEmployeeInviteDataAttributes) SetDistributorId(v uuid.UUID) {
 	o.DistributorId = v
 }
 
 // GetUserId returns the UserId field value
-func (o *CreateEmployeeInviteDataAttributes) GetUserId() string {
+func (o *CreateEmployeeInviteDataAttributes) GetUserId() uuid.UUID {
 	if o == nil {
-		var ret string
+		var ret uuid.UUID
 		return ret
 	}
 
@@ -87,7 +88,7 @@ func (o *CreateEmployeeInviteDataAttributes) GetUserId() string {
 
 // GetUserIdOk returns a tuple with the UserId field value
 // and a boolean to check if the value has been set.
-func (o *CreateEmployeeInviteDataAttributes) GetUserIdOk() (*string, bool) {
+func (o *CreateEmployeeInviteDataAttributes) GetUserIdOk() (*uuid.UUID, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -95,7 +96,7 @@ func (o *CreateEmployeeInviteDataAttributes) GetUserIdOk() (*string, bool) {
 }
 
 // SetUserId sets field value
-func (o *CreateEmployeeInviteDataAttributes) SetUserId(v string) {
+func (o *CreateEmployeeInviteDataAttributes) SetUserId(v uuid.UUID) {
 	o.UserId = v
 }
 

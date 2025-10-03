@@ -4,14 +4,14 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**DistributorId** | **string** | The UUID of the distributor to be blocked. | 
+**DistributorId** | [**uuid.UUID**](uuid.UUID.md) | The UUID of the distributor to be blocked. | 
 **Reason** | **string** | The reason for blocking the distributor. | 
 
 ## Methods
 
 ### NewCreateDistributorBlockDataAttributes
 
-`func NewCreateDistributorBlockDataAttributes(distributorId string, reason string, ) *CreateDistributorBlockDataAttributes`
+`func NewCreateDistributorBlockDataAttributes(distributorId uuid.UUID, reason string, ) *CreateDistributorBlockDataAttributes`
 
 NewCreateDistributorBlockDataAttributes instantiates a new CreateDistributorBlockDataAttributes object
 This constructor will assign default values to properties that have it defined,
@@ -28,20 +28,20 @@ but it doesn't guarantee that properties required by API are set
 
 ### GetDistributorId
 
-`func (o *CreateDistributorBlockDataAttributes) GetDistributorId() string`
+`func (o *CreateDistributorBlockDataAttributes) GetDistributorId() uuid.UUID`
 
 GetDistributorId returns the DistributorId field if non-nil, zero value otherwise.
 
 ### GetDistributorIdOk
 
-`func (o *CreateDistributorBlockDataAttributes) GetDistributorIdOk() (*string, bool)`
+`func (o *CreateDistributorBlockDataAttributes) GetDistributorIdOk() (*uuid.UUID, bool)`
 
 GetDistributorIdOk returns a tuple with the DistributorId field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetDistributorId
 
-`func (o *CreateDistributorBlockDataAttributes) SetDistributorId(v string)`
+`func (o *CreateDistributorBlockDataAttributes) SetDistributorId(v uuid.UUID)`
 
 SetDistributorId sets DistributorId field to given value.
 

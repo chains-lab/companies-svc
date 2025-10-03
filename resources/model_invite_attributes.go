@@ -12,6 +12,7 @@ package resources
 
 import (
 	"encoding/json"
+	"github.com/google/uuid"
 	"time"
 	"bytes"
 	"fmt"
@@ -27,7 +28,7 @@ type InviteAttributes struct {
 	// role of the user in this city
 	Role string `json:"role"`
 	// distributor id
-	DistributorId string `json:"distributor_id"`
+	DistributorId uuid.UUID `json:"distributor_id"`
 	// unique token for the invite
 	Token string `json:"token"`
 	// timestamp when the invite will expire
@@ -42,7 +43,7 @@ type _InviteAttributes InviteAttributes
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewInviteAttributes(status string, role string, distributorId string, token string, expiresAt time.Time, createdAt time.Time) *InviteAttributes {
+func NewInviteAttributes(status string, role string, distributorId uuid.UUID, token string, expiresAt time.Time, createdAt time.Time) *InviteAttributes {
 	this := InviteAttributes{}
 	this.Status = status
 	this.Role = role
@@ -110,9 +111,9 @@ func (o *InviteAttributes) SetRole(v string) {
 }
 
 // GetDistributorId returns the DistributorId field value
-func (o *InviteAttributes) GetDistributorId() string {
+func (o *InviteAttributes) GetDistributorId() uuid.UUID {
 	if o == nil {
-		var ret string
+		var ret uuid.UUID
 		return ret
 	}
 
@@ -121,7 +122,7 @@ func (o *InviteAttributes) GetDistributorId() string {
 
 // GetDistributorIdOk returns a tuple with the DistributorId field value
 // and a boolean to check if the value has been set.
-func (o *InviteAttributes) GetDistributorIdOk() (*string, bool) {
+func (o *InviteAttributes) GetDistributorIdOk() (*uuid.UUID, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -129,7 +130,7 @@ func (o *InviteAttributes) GetDistributorIdOk() (*string, bool) {
 }
 
 // SetDistributorId sets field value
-func (o *InviteAttributes) SetDistributorId(v string) {
+func (o *InviteAttributes) SetDistributorId(v uuid.UUID) {
 	o.DistributorId = v
 }
 

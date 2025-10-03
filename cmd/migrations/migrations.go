@@ -9,12 +9,12 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-//go:embed migrations/*.sql
+//go:embed schema/*.sql
 var Migrations embed.FS
 
 var migrations = &migrate.EmbedFileSystemMigrationSource{
 	FileSystem: Migrations,
-	Root:       "migrations",
+	Root:       "schema",
 }
 
 func MigrateUp(dbUrl string) error {

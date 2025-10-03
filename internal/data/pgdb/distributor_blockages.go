@@ -12,7 +12,7 @@ import (
 
 const blockedTable = "distributor_blockages"
 
-type Blockages struct {
+type DistributorBlock struct {
 	ID            uuid.UUID  `db:"id"`
 	DistributorID uuid.UUID  `db:"distributor_id"`
 	InitiatorID   uuid.UUID  `db:"initiator_id"`
@@ -22,7 +22,7 @@ type Blockages struct {
 	CanceledAt    *time.Time `db:"canceled_at"`
 }
 
-type BlockQ struct {
+type BlockagesQ struct {
 	db       *sql.DB
 	selector sq.SelectBuilder
 	updater  sq.UpdateBuilder
@@ -31,10 +31,10 @@ type BlockQ struct {
 	counter  sq.SelectBuilder
 }
 
-func NewBlockagesQ(db *sql.DB) BlockQ {
+func NewBlockagesQ(db *sql.DB) BlockagesQ {
 	builder := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 
-	return BlockQ{
+	return BlockagesQ{
 		db:       db,
 		selector: builder.Select("*").From(blockedTable),
 		updater:  builder.Update(blockedTable),
@@ -44,8 +44,8 @@ func NewBlockagesQ(db *sql.DB) BlockQ {
 	}
 }
 
-func scanBlock(scanner interface{ Scan(dest ...any) error }) (Blockages, error) {
-	var s Blockages
+func scanBlock(scanner interface{ Scan(dest ...any) error }) (DistributorBlock, error) {
+	var s DistributorBlock
 	var nt sql.NullTime
 	if err := scanner.Scan(
 		&s.ID,
@@ -67,11 +67,11 @@ func scanBlock(scanner interface{ Scan(dest ...any) error }) (Blockages, error) 
 	return s, nil
 }
 
-func (q BlockQ) New() BlockQ {
+func (q BlockagesQ) New() BlockagesQ {
 	return NewBlockagesQ(q.db)
 }
 
-func (q BlockQ) Insert(ctx context.Context, input Blockages) error {
+func (q BlockagesQ) Insert(ctx context.Context, input DistributorBlock) error {
 	values := map[string]interface{}{
 		"id":             input.ID,
 		"distributor_id": input.DistributorID,
@@ -87,7 +87,7 @@ func (q BlockQ) Insert(ctx context.Context, input Blockages) error {
 		return fmt.Errorf("building inserter query for table: %s input: %w", blockedTable, err)
 	}
 
-	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
+	if tx, ok := TxFromCtx(ctx); ok {
 		_, err = tx.ExecContext(ctx, query, args...)
 	} else {
 		_, err = q.db.ExecContext(ctx, query, args...)
@@ -96,14 +96,14 @@ func (q BlockQ) Insert(ctx context.Context, input Blockages) error {
 	return err
 }
 
-func (q BlockQ) Get(ctx context.Context) (Blockages, error) {
+func (q BlockagesQ) Get(ctx context.Context) (DistributorBlock, error) {
 	query, args, err := q.selector.Limit(1).ToSql()
 	if err != nil {
-		return Blockages{}, fmt.Errorf("building selector query for table %s: %w", blockedTable, err)
+		return DistributorBlock{}, fmt.Errorf("building selector query for table %s: %w", blockedTable, err)
 	}
 
 	var row *sql.Row
-	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
+	if tx, ok := TxFromCtx(ctx); ok {
 		row = tx.QueryRowContext(ctx, query, args...)
 	} else {
 		row = q.db.QueryRowContext(ctx, query, args...)
@@ -111,19 +111,19 @@ func (q BlockQ) Get(ctx context.Context) (Blockages, error) {
 
 	s, err := scanBlock(row)
 	if err != nil {
-		return Blockages{}, fmt.Errorf("scanning row for table %s: %w", blockedTable, err)
+		return DistributorBlock{}, fmt.Errorf("scanning row for table %s: %w", blockedTable, err)
 	}
 	return s, nil
 }
 
-func (q BlockQ) Select(ctx context.Context) ([]Blockages, error) {
+func (q BlockagesQ) Select(ctx context.Context) ([]DistributorBlock, error) {
 	query, args, err := q.selector.ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("building selector query for table %s: %w", blockedTable, err)
 	}
 
 	var rows *sql.Rows
-	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
+	if tx, ok := TxFromCtx(ctx); ok {
 		rows, err = tx.QueryContext(ctx, query, args...)
 	} else {
 		rows, err = q.db.QueryContext(ctx, query, args...)
@@ -133,7 +133,7 @@ func (q BlockQ) Select(ctx context.Context) ([]Blockages, error) {
 	}
 	defer rows.Close()
 
-	var res []Blockages
+	var res []DistributorBlock
 	for rows.Next() {
 		s, err := scanBlock(rows)
 		if err != nil {
@@ -144,35 +144,37 @@ func (q BlockQ) Select(ctx context.Context) ([]Blockages, error) {
 	return res, nil
 }
 
-func (q BlockQ) Update(ctx context.Context, input map[string]any) error {
-	values := map[string]any{}
-
-	if active, ok := input["active"]; ok {
-		values["active"] = active
-	}
-
-	query, args, err := q.updater.SetMap(values).ToSql()
+func (q BlockagesQ) Update(ctx context.Context) error {
+	query, args, err := q.updater.ToSql()
 	if err != nil {
-		return fmt.Errorf("building updater query for table: %s: %w", blockedTable, err)
+		return fmt.Errorf("building update query for %s: %w", distributorsTable, err)
 	}
 
-	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
+	if tx, ok := TxFromCtx(ctx); ok {
 		_, err = tx.ExecContext(ctx, query, args...)
 	} else {
 		_, err = q.db.ExecContext(ctx, query, args...)
 	}
-
 	return err
-
 }
 
-func (q BlockQ) Delete(ctx context.Context) error {
+func (q BlockagesQ) UpdateStatus(status string) BlockagesQ {
+	q.updater = q.updater.Set("status", status)
+	return q
+}
+
+func (q BlockagesQ) UpdateCanceledAt(canceledAt time.Time) BlockagesQ {
+	q.updater = q.updater.Set("canceled_at", canceledAt)
+	return q
+}
+
+func (q BlockagesQ) Delete(ctx context.Context) error {
 	query, args, err := q.deleter.ToSql()
 	if err != nil {
 		return fmt.Errorf("building deleter query for table: %s: %w", blockedTable, err)
 	}
 
-	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
+	if tx, ok := TxFromCtx(ctx); ok {
 		_, err = tx.ExecContext(ctx, query, args...)
 	} else {
 		_, err = q.db.ExecContext(ctx, query, args...)
@@ -181,7 +183,7 @@ func (q BlockQ) Delete(ctx context.Context) error {
 	return err
 }
 
-func (q BlockQ) FilterID(id uuid.UUID) BlockQ {
+func (q BlockagesQ) FilterID(id uuid.UUID) BlockagesQ {
 	q.selector = q.selector.Where(sq.Eq{"id": id})
 	q.counter = q.counter.Where(sq.Eq{"id": id})
 	q.updater = q.updater.Where(sq.Eq{"id": id})
@@ -189,7 +191,7 @@ func (q BlockQ) FilterID(id uuid.UUID) BlockQ {
 	return q
 }
 
-func (q BlockQ) FilterDistributorID(distributorID ...uuid.UUID) BlockQ {
+func (q BlockagesQ) FilterDistributorID(distributorID ...uuid.UUID) BlockagesQ {
 	q.selector = q.selector.Where(sq.Eq{"distributor_id": distributorID})
 	q.counter = q.counter.Where(sq.Eq{"distributor_id": distributorID})
 	q.updater = q.updater.Where(sq.Eq{"distributor_id": distributorID})
@@ -197,7 +199,7 @@ func (q BlockQ) FilterDistributorID(distributorID ...uuid.UUID) BlockQ {
 	return q
 }
 
-func (q BlockQ) FilterInitiatorID(initiatorID ...uuid.UUID) BlockQ {
+func (q BlockagesQ) FilterInitiatorID(initiatorID ...uuid.UUID) BlockagesQ {
 	q.selector = q.selector.Where(sq.Eq{"initiator_id": initiatorID})
 	q.counter = q.counter.Where(sq.Eq{"initiator_id": initiatorID})
 	q.updater = q.updater.Where(sq.Eq{"initiator_id": initiatorID})
@@ -205,7 +207,7 @@ func (q BlockQ) FilterInitiatorID(initiatorID ...uuid.UUID) BlockQ {
 	return q
 }
 
-func (q BlockQ) FilterStatus(status ...string) BlockQ {
+func (q BlockagesQ) FilterStatus(status ...string) BlockagesQ {
 	q.selector = q.selector.Where(sq.Eq{"status": status})
 	q.counter = q.counter.Where(sq.Eq{"status": status})
 	q.updater = q.updater.Where(sq.Eq{"status": status})
@@ -213,7 +215,7 @@ func (q BlockQ) FilterStatus(status ...string) BlockQ {
 	return q
 }
 
-func (q BlockQ) OrderByBlockedAt(ascending bool) BlockQ {
+func (q BlockagesQ) OrderByBlockedAt(ascending bool) BlockagesQ {
 	if ascending {
 		q.selector = q.selector.OrderBy("blocked_at ASC")
 	} else {
@@ -222,21 +224,21 @@ func (q BlockQ) OrderByBlockedAt(ascending bool) BlockQ {
 	return q
 }
 
-func (q BlockQ) Page(limit, offset uint64) BlockQ {
+func (q BlockagesQ) Page(limit, offset uint64) BlockagesQ {
 	q.selector = q.selector.Limit(limit).Offset(offset)
 	q.counter = q.counter.Limit(1) // For counting, we don't need to limit the results
 
 	return q
 }
 
-func (q BlockQ) Count(ctx context.Context) (uint64, error) {
+func (q BlockagesQ) Count(ctx context.Context) (uint64, error) {
 	query, args, err := q.counter.ToSql()
 	if err != nil {
 		return 0, fmt.Errorf("building count query for table %s: %w", blockedTable, err)
 	}
 
 	var count uint64
-	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
+	if tx, ok := TxFromCtx(ctx); ok {
 		err = tx.QueryRowContext(ctx, query, args...).Scan(&count)
 	} else {
 		err = q.db.QueryRowContext(ctx, query, args...).Scan(&count)

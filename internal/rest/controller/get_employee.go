@@ -1,4 +1,4 @@
-package handlers
+package controller
 
 import (
 	"errors"
@@ -7,21 +7,27 @@ import (
 	"github.com/chains-lab/ape"
 	"github.com/chains-lab/ape/problems"
 	"github.com/chains-lab/distributors-svc/internal/domain/errx"
+	"github.com/chains-lab/distributors-svc/internal/domain/service/employee"
 	"github.com/chains-lab/distributors-svc/internal/rest/responses"
 	"github.com/go-chi/chi/v5"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/google/uuid"
 )
 
-func (a Adapter) GetEmployee(w http.ResponseWriter, r *http.Request) {
+func (a Service) GetEmployee(w http.ResponseWriter, r *http.Request) {
 	userID, err := uuid.Parse(chi.URLParam(r, "user_id"))
 	if err != nil {
 		a.log.WithError(err).Errorf("invalid user ID format")
-		ape.RenderErr(w, problems.InvalidParameter("user_id", err))
+		ape.RenderErr(w, problems.BadRequest(validation.Errors{
+			"user_id": err,
+		})...)
 
 		return
 	}
 
-	employee, err := a.app.GetEmployee(r.Context(), userID)
+	emp, err := a.domain.employee.Get(r.Context(), employee.GetFilters{
+		UserID: &userID,
+	})
 	if err != nil {
 		a.log.WithError(err).Errorf("failed to get employee")
 		switch {
@@ -34,5 +40,5 @@ func (a Adapter) GetEmployee(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ape.Render(w, http.StatusOK, responses.Employee(employee))
+	ape.Render(w, http.StatusOK, responses.Employee(emp))
 }

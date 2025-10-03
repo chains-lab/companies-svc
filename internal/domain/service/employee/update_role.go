@@ -2,8 +2,6 @@ package employee
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 	"fmt"
 	"time"
 
@@ -23,13 +21,16 @@ func (s Service) UpdateEmployeeRole(
 	if err != nil {
 		return models.Employee{}, err
 	}
-	user, err := s.GetByUserID(ctx, userID)
+
+	user, err := s.Get(ctx, GetFilters{
+		UserID: &userID,
+	})
 	if err != nil {
 		return models.Employee{}, err
 	}
 
 	if initiator.DistributorID != user.DistributorID {
-		return models.Employee{}, errx.ErrorInitiatorEmployeeHaveNotEnoughRights.Raise(
+		return models.Employee{}, errx.ErrorInitiatorIsNotEmployeeOfThisDistributor.Raise(
 			fmt.Errorf("initiator %s and chosen employee %s have different distributors", initiatorID, userID),
 		)
 	}
@@ -41,7 +42,7 @@ func (s Service) UpdateEmployeeRole(
 		)
 	}
 	if allowed != 1 {
-		return models.Employee{}, errx.ErrorInitiatorEmployeeHaveNotEnoughRights.Raise(
+		return models.Employee{}, errx.ErrorInitiatorHaveNotEnoughRights.Raise(
 			fmt.Errorf("initiator have not enough rights to update employee role"),
 		)
 	}
@@ -53,33 +54,25 @@ func (s Service) UpdateEmployeeRole(
 		)
 	}
 	if allowed != 1 {
-		return models.Employee{}, errx.ErrorInitiatorEmployeeHaveNotEnoughRights.Raise(
+		return models.Employee{}, errx.ErrorInitiatorHaveNotEnoughRights.Raise(
 			fmt.Errorf("initiator have not enough rights to update employee role"),
 		)
 	}
 
-	err = s.employee.New().FilterUserID(userID).Update(ctx, map[string]interface{}{
-		"role":       newRole,
-		"updated_at": time.Now().UTC(),
-	})
+	now := time.Now().UTC()
+
+	err = s.db.UpdateEmployeeRole(ctx, userID, newRole, now)
 	if err != nil {
-		switch {
-		case errors.Is(err, sql.ErrNoRows):
-			return models.Employee{}, errx.ErrorEmployeeNotFound.Raise(
-				fmt.Errorf("employee with userID %s not found: %w", userID, err),
-			)
-		default:
-			return models.Employee{}, errx.ErrorInternal.Raise(
-				fmt.Errorf("internal error: %w", err),
-			)
-		}
+		return models.Employee{}, errx.ErrorInternal.Raise(
+			fmt.Errorf("internal error: %w", err),
+		)
 	}
 
 	return models.Employee{
 		UserID:        user.UserID,
 		DistributorID: user.DistributorID,
 		Role:          newRole,
-		UpdatedAt:     time.Now().UTC(),
+		UpdatedAt:     now,
 		CreatedAt:     user.CreatedAt,
 	}, nil
 }

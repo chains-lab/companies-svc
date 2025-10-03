@@ -5,7 +5,6 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/chains-lab/distributors-svc/internal/app"
 	"github.com/chains-lab/distributors-svc/internal/domain/errx"
 	"github.com/chains-lab/distributors-svc/internal/domain/models"
 	"github.com/chains-lab/enum"
@@ -17,7 +16,7 @@ func CreateDistributor(t *testing.T, s Setup) (models.Distributor, models.Employ
 	ownerID := uuid.New()
 	ctx := context.Background()
 
-	dist, err := s.app.CreateDistributor(ctx, ownerID, "Distributor 1", "icon")
+	dist, err := s.app.CreateDistributor(ctx, ownerID, "DistributorID 1", "icon")
 	if err != nil {
 		t.Fatalf("CreateDistributor: %v", err)
 	}
@@ -68,14 +67,14 @@ func TestCreateDistributor(t *testing.T) {
 	ctx := context.Background()
 
 	ownerID := uuid.New()
-	dist, err := s.app.CreateDistributor(ctx, ownerID, "Distributor 1", "icon")
+	dist, err := s.app.CreateDistributor(ctx, ownerID, "DistributorID 1", "icon")
 	if err != nil {
 		t.Fatalf("CreateDistributor: %v", err)
 	}
 
 	dist, err = s.app.GetDistributor(ctx, dist.ID)
 	if err != nil {
-		t.Fatalf("GetDistributor: %v", err)
+		t.Fatalf("Get: %v", err)
 	}
 
 	owner, err := s.app.GetEmployee(ctx, ownerID)
@@ -92,8 +91,8 @@ func TestCreateDistributor(t *testing.T) {
 		t.Errorf("expected owner ID '%s', got '%s'", ownerID, owner.UserID)
 	}
 
-	if dist.Name != "Distributor 1" {
-		t.Errorf("expected distributor name 'Distributor 1', got '%s'", dist.Name)
+	if dist.Name != "DistributorID 1" {
+		t.Errorf("expected distributor name 'DistributorID 1', got '%s'", dist.Name)
 	}
 
 	if owner.Role != enum.EmployeeRoleOwner {
@@ -113,7 +112,7 @@ func TestCreateDistributorByEmployee(t *testing.T) {
 
 	_, owner := CreateDistributor(t, s)
 
-	_, err = s.app.CreateDistributor(ctx, owner.UserID, "Distributor 2", "icon2")
+	_, err = s.app.CreateDistributor(ctx, owner.UserID, "DistributorID 2", "icon2")
 	if !errors.Is(err, errx.ErrorCurrentEmployeeCannotCreateDistributor) {
 		t.Fatalf("expected error %v, got %v", errx.ErrorCurrentEmployeeCannotCreateDistributor, err)
 	}
@@ -131,7 +130,7 @@ func TestUpdateDistributor(t *testing.T) {
 
 	dis, owner := CreateDistributor(t, s)
 
-	name := "Updated Distributor Name"
+	name := "Updated DistributorID Name"
 	icon := "Updated Icon"
 	dis, err = s.app.UpdateDistributor(ctx, owner.UserID, dis.ID, app.UpdateDistributorParams{
 		Name: &name,
@@ -171,7 +170,7 @@ func TestInactiveDistributor(t *testing.T) {
 		Size: 10,
 	}, nil)
 	if err != nil {
-		t.Fatalf("ListEmployees: %v", err)
+		t.Fatalf("Filter: %v", err)
 	}
 	if len(list) != 4 {
 		t.Fatalf("expected 4 employees, got %d", len(list))
@@ -187,8 +186,8 @@ func TestInactiveDistributor(t *testing.T) {
 	}
 
 	dis, err = s.app.SetDistributorStatus(ctx, admin.UserID, disID, enum.DistributorStatusBlocked)
-	if !errors.Is(err, errx.ErrorInitiatorEmployeeHaveNotEnoughRights) {
-		t.Fatalf("expected error %v, got %v", errx.ErrorInitiatorEmployeeHaveNotEnoughRights, err)
+	if !errors.Is(err, errx.ErrorInitiatorHaveNotEnoughRights) {
+		t.Fatalf("expected error %v, got %v", errx.ErrorInitiatorHaveNotEnoughRights, err)
 	}
 
 	err = s.app.DeleteEmployee(ctx, admin.UserID, admin.UserID, disID)
@@ -197,12 +196,12 @@ func TestInactiveDistributor(t *testing.T) {
 	}
 
 	err = s.app.DeleteEmployee(ctx, admin.UserID, owner.UserID, disID)
-	if !errors.Is(err, errx.ErrorInitiatorEmployeeHaveNotEnoughRights) {
+	if !errors.Is(err, errx.ErrorInitiatorHaveNotEnoughRights) {
 		t.Fatalf("DeleteEmployee: %v", err)
 	}
 
 	err = s.app.DeleteEmployee(ctx, moder1.UserID, moder2.UserID, disID)
-	if !errors.Is(err, errx.ErrorInitiatorEmployeeHaveNotEnoughRights) {
+	if !errors.Is(err, errx.ErrorInitiatorHaveNotEnoughRights) {
 		t.Fatalf("DeleteEmployee: %v", err)
 	}
 
@@ -218,7 +217,7 @@ func TestInactiveDistributor(t *testing.T) {
 		Size: 10,
 	}, nil)
 	if err != nil {
-		t.Fatalf("ListEmployees: %v", err)
+		t.Fatalf("Filter: %v", err)
 	}
 	if len(list) != 3 {
 		t.Fatalf("expected 3 employee, got %d", len(list))
@@ -239,7 +238,7 @@ func TestInactiveDistributor(t *testing.T) {
 		Size: 10,
 	}, nil)
 	if err != nil {
-		t.Fatalf("ListEmployees: %v", err)
+		t.Fatalf("Filter: %v", err)
 	}
 	if len(list) != 1 {
 		t.Fatalf("expected 0 employee, got %d", len(list))

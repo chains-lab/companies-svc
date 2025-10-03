@@ -2,16 +2,20 @@ package cmd
 
 import (
 	"context"
+	"database/sql"
 	"sync"
 
 	"github.com/chains-lab/distributors-svc/internal"
-	"github.com/chains-lab/distributors-svc/internal/app"
+	"github.com/chains-lab/distributors-svc/internal/data"
+	"github.com/chains-lab/distributors-svc/internal/domain/service/distributor"
+	"github.com/chains-lab/distributors-svc/internal/domain/service/employee"
+	"github.com/chains-lab/distributors-svc/internal/infra/jwtmanager"
 	"github.com/chains-lab/distributors-svc/internal/rest"
-	"github.com/chains-lab/distributors-svc/internal/rest/handlers"
+	"github.com/chains-lab/distributors-svc/internal/rest/controller"
 	"github.com/chains-lab/logium"
 )
 
-func Start(ctx context.Context, cfg internal.Config, log logium.Logger, wg *sync.WaitGroup, app *app.App) {
+func Start(ctx context.Context, cfg internal.Config, log logium.Logger, wg *sync.WaitGroup) {
 	run := func(f func()) {
 		wg.Add(1)
 		go func() {
@@ -20,11 +24,18 @@ func Start(ctx context.Context, cfg internal.Config, log logium.Logger, wg *sync
 		}()
 	}
 
-	restSVC := rest.NewRest(cfg, log)
+	pg, err := sql.Open("postgres", cfg.Database.SQL.URL)
+	if err != nil {
+		log.Fatal("failed to connect to database", "error", err)
+	}
 
-	run(func() {
-		handl := handlers.NewAdapter(cfg, log, app)
+	database := data.NewDatabase(pg)
 
-		restSVC.Router(ctx, cfg, handl)
-	})
+	jwtInviteManager := jwtmanager.NewManager(cfg)
+	distributorSvc := distributor.NewService(database)
+	employeeSvc := employee.NewService(database, jwtInviteManager)
+
+	ctrl := controller.New(log, distributorSvc, employeeSvc)
+
+	run(func() { rest.Run(ctx, cfg, log, ctrl) })
 }

@@ -1,4 +1,4 @@
-package handlers
+package controller
 
 import (
 	"errors"
@@ -12,7 +12,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func (a Adapter) AcceptInvite(w http.ResponseWriter, r *http.Request) {
+func (a Service) AcceptInvite(w http.ResponseWriter, r *http.Request) {
 	initiator, err := meta.User(r.Context())
 	if err != nil {
 		a.log.WithError(err).Error("failed to get user from context")
@@ -23,7 +23,7 @@ func (a Adapter) AcceptInvite(w http.ResponseWriter, r *http.Request) {
 
 	token := chi.URLParam(r, "token")
 
-	invite, err := a.app.AcceptInvite(r.Context(), initiator.ID, token)
+	invite, err := a.domain.employee.AcceptInvite(r.Context(), initiator.ID, token)
 	if err != nil {
 		a.log.WithError(err).Error("failed to answer to invite")
 		switch {
@@ -36,8 +36,6 @@ func (a Adapter) AcceptInvite(w http.ResponseWriter, r *http.Request) {
 		case errors.Is(err, errx.ErrorInviteExpired):
 			ape.RenderErr(w, problems.Conflict("invite expired"))
 		case errors.Is(err, errx.ErrorUnexpectedInviteStatus):
-		case errors.Is(err, errx.ErrorAnswerToInviteForNotActiveDistributor):
-			ape.RenderErr(w, problems.Conflict("cannot accept invite for not active distributor"))
 		default:
 			ape.RenderErr(w, problems.InternalError())
 		}

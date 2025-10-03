@@ -15,7 +15,7 @@ func (s Service) CancelBlock(
 	ctx context.Context,
 	distributorID uuid.UUID,
 ) (models.Distributor, error) {
-	dis, err := s.GetDistributor(ctx, distributorID)
+	dis, err := s.Get(ctx, distributorID)
 	if err != nil {
 		return models.Distributor{}, err
 	}
@@ -35,7 +35,7 @@ func (s Service) CancelBlock(
 			)
 		}
 
-		err = s.db.UpdateDistributorStatus(ctx, distributorID, enum.DistributorStatusInactive)
+		err = s.db.UpdateDistributorStatus(ctx, distributorID, enum.DistributorStatusInactive, canceledAt)
 		if err != nil {
 			return errx.ErrorInternal.Raise(
 				fmt.Errorf("updating distributor status: %w", err),

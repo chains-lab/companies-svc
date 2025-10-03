@@ -17,7 +17,7 @@ func (s Service) Update(ctx context.Context,
 	distributorID uuid.UUID,
 	params UpdateParams,
 ) (models.Distributor, error) {
-	distributor, err := s.GetDistributor(ctx, distributorID)
+	distributor, err := s.Get(ctx, distributorID)
 	if err != nil {
 		return models.Distributor{}, err
 	}

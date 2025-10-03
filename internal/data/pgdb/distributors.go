@@ -3,6 +3,7 @@ package pgdb
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
@@ -56,7 +57,7 @@ func (q DistributorsQ) Insert(ctx context.Context, in Distributor) error {
 		return fmt.Errorf("build insert %s: %w", distributorsTable, err)
 	}
 
-	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
+	if tx, ok := TxFromCtx(ctx); ok {
 		_, err = tx.ExecContext(ctx, qry, args...)
 	} else {
 		_, err = q.db.ExecContext(ctx, qry, args...)
@@ -71,7 +72,7 @@ func (q DistributorsQ) Get(ctx context.Context) (Distributor, error) {
 	}
 
 	var row *sql.Row
-	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
+	if tx, ok := TxFromCtx(ctx); ok {
 		row = tx.QueryRowContext(ctx, query, args...)
 	} else {
 		row = q.db.QueryRowContext(ctx, query, args...)
@@ -100,7 +101,7 @@ func (q DistributorsQ) Select(ctx context.Context) ([]Distributor, error) {
 	}
 
 	var rows *sql.Rows
-	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
+	if tx, ok := TxFromCtx(ctx); ok {
 		rows, err = tx.QueryContext(ctx, query, args...)
 	} else {
 		rows, err = q.db.QueryContext(ctx, query, args...)
@@ -129,36 +130,35 @@ func (q DistributorsQ) Select(ctx context.Context) ([]Distributor, error) {
 	return distributors, nil
 }
 
-func (q DistributorsQ) Update(ctx context.Context, input map[string]any) error {
-	values := map[string]any{}
+func (q DistributorsQ) Update(ctx context.Context, updatedAt time.Time) error {
+	q.updater = q.updater.Set("updated_at", updatedAt)
 
-	if icon, ok := input["icon"]; ok {
-		values["icon"] = icon
-	}
-	if name, ok := input["name"]; ok {
-		values["name"] = name
-	}
-	if status, ok := input["status"]; ok {
-		values["status"] = status
-	}
-	if updatedAt, ok := input["updated_at"]; ok {
-		values["updated_at"] = updatedAt
-	} else {
-		values["updated_at"] = time.Now().UTC()
-	}
-
-	query, args, err := q.updater.SetMap(values).ToSql()
+	query, args, err := q.updater.ToSql()
 	if err != nil {
-		return fmt.Errorf("building updater query for table: %s: %w", distributorsTable, err)
+		return fmt.Errorf("building update query for %s: %w", distributorsTable, err)
 	}
 
-	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
+	if tx, ok := TxFromCtx(ctx); ok {
 		_, err = tx.ExecContext(ctx, query, args...)
 	} else {
 		_, err = q.db.ExecContext(ctx, query, args...)
 	}
-
 	return err
+}
+
+func (q DistributorsQ) UpdateName(name string) DistributorsQ {
+	q.updater = q.updater.Set("name", name)
+	return q
+}
+
+func (q DistributorsQ) UpdateIcon(icon string) DistributorsQ {
+	q.updater = q.updater.Set("icon", icon)
+	return q
+}
+
+func (q DistributorsQ) UpdateStatus(status string) DistributorsQ {
+	q.updater = q.updater.Set("status", status)
+	return q
 }
 
 func (q DistributorsQ) Delete(ctx context.Context) error {
@@ -167,7 +167,7 @@ func (q DistributorsQ) Delete(ctx context.Context) error {
 		return fmt.Errorf("building deleter query for table: %s: %w", distributorsTable, err)
 	}
 
-	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
+	if tx, ok := TxFromCtx(ctx); ok {
 		_, err = tx.ExecContext(ctx, query, args...)
 	} else {
 		_, err = q.db.ExecContext(ctx, query, args...)
@@ -192,7 +192,7 @@ func (q DistributorsQ) FilterStatus(status ...string) DistributorsQ {
 	return q
 }
 
-func (q DistributorsQ) LikeName(name string) DistributorsQ {
+func (q DistributorsQ) FilterLikeName(name string) DistributorsQ {
 	cond := sq.Expr("name ILIKE ?", fmt.Sprintf("%%%s%%", name))
 	q.selector = q.selector.Where(cond)
 	q.counter = q.counter.Where(cond)
@@ -208,7 +208,7 @@ func (q DistributorsQ) Count(ctx context.Context) (uint64, error) {
 	}
 
 	var count uint64
-	if tx, ok := ctx.Value(TxKey).(*sql.Tx); ok {
+	if tx, ok := TxFromCtx(ctx); ok {
 		err = tx.QueryRowContext(ctx, query, args...).Scan(&count)
 	} else {
 		err = q.db.QueryRowContext(ctx, query, args...).Scan(&count)
@@ -237,24 +237,40 @@ func (q DistributorsQ) OrderByName(ascend bool) DistributorsQ {
 	return q
 }
 
-func (q DistributorsQ) Transaction(fn func(ctx context.Context) error) error {
-	ctx := context.Background()
+func (q DistributorsQ) Transaction(ctx context.Context, fn func(ctx context.Context) error) error {
+	_, ok := TxFromCtx(ctx)
+	if ok {
+		return fn(ctx)
+	}
 
 	tx, err := q.db.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("failed to start transaction: %w", err)
 	}
 
+	defer func() {
+		if p := recover(); p != nil {
+			_ = tx.Rollback()
+			panic(p)
+		}
+		if err != nil {
+			rbErr := tx.Rollback()
+			if rbErr != nil && !errors.Is(rbErr, sql.ErrTxDone) {
+				err = fmt.Errorf("tx err: %v; rollback err: %v", err, rbErr)
+			}
+		}
+	}()
+
 	ctxWithTx := context.WithValue(ctx, TxKey, tx)
 
-	if err := fn(ctxWithTx); err != nil {
+	if err = fn(ctxWithTx); err != nil {
 		if rbErr := tx.Rollback(); rbErr != nil {
 			return fmt.Errorf("transaction failed: %v, rollback error: %v", err, rbErr)
 		}
 		return fmt.Errorf("transaction failed: %w", err)
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err = tx.Commit(); err != nil {
 		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 

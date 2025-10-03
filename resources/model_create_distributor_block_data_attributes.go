@@ -12,6 +12,7 @@ package resources
 
 import (
 	"encoding/json"
+	"github.com/google/uuid"
 	"bytes"
 	"fmt"
 )
@@ -22,7 +23,7 @@ var _ MappedNullable = &CreateDistributorBlockDataAttributes{}
 // CreateDistributorBlockDataAttributes struct for CreateDistributorBlockDataAttributes
 type CreateDistributorBlockDataAttributes struct {
 	// The UUID of the distributor to be blocked.
-	DistributorId string `json:"distributor_id"`
+	DistributorId uuid.UUID `json:"distributor_id"`
 	// The reason for blocking the distributor.
 	Reason string `json:"reason"`
 }
@@ -33,7 +34,7 @@ type _CreateDistributorBlockDataAttributes CreateDistributorBlockDataAttributes
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewCreateDistributorBlockDataAttributes(distributorId string, reason string) *CreateDistributorBlockDataAttributes {
+func NewCreateDistributorBlockDataAttributes(distributorId uuid.UUID, reason string) *CreateDistributorBlockDataAttributes {
 	this := CreateDistributorBlockDataAttributes{}
 	this.DistributorId = distributorId
 	this.Reason = reason
@@ -49,9 +50,9 @@ func NewCreateDistributorBlockDataAttributesWithDefaults() *CreateDistributorBlo
 }
 
 // GetDistributorId returns the DistributorId field value
-func (o *CreateDistributorBlockDataAttributes) GetDistributorId() string {
+func (o *CreateDistributorBlockDataAttributes) GetDistributorId() uuid.UUID {
 	if o == nil {
-		var ret string
+		var ret uuid.UUID
 		return ret
 	}
 
@@ -60,7 +61,7 @@ func (o *CreateDistributorBlockDataAttributes) GetDistributorId() string {
 
 // GetDistributorIdOk returns a tuple with the DistributorId field value
 // and a boolean to check if the value has been set.
-func (o *CreateDistributorBlockDataAttributes) GetDistributorIdOk() (*string, bool) {
+func (o *CreateDistributorBlockDataAttributes) GetDistributorIdOk() (*uuid.UUID, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -68,7 +69,7 @@ func (o *CreateDistributorBlockDataAttributes) GetDistributorIdOk() (*string, bo
 }
 
 // SetDistributorId sets field value
-func (o *CreateDistributorBlockDataAttributes) SetDistributorId(v string) {
+func (o *CreateDistributorBlockDataAttributes) SetDistributorId(v uuid.UUID) {
 	o.DistributorId = v
 }
 

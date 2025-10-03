@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s Service) GetDistributor(ctx context.Context, ID uuid.UUID) (models.Distributor, error) {
+func (s Service) Get(ctx context.Context, ID uuid.UUID) (models.Distributor, error) {
 	distributor, err := s.db.GetDistributorByID(ctx, ID)
 	if err != nil {
 		return models.Distributor{}, errx.ErrorInternal.Raise(

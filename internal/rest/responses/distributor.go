@@ -3,13 +3,12 @@ package responses
 import (
 	"github.com/chains-lab/distributors-svc/internal/domain/models"
 	"github.com/chains-lab/distributors-svc/resources"
-	"github.com/chains-lab/pagi"
 )
 
 func Distributor(m models.Distributor) resources.Distributor {
 	resp := resources.Distributor{
 		Data: resources.DistributorData{
-			Id:   m.ID.String(),
+			Id:   m.ID,
 			Type: resources.DistributorType,
 			Attributes: resources.DistributorAttributes{
 				Icon:      m.Icon,
@@ -24,18 +23,18 @@ func Distributor(m models.Distributor) resources.Distributor {
 	return resp
 }
 
-func DistributorCollection(ms []models.Distributor, pag pagi.Response) resources.DistributorsCollection {
-	items := make([]resources.DistributorData, 0, len(ms))
-	for _, m := range ms {
+func DistributorCollection(ms models.DistributorCollection) resources.DistributorsCollection {
+	items := make([]resources.DistributorData, 0, len(ms.Data))
+	for _, m := range ms.Data {
 		items = append(items, Distributor(m).Data)
 	}
 
 	return resources.DistributorsCollection{
 		Data: items,
 		Links: resources.PaginationData{
-			PageNumber: int64(pag.Page),
-			PageSize:   int64(pag.Size),
-			TotalItems: int64(pag.Total),
+			PageNumber: int64(ms.Page),
+			PageSize:   int64(ms.Size),
+			TotalItems: int64(ms.Total),
 		},
 	}
 }

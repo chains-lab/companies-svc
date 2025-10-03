@@ -12,8 +12,9 @@ import (
 )
 
 type CreateParams struct {
-	Name string
-	Icon string
+	InitiatorID uuid.UUID
+	Name        string
+	Icon        string
 }
 
 func (s Service) Create(
@@ -31,11 +32,44 @@ func (s Service) Create(
 		UpdatedAt: now,
 	}
 
-	err := s.db.CreateDistributor(ctx, dis)
+	user, err := s.db.GetUserEmployee(ctx, params.InitiatorID)
 	if err != nil {
 		return models.Distributor{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("internal error: %w", err),
+			fmt.Errorf("failed to get user employee: %w", err),
 		)
+	}
+	if !user.IsNil() {
+		return models.Distributor{}, errx.ErrorCurrentEmployeeCannotCreateDistributor.Raise(
+			fmt.Errorf("user is already an employee of distributor: %s", user.DistributorID),
+		)
+	}
+
+	txErr := s.db.Transaction(ctx, func(ctx context.Context) error {
+		_, err = s.db.CreateDistributor(ctx, dis)
+		if err != nil {
+			return errx.ErrorInternal.Raise(
+				fmt.Errorf("internal error: %w", err),
+			)
+		}
+
+		emp := models.Employee{
+			UserID:        params.InitiatorID,
+			DistributorID: dis.ID,
+			Role:          enum.EmployeeRoleAdmin,
+			CreatedAt:     now,
+			UpdatedAt:     now,
+		}
+		err = s.db.CreateEmployee(ctx, emp)
+		if err != nil {
+			return errx.ErrorInternal.Raise(
+				fmt.Errorf("failed to create employee for distributor: %w", err),
+			)
+		}
+
+		return nil
+	})
+	if txErr != nil {
+		return models.Distributor{}, txErr
 	}
 
 	return dis, err
