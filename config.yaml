@@ -1,5 +1,5 @@
 server:
-  name: "distributor-svc"
+  name: "company-svc"
 
 rest:
   port: ":8004"

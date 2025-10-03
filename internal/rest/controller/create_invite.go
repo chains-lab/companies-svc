@@ -6,11 +6,11 @@ import (
 
 	"github.com/chains-lab/ape"
 	"github.com/chains-lab/ape/problems"
-	"github.com/chains-lab/distributors-svc/internal/domain/errx"
-	"github.com/chains-lab/distributors-svc/internal/domain/service/employee"
-	"github.com/chains-lab/distributors-svc/internal/rest/meta"
-	"github.com/chains-lab/distributors-svc/internal/rest/requests"
-	"github.com/chains-lab/distributors-svc/internal/rest/responses"
+	"github.com/chains-lab/companies-svc/internal/domain/errx"
+	"github.com/chains-lab/companies-svc/internal/domain/service/employee"
+	"github.com/chains-lab/companies-svc/internal/rest/meta"
+	"github.com/chains-lab/companies-svc/internal/rest/requests"
+	"github.com/chains-lab/companies-svc/internal/rest/responses"
 )
 
 func (a Service) CreateInvite(w http.ResponseWriter, r *http.Request) {
@@ -31,16 +31,16 @@ func (a Service) CreateInvite(w http.ResponseWriter, r *http.Request) {
 	}
 
 	invite, err := a.domain.employee.CreateInvite(r.Context(), initiator.ID, employee.SentInviteParams{
-		DistributorID: req.Data.Attributes.DistributorId,
-		Role:          req.Data.Attributes.Role,
+		CompanyID: req.Data.Attributes.CompanyId,
+		Role:      req.Data.Attributes.Role,
 	})
 	if err != nil {
 		a.log.WithError(err).Errorf("failed to create employee invite")
 		switch {
-		case errors.Is(err, errx.ErrorDistributorNotFound):
-			ape.RenderErr(w, problems.NotFound("distributor not found"))
-		case errors.Is(err, errx.ErrorDistributorIsBlocked):
-			ape.RenderErr(w, problems.Conflict("distributor is blocked"))
+		case errors.Is(err, errx.ErrorcompanyNotFound):
+			ape.RenderErr(w, problems.NotFound("company not found"))
+		case errors.Is(err, errx.ErrorcompanyIsBlocked):
+			ape.RenderErr(w, problems.Conflict("company is blocked"))
 		default:
 			ape.RenderErr(w, problems.InternalError())
 		}

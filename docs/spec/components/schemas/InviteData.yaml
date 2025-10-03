@@ -10,6 +10,6 @@ properties:
     description: "invite id"
   type:
     type: string
-    enum: [ distributor_invite ]
+    enum: [ company_invite ]
   attributes:
     $ref: './InviteAttributes.yaml'

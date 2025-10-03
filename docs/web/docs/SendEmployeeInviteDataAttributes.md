@@ -4,15 +4,15 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**DistributorId** | **string** | The UUID of the distributor to which the user is being invited. | 
+**companyId** | **string** | The UUID of the company to which the user is being invited. | 
 **UserId** | **string** | The UUID of the user being invited. | 
-**Role** | **string** | The role assigned to the invited user within the distributor. | 
+**Role** | **string** | The role assigned to the invited user within the company. | 
 
 ## Methods
 
 ### NewSendEmployeeInviteDataAttributes
 
-`func NewSendEmployeeInviteDataAttributes(distributorId string, userId string, role string, ) *SendEmployeeInviteDataAttributes`
+`func NewSendEmployeeInviteDataAttributes(companyId string, userId string, role string, ) *SendEmployeeInviteDataAttributes`
 
 NewSendEmployeeInviteDataAttributes instantiates a new SendEmployeeInviteDataAttributes object
 This constructor will assign default values to properties that have it defined,
@@ -27,24 +27,24 @@ NewSendEmployeeInviteDataAttributesWithDefaults instantiates a new SendEmployeeI
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
-### GetDistributorId
+### GetcompanyId
 
-`func (o *SendEmployeeInviteDataAttributes) GetDistributorId() string`
+`func (o *SendEmployeeInviteDataAttributes) GetcompanyId() string`
 
-GetDistributorId returns the DistributorId field if non-nil, zero value otherwise.
+GetcompanyId returns the companyId field if non-nil, zero value otherwise.
 
-### GetDistributorIdOk
+### GetcompanyIdOk
 
-`func (o *SendEmployeeInviteDataAttributes) GetDistributorIdOk() (*string, bool)`
+`func (o *SendEmployeeInviteDataAttributes) GetcompanyIdOk() (*string, bool)`
 
-GetDistributorIdOk returns a tuple with the DistributorId field if it's non-nil, zero value otherwise
+GetcompanyIdOk returns a tuple with the companyId field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetDistributorId
+### SetcompanyId
 
-`func (o *SendEmployeeInviteDataAttributes) SetDistributorId(v string)`
+`func (o *SendEmployeeInviteDataAttributes) SetcompanyId(v string)`
 
-SetDistributorId sets DistributorId field to given value.
+SetcompanyId sets companyId field to given value.
 
 
 ### GetUserId

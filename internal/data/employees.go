@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/chains-lab/distributors-svc/internal/data/pgdb"
-	"github.com/chains-lab/distributors-svc/internal/domain/models"
-	"github.com/chains-lab/distributors-svc/internal/domain/service/employee"
+	"github.com/chains-lab/companies-svc/internal/data/pgdb"
+	"github.com/chains-lab/companies-svc/internal/domain/models"
+	"github.com/chains-lab/companies-svc/internal/domain/service/employee"
 	"github.com/chains-lab/pagi"
 	"github.com/google/uuid"
 )
@@ -26,8 +26,8 @@ func (d *Database) FilterEmployees(
 
 	query := d.sql.employees.New()
 
-	if filter.DistributorID != nil {
-		query = query.FilterDistributorID(*filter.DistributorID)
+	if filter.CompanyID != nil {
+		query = query.FiltercompanyID(*filter.CompanyID)
 	}
 	if filter.Roles != nil && len(filter.Roles) > 0 {
 		query = query.FilterRole(filter.Roles...)
@@ -59,8 +59,8 @@ func (d *Database) FilterEmployees(
 func (d *Database) GetEmployee(ctx context.Context, filter employee.GetFilters) (models.Employee, error) {
 	query := d.sql.employees.New()
 
-	if filter.DistributorID != nil {
-		query = query.FilterDistributorID(*filter.DistributorID)
+	if filter.CompanyID != nil {
+		query = query.FiltercompanyID(*filter.CompanyID)
 	}
 	if filter.UserID != nil {
 		query = query.FilterUserID(*filter.UserID)
@@ -90,26 +90,26 @@ func (d *Database) UpdateEmployeeRole(ctx context.Context, userID uuid.UUID, new
 	return d.sql.employees.New().FilterUserID(userID).UpdateRole(newRole).Update(ctx, updatedAt)
 }
 
-func (d *Database) DeleteEmployee(ctx context.Context, userID, distributorID uuid.UUID) error {
-	return d.sql.employees.New().FilterUserID(userID).FilterDistributorID(distributorID).Delete(ctx)
+func (d *Database) DeleteEmployee(ctx context.Context, userID, companyID uuid.UUID) error {
+	return d.sql.employees.New().FilterUserID(userID).FiltercompanyID(companyID).Delete(ctx)
 }
 
 func employeeModelToSchema(input models.Employee) pgdb.Employee {
 	return pgdb.Employee{
-		UserID:        input.UserID,
-		DistributorID: input.DistributorID,
-		Role:          input.Role,
-		UpdatedAt:     input.UpdatedAt,
-		CreatedAt:     input.CreatedAt,
+		UserID:    input.UserID,
+		CompanyID: input.CompanyID,
+		Role:      input.Role,
+		UpdatedAt: input.UpdatedAt,
+		CreatedAt: input.CreatedAt,
 	}
 }
 
 func employeeSchemaToModel(input pgdb.Employee) models.Employee {
 	return models.Employee{
-		UserID:        input.UserID,
-		DistributorID: input.DistributorID,
-		Role:          input.Role,
-		UpdatedAt:     input.UpdatedAt,
-		CreatedAt:     input.CreatedAt,
+		UserID:    input.UserID,
+		CompanyID: input.CompanyID,
+		Role:      input.Role,
+		UpdatedAt: input.UpdatedAt,
+		CreatedAt: input.CreatedAt,
 	}
 }

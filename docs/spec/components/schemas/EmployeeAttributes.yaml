@@ -1,17 +1,17 @@
 type: object
 required:
-  - distributor_id
+  - company_id
   - role
   - created_at
   - updated_at
 properties:
-    distributor_id:
+    company_id:
         type: string
         format: uuid
-        description: "The unique identifier for the distributor associated with the employee."
+        description: "The unique identifier for the company associated with the employee."
     role:
         type: string
-        description: "The role of the employee within the distributor's organization (e.g., manager, staff)."
+        description: "The role of the employee within the company's organization (e.g., manager, staff)."
     created_at:
         type: string
         format: date-time

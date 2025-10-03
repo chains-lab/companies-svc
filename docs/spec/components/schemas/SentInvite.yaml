@@ -15,17 +15,17 @@ properties:
         description: "invite id"
       type:
         type: string
-        enum: [ distributor_invite ]
+        enum: [ company_invite ]
       attributes:
         type: object
         required:
-          - distributor_id
+          - company_id
           - role
         properties:
-          distributor_id:
+          company_id:
             type: string
             format: uuid
-            description: "ID of the distributor the invite is for"
+            description: "ID of the company the invite is for"
           role:
             type: string
             description: "Role assigned to the invited user"

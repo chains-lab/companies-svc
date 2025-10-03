@@ -22,11 +22,11 @@ var _ MappedNullable = &CreateEmployeeInviteDataAttributes{}
 
 // CreateEmployeeInviteDataAttributes struct for CreateEmployeeInviteDataAttributes
 type CreateEmployeeInviteDataAttributes struct {
-	// The UUID of the distributor to which the user is being invited.
-	DistributorId uuid.UUID `json:"distributor_id"`
+	// The UUID of the company to which the user is being invited.
+	CompanyId uuid.UUID `json:"company_id"`
 	// The UUID of the user being invited.
 	UserId uuid.UUID `json:"user_id"`
-	// The role assigned to the invited user within the distributor.
+	// The role assigned to the invited user within the company.
 	Role string `json:"role"`
 }
 
@@ -36,9 +36,9 @@ type _CreateEmployeeInviteDataAttributes CreateEmployeeInviteDataAttributes
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewCreateEmployeeInviteDataAttributes(distributorId uuid.UUID, userId uuid.UUID, role string) *CreateEmployeeInviteDataAttributes {
+func NewCreateEmployeeInviteDataAttributes(companyId uuid.UUID, userId uuid.UUID, role string) *CreateEmployeeInviteDataAttributes {
 	this := CreateEmployeeInviteDataAttributes{}
-	this.DistributorId = distributorId
+	this.CompanyId = companyId
 	this.UserId = userId
 	this.Role = role
 	return &this
@@ -52,28 +52,28 @@ func NewCreateEmployeeInviteDataAttributesWithDefaults() *CreateEmployeeInviteDa
 	return &this
 }
 
-// GetDistributorId returns the DistributorId field value
-func (o *CreateEmployeeInviteDataAttributes) GetDistributorId() uuid.UUID {
+// GetCompanyId returns the CompanyId field value
+func (o *CreateEmployeeInviteDataAttributes) GetCompanyId() uuid.UUID {
 	if o == nil {
 		var ret uuid.UUID
 		return ret
 	}
 
-	return o.DistributorId
+	return o.CompanyId
 }
 
-// GetDistributorIdOk returns a tuple with the DistributorId field value
+// GetCompanyIdOk returns a tuple with the CompanyId field value
 // and a boolean to check if the value has been set.
-func (o *CreateEmployeeInviteDataAttributes) GetDistributorIdOk() (*uuid.UUID, bool) {
+func (o *CreateEmployeeInviteDataAttributes) GetCompanyIdOk() (*uuid.UUID, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.DistributorId, true
+	return &o.CompanyId, true
 }
 
-// SetDistributorId sets field value
-func (o *CreateEmployeeInviteDataAttributes) SetDistributorId(v uuid.UUID) {
-	o.DistributorId = v
+// SetCompanyId sets field value
+func (o *CreateEmployeeInviteDataAttributes) SetCompanyId(v uuid.UUID) {
+	o.CompanyId = v
 }
 
 // GetUserId returns the UserId field value
@@ -134,7 +134,7 @@ func (o CreateEmployeeInviteDataAttributes) MarshalJSON() ([]byte, error) {
 
 func (o CreateEmployeeInviteDataAttributes) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["distributor_id"] = o.DistributorId
+	toSerialize["company_id"] = o.CompanyId
 	toSerialize["user_id"] = o.UserId
 	toSerialize["role"] = o.Role
 	return toSerialize, nil
@@ -145,7 +145,7 @@ func (o *CreateEmployeeInviteDataAttributes) UnmarshalJSON(data []byte) (err err
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
-		"distributor_id",
+		"company_id",
 		"user_id",
 		"role",
 	}

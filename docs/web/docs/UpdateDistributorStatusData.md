@@ -1,88 +1,88 @@
-# UpdateDistributorStatusData
+# UpdatecompaniestatusData
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | [**uuid.UUID**](uuid.UUID.md) | The UUID of the distributor to be updated. | 
+**Id** | [**uuid.UUID**](uuid.UUID.md) | The UUID of the company to be updated. | 
 **Type** | **string** |  | 
-**Attributes** | [**UpdateDistributorStatusDataAttributes**](UpdateDistributorStatusDataAttributes.md) |  | 
+**Attributes** | [**UpdatecompaniestatusDataAttributes**](UpdatecompaniestatusDataAttributes.md) |  | 
 
 ## Methods
 
-### NewUpdateDistributorStatusData
+### NewUpdatecompaniestatusData
 
-`func NewUpdateDistributorStatusData(id uuid.UUID, type_ string, attributes UpdateDistributorStatusDataAttributes, ) *UpdateDistributorStatusData`
+`func NewUpdatecompaniestatusData(id uuid.UUID, type_ string, attributes UpdatecompaniestatusDataAttributes, ) *UpdatecompaniestatusData`
 
-NewUpdateDistributorStatusData instantiates a new UpdateDistributorStatusData object
+NewUpdatecompaniestatusData instantiates a new UpdatecompaniestatusData object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewUpdateDistributorStatusDataWithDefaults
+### NewUpdatecompaniestatusDataWithDefaults
 
-`func NewUpdateDistributorStatusDataWithDefaults() *UpdateDistributorStatusData`
+`func NewUpdatecompaniestatusDataWithDefaults() *UpdatecompaniestatusData`
 
-NewUpdateDistributorStatusDataWithDefaults instantiates a new UpdateDistributorStatusData object
+NewUpdatecompaniestatusDataWithDefaults instantiates a new UpdatecompaniestatusData object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetId
 
-`func (o *UpdateDistributorStatusData) GetId() uuid.UUID`
+`func (o *UpdatecompaniestatusData) GetId() uuid.UUID`
 
 GetId returns the Id field if non-nil, zero value otherwise.
 
 ### GetIdOk
 
-`func (o *UpdateDistributorStatusData) GetIdOk() (*uuid.UUID, bool)`
+`func (o *UpdatecompaniestatusData) GetIdOk() (*uuid.UUID, bool)`
 
 GetIdOk returns a tuple with the Id field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetId
 
-`func (o *UpdateDistributorStatusData) SetId(v uuid.UUID)`
+`func (o *UpdatecompaniestatusData) SetId(v uuid.UUID)`
 
 SetId sets Id field to given value.
 
 
 ### GetType
 
-`func (o *UpdateDistributorStatusData) GetType() string`
+`func (o *UpdatecompaniestatusData) GetType() string`
 
 GetType returns the Type field if non-nil, zero value otherwise.
 
 ### GetTypeOk
 
-`func (o *UpdateDistributorStatusData) GetTypeOk() (*string, bool)`
+`func (o *UpdatecompaniestatusData) GetTypeOk() (*string, bool)`
 
 GetTypeOk returns a tuple with the Type field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetType
 
-`func (o *UpdateDistributorStatusData) SetType(v string)`
+`func (o *UpdatecompaniestatusData) SetType(v string)`
 
 SetType sets Type field to given value.
 
 
 ### GetAttributes
 
-`func (o *UpdateDistributorStatusData) GetAttributes() UpdateDistributorStatusDataAttributes`
+`func (o *UpdatecompaniestatusData) GetAttributes() UpdatecompaniestatusDataAttributes`
 
 GetAttributes returns the Attributes field if non-nil, zero value otherwise.
 
 ### GetAttributesOk
 
-`func (o *UpdateDistributorStatusData) GetAttributesOk() (*UpdateDistributorStatusDataAttributes, bool)`
+`func (o *UpdatecompaniestatusData) GetAttributesOk() (*UpdatecompaniestatusDataAttributes, bool)`
 
 GetAttributesOk returns a tuple with the Attributes field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetAttributes
 
-`func (o *UpdateDistributorStatusData) SetAttributes(v UpdateDistributorStatusDataAttributes)`
+`func (o *UpdatecompaniestatusData) SetAttributes(v UpdatecompaniestatusDataAttributes)`
 
 SetAttributes sets Attributes field to given value.
 

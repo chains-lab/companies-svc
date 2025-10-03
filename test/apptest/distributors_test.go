@@ -5,20 +5,20 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/chains-lab/distributors-svc/internal/domain/errx"
-	"github.com/chains-lab/distributors-svc/internal/domain/models"
+	"github.com/chains-lab/companies-svc/internal/domain/errx"
+	"github.com/chains-lab/companies-svc/internal/domain/models"
 	"github.com/chains-lab/enum"
 	"github.com/chains-lab/pagi"
 	"github.com/google/uuid"
 )
 
-func CreateDistributor(t *testing.T, s Setup) (models.Distributor, models.Employee) {
+func Createcompany(t *testing.T, s Setup) (models.Company, models.Employee) {
 	ownerID := uuid.New()
 	ctx := context.Background()
 
-	dist, err := s.app.CreateDistributor(ctx, ownerID, "DistributorID 1", "icon")
+	dist, err := s.app.Createcompany(ctx, ownerID, "companyID 1", "icon")
 	if err != nil {
-		t.Fatalf("CreateDistributor: %v", err)
+		t.Fatalf("CreateCompany: %v", err)
 	}
 
 	owner, err := s.app.GetEmployee(ctx, ownerID)
@@ -29,15 +29,15 @@ func CreateDistributor(t *testing.T, s Setup) (models.Distributor, models.Employ
 	return dist, owner
 }
 
-func CreateEmployee(t *testing.T, s Setup, initiatorID, distributorID uuid.UUID, role string) models.Employee {
+func CreateEmployee(t *testing.T, s Setup, initiatorID, companyID uuid.UUID, role string) models.Employee {
 	ctx := context.Background()
 
 	userID := uuid.New()
 
 	imp, err := s.app.CreateInvite(ctx, app.CreateInviteParams{
-		InitiatorID:   initiatorID,
-		DistributorID: distributorID,
-		Role:          role,
+		InitiatorID: initiatorID,
+		companyID:   companyID,
+		Role:        role,
 	})
 	if err != nil {
 		t.Fatalf("CreateInvite: %v", err)
@@ -56,7 +56,7 @@ func CreateEmployee(t *testing.T, s Setup, initiatorID, distributorID uuid.UUID,
 	return emp
 }
 
-func TestCreateDistributor(t *testing.T) {
+func TestCreatecompany(t *testing.T) {
 	s, err := newSetup(t)
 	if err != nil {
 		t.Fatalf("newSetup: %v", err)
@@ -67,12 +67,12 @@ func TestCreateDistributor(t *testing.T) {
 	ctx := context.Background()
 
 	ownerID := uuid.New()
-	dist, err := s.app.CreateDistributor(ctx, ownerID, "DistributorID 1", "icon")
+	dist, err := s.app.Createcompany(ctx, ownerID, "companyID 1", "icon")
 	if err != nil {
-		t.Fatalf("CreateDistributor: %v", err)
+		t.Fatalf("CreateCompany: %v", err)
 	}
 
-	dist, err = s.app.GetDistributor(ctx, dist.ID)
+	dist, err = s.app.Getcompany(ctx, dist.ID)
 	if err != nil {
 		t.Fatalf("Get: %v", err)
 	}
@@ -91,8 +91,8 @@ func TestCreateDistributor(t *testing.T) {
 		t.Errorf("expected owner ID '%s', got '%s'", ownerID, owner.UserID)
 	}
 
-	if dist.Name != "DistributorID 1" {
-		t.Errorf("expected distributor name 'DistributorID 1', got '%s'", dist.Name)
+	if dist.Name != "companyID 1" {
+		t.Errorf("expected company name 'companyID 1', got '%s'", dist.Name)
 	}
 
 	if owner.Role != enum.EmployeeRoleOwner {
@@ -100,7 +100,7 @@ func TestCreateDistributor(t *testing.T) {
 	}
 }
 
-func TestCreateDistributorByEmployee(t *testing.T) {
+func TestCreatecompanyByEmployee(t *testing.T) {
 	s, err := newSetup(t)
 	if err != nil {
 		t.Fatalf("newSetup: %v", err)
@@ -110,15 +110,15 @@ func TestCreateDistributorByEmployee(t *testing.T) {
 
 	ctx := context.Background()
 
-	_, owner := CreateDistributor(t, s)
+	_, owner := Createcompany(t, s)
 
-	_, err = s.app.CreateDistributor(ctx, owner.UserID, "DistributorID 2", "icon2")
-	if !errors.Is(err, errx.ErrorCurrentEmployeeCannotCreateDistributor) {
-		t.Fatalf("expected error %v, got %v", errx.ErrorCurrentEmployeeCannotCreateDistributor, err)
+	_, err = s.app.Createcompany(ctx, owner.UserID, "companyID 2", "icon2")
+	if !errors.Is(err, errx.ErrorCurrentEmployeeCannotCreatecompany) {
+		t.Fatalf("expected error %v, got %v", errx.ErrorCurrentEmployeeCannotCreatecompany, err)
 	}
 }
 
-func TestUpdateDistributor(t *testing.T) {
+func TestUpdatecompany(t *testing.T) {
 	s, err := newSetup(t)
 	if err != nil {
 		t.Fatalf("newSetup: %v", err)
@@ -128,27 +128,27 @@ func TestUpdateDistributor(t *testing.T) {
 
 	ctx := context.Background()
 
-	dis, owner := CreateDistributor(t, s)
+	dis, owner := Createcompany(t, s)
 
-	name := "Updated DistributorID Name"
+	name := "Updated companyID Name"
 	icon := "Updated Icon"
-	dis, err = s.app.UpdateDistributor(ctx, owner.UserID, dis.ID, app.UpdateDistributorParams{
+	dis, err = s.app.Updatecompany(ctx, owner.UserID, dis.ID, app.UpdatecompanyParams{
 		Name: &name,
 		Icon: &icon,
 	})
 	if err != nil {
-		t.Fatalf("UpdateDistributor: %v", err)
+		t.Fatalf("UpdateCompany: %v", err)
 	}
 
 	if dis.Name != name {
-		t.Errorf("expected updated distributor name '%s', got '%s'", name, dis.Name)
+		t.Errorf("expected updated company name '%s', got '%s'", name, dis.Name)
 	}
 	if dis.Icon != icon {
-		t.Errorf("expected updated distributor icon '%s', got '%s'", icon, dis.Icon)
+		t.Errorf("expected updated company icon '%s', got '%s'", icon, dis.Icon)
 	}
 }
 
-func TestInactiveDistributor(t *testing.T) {
+func TestInactivecompany(t *testing.T) {
 	s, err := newSetup(t)
 	if err != nil {
 		t.Fatalf("newSetup: %v", err)
@@ -158,13 +158,13 @@ func TestInactiveDistributor(t *testing.T) {
 
 	ctx := context.Background()
 
-	dis, owner := CreateDistributor(t, s)
+	dis, owner := Createcompany(t, s)
 	admin := CreateEmployee(t, s, owner.UserID, dis.ID, enum.EmployeeRoleAdmin)
 	moder1 := CreateEmployee(t, s, admin.UserID, dis.ID, enum.EmployeeRoleModerator)
 	moder2 := CreateEmployee(t, s, admin.UserID, dis.ID, enum.EmployeeRoleModerator)
 
 	list, pag, err := s.app.ListEmployees(ctx, app.FilterEmployeeList{
-		Distributors: []uuid.UUID{dis.ID},
+		companies: []uuid.UUID{dis.ID},
 	}, pagi.Request{
 		Page: 1,
 		Size: 10,
@@ -180,12 +180,12 @@ func TestInactiveDistributor(t *testing.T) {
 	}
 
 	disID := dis.ID
-	dis, err = s.app.SetDistributorStatus(ctx, owner.UserID, disID, enum.DistributorStatusBlocked)
-	if !errors.Is(err, errx.ErrorUnexpectedDistributorSetStatus) {
-		t.Fatalf("expected error %v, got %v", errx.ErrorUnexpectedDistributorSetStatus, err)
+	dis, err = s.app.Setcompaniestatus(ctx, owner.UserID, disID, enum.companiestatusBlocked)
+	if !errors.Is(err, errx.ErrorUnexpectedcompaniesetStatus) {
+		t.Fatalf("expected error %v, got %v", errx.ErrorUnexpectedcompaniesetStatus, err)
 	}
 
-	dis, err = s.app.SetDistributorStatus(ctx, admin.UserID, disID, enum.DistributorStatusBlocked)
+	dis, err = s.app.Setcompaniestatus(ctx, admin.UserID, disID, enum.companiestatusBlocked)
 	if !errors.Is(err, errx.ErrorInitiatorHaveNotEnoughRights) {
 		t.Fatalf("expected error %v, got %v", errx.ErrorInitiatorHaveNotEnoughRights, err)
 	}
@@ -211,7 +211,7 @@ func TestInactiveDistributor(t *testing.T) {
 	}
 
 	list, pag, err = s.app.ListEmployees(ctx, app.FilterEmployeeList{
-		Distributors: []uuid.UUID{disID},
+		companies: []uuid.UUID{disID},
 	}, pagi.Request{
 		Page: 1,
 		Size: 10,
@@ -223,16 +223,16 @@ func TestInactiveDistributor(t *testing.T) {
 		t.Fatalf("expected 3 employee, got %d", len(list))
 	}
 
-	dis, err = s.app.SetDistributorStatus(ctx, owner.UserID, disID, enum.DistributorStatusInactive)
+	dis, err = s.app.Setcompaniestatus(ctx, owner.UserID, disID, enum.companiestatusInactive)
 	if err != nil {
-		t.Fatalf("SetDistributorStatus: %v", err)
+		t.Fatalf("Setcompaniestatus: %v", err)
 	}
-	if dis.Status != enum.DistributorStatusInactive {
-		t.Errorf("expected distributor status '%s', got '%s'", enum.DistributorStatusInactive, dis.Status)
+	if dis.Status != enum.companiestatusInactive {
+		t.Errorf("expected company status '%s', got '%s'", enum.companiestatusInactive, dis.Status)
 	}
 
 	list, pag, err = s.app.ListEmployees(ctx, app.FilterEmployeeList{
-		Distributors: []uuid.UUID{disID},
+		companies: []uuid.UUID{disID},
 	}, pagi.Request{
 		Page: 1,
 		Size: 10,

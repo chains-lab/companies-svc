@@ -4,14 +4,14 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**DistributorId** | [**uuid.UUID**](uuid.UUID.md) | ID of the distributor the invite is for | 
+**CompanyId** | [**uuid.UUID**](uuid.UUID.md) | ID of the company the invite is for | 
 **Role** | **string** | Role assigned to the invited user | 
 
 ## Methods
 
 ### NewSentInviteDataAttributes
 
-`func NewSentInviteDataAttributes(distributorId uuid.UUID, role string, ) *SentInviteDataAttributes`
+`func NewSentInviteDataAttributes(companyId uuid.UUID, role string, ) *SentInviteDataAttributes`
 
 NewSentInviteDataAttributes instantiates a new SentInviteDataAttributes object
 This constructor will assign default values to properties that have it defined,
@@ -26,24 +26,24 @@ NewSentInviteDataAttributesWithDefaults instantiates a new SentInviteDataAttribu
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
-### GetDistributorId
+### GetCompanyId
 
-`func (o *SentInviteDataAttributes) GetDistributorId() uuid.UUID`
+`func (o *SentInviteDataAttributes) GetCompanyId() uuid.UUID`
 
-GetDistributorId returns the DistributorId field if non-nil, zero value otherwise.
+GetCompanyId returns the CompanyId field if non-nil, zero value otherwise.
 
-### GetDistributorIdOk
+### GetCompanyIdOk
 
-`func (o *SentInviteDataAttributes) GetDistributorIdOk() (*uuid.UUID, bool)`
+`func (o *SentInviteDataAttributes) GetCompanyIdOk() (*uuid.UUID, bool)`
 
-GetDistributorIdOk returns a tuple with the DistributorId field if it's non-nil, zero value otherwise
+GetCompanyIdOk returns a tuple with the CompanyId field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetDistributorId
+### SetCompanyId
 
-`func (o *SentInviteDataAttributes) SetDistributorId(v uuid.UUID)`
+`func (o *SentInviteDataAttributes) SetCompanyId(v uuid.UUID)`
 
-SetDistributorId sets DistributorId field to given value.
+SetCompanyId sets CompanyId field to given value.
 
 
 ### GetRole

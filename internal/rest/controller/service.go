@@ -3,49 +3,49 @@ package controller
 import (
 	"context"
 
-	"github.com/chains-lab/distributors-svc/internal/domain/models"
-	"github.com/chains-lab/distributors-svc/internal/domain/service/distributor"
-	"github.com/chains-lab/distributors-svc/internal/domain/service/employee"
+	"github.com/chains-lab/companies-svc/internal/domain/models"
+	"github.com/chains-lab/companies-svc/internal/domain/service/company"
+	"github.com/chains-lab/companies-svc/internal/domain/service/employee"
 	"github.com/chains-lab/logium"
 	"github.com/google/uuid"
 )
 
-type DistributorSvc interface {
+type companiesvc interface {
 	CreteBlock(
 		ctx context.Context,
 		initiatorID uuid.UUID,
-		distributorID uuid.UUID,
+		companyID uuid.UUID,
 		reason string,
-	) (models.DistributorBlock, error)
+	) (models.CompanyBlock, error)
 	FilterBlockages(
 		ctx context.Context,
-		filters distributor.FilterBlockages,
+		filters company.FilterBlockages,
 		page, size uint64,
-	) (models.DistributorBlockCollection, error)
-	GetBlock(ctx context.Context, BlockID uuid.UUID) (models.DistributorBlock, error)
-	CancelBlock(ctx context.Context, distributorID uuid.UUID) (models.Distributor, error)
+	) (models.CompanyBlockCollection, error)
+	GetBlock(ctx context.Context, BlockID uuid.UUID) (models.CompanyBlock, error)
+	CancelBlock(ctx context.Context, companyID uuid.UUID) (models.Company, error)
 
-	Create(ctx context.Context, params distributor.CreateParams) (models.Distributor, error)
+	Create(ctx context.Context, params company.CreateParams) (models.Company, error)
 
 	Filter(
 		ctx context.Context,
-		filters distributor.Filters,
+		filters company.Filters,
 		page, size uint64,
-	) (models.DistributorCollection, error)
+	) (models.CompanyCollection, error)
 
-	Get(ctx context.Context, ID uuid.UUID) (models.Distributor, error)
-	GetActiveDistributorBlock(ctx context.Context, distributorID uuid.UUID) (models.DistributorBlock, error)
+	Get(ctx context.Context, ID uuid.UUID) (models.Company, error)
+	GetActivecompanyBlock(ctx context.Context, companyID uuid.UUID) (models.CompanyBlock, error)
 
 	UpdateStatus(
 		ctx context.Context,
-		distributorID uuid.UUID,
+		companyID uuid.UUID,
 		status string,
-	) (models.Distributor, error)
+	) (models.Company, error)
 
 	Update(ctx context.Context,
-		distributorID uuid.UUID,
-		params distributor.UpdateParams,
-	) (models.Distributor, error)
+		companyID uuid.UUID,
+		params company.UpdateParams,
+	) (models.Company, error)
 }
 
 type EmployeeSvc interface {
@@ -69,13 +69,13 @@ type EmployeeSvc interface {
 		newRole string,
 	) (models.Employee, error)
 
-	Delete(ctx context.Context, initiatorID, userID, distributorID uuid.UUID) error
+	Delete(ctx context.Context, initiatorID, userID, companyID uuid.UUID) error
 	RefuseOwn(ctx context.Context, initiatorID uuid.UUID) error
 }
 
 type domain struct {
-	employee    EmployeeSvc
-	distributor DistributorSvc
+	employee EmployeeSvc
+	company  companiesvc
 }
 
 type Service struct {
@@ -83,12 +83,12 @@ type Service struct {
 	log    logium.Logger
 }
 
-func New(log logium.Logger, dis DistributorSvc, emp EmployeeSvc) Service {
+func New(log logium.Logger, dis companiesvc, emp EmployeeSvc) Service {
 	return Service{
 		log: log,
 		domain: domain{
-			employee:    emp,
-			distributor: dis,
+			employee: emp,
+			company:  dis,
 		},
 	}
 }

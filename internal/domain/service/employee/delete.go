@@ -4,14 +4,14 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/chains-lab/distributors-svc/internal/domain/errx"
+	"github.com/chains-lab/companies-svc/internal/domain/errx"
 	"github.com/google/uuid"
 )
 
-func (s Service) Delete(ctx context.Context, initiatorID, userID, distributorID uuid.UUID) error {
+func (s Service) Delete(ctx context.Context, initiatorID, userID, companyID uuid.UUID) error {
 	_, err := s.Get(ctx, GetFilters{
-		UserID:        &userID,
-		DistributorID: &distributorID,
+		UserID:    &userID,
+		CompanyID: &companyID,
 	})
 	if err != nil {
 		return err
@@ -19,7 +19,7 @@ func (s Service) Delete(ctx context.Context, initiatorID, userID, distributorID 
 
 	//TODO compare roles of initiator and user
 
-	err = s.db.DeleteEmployee(ctx, userID, distributorID)
+	err = s.db.DeleteEmployee(ctx, userID, companyID)
 	if err != nil {
 		return errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to delete employee, cause: %w", err),

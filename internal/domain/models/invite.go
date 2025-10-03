@@ -7,15 +7,15 @@ import (
 )
 
 type Invite struct {
-	ID            uuid.UUID
-	Status        string
-	Role          string
-	DistributorID uuid.UUID
-	UserID        *uuid.UUID
-	AnsweredAt    *time.Time
-	Token         string
-	ExpiresAt     time.Time
-	CreatedAt     time.Time
+	ID         uuid.UUID
+	Status     string
+	Role       string
+	CompanyID  uuid.UUID
+	UserID     *uuid.UUID
+	AnsweredAt *time.Time
+	Token      string
+	ExpiresAt  time.Time
+	CreatedAt  time.Time
 }
 
 func (i Invite) IsNil() bool {

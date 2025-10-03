@@ -27,16 +27,16 @@ generate-models:
 
 
 migrate-up:
-	KV_VIPER_FILE=$(CONFIG_FILE) go build -o ./cmd/distributors-svc/main ./cmd/distributors-svc/main.go
-	KV_VIPER_FILE=$(CONFIG_FILE) ./cmd/distributors-svc/main migrate up
+	KV_VIPER_FILE=$(CONFIG_FILE) go build -o ./cmd/companies-svc/main ./cmd/companies-svc/main.go
+	KV_VIPER_FILE=$(CONFIG_FILE) ./cmd/companies-svc/main migrate up
 
 migrate-down:
-	KV_VIPER_FILE=$(CONFIG_FILE) go build -o ./cmd/distributors-svc/main ./cmd/distributors-svc/main.go
-	KV_VIPER_FILE=$(CONFIG_FILE) ./cmd/distributors-svc/main migrate down
+	KV_VIPER_FILE=$(CONFIG_FILE) go build -o ./cmd/companies-svc/main ./cmd/companies-svc/main.go
+	KV_VIPER_FILE=$(CONFIG_FILE) ./cmd/companies-svc/main migrate down
 
 run-server:
-	KV_VIPER_FILE=$(CONFIG_FILE) go build -o ./cmd/distributors-svc/main ./cmd/distributors-svc/main.go
-	KV_VIPER_FILE=$(CONFIG_FILE) ./cmd/distributors-svc/main run service
+	KV_VIPER_FILE=$(CONFIG_FILE) go build -o ./cmd/companies-svc/main ./cmd/companies-svc/main.go
+	KV_VIPER_FILE=$(CONFIG_FILE) ./cmd/companies-svc/main run service
 
 docker-uo:
 	docker compose up -d

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/chains-lab/distributors-svc/internal/domain/errx"
+	"github.com/chains-lab/companies-svc/internal/domain/errx"
 	"github.com/chains-lab/enum"
 	"github.com/google/uuid"
 )
@@ -20,7 +20,7 @@ func (s Service) RefuseOwn(ctx context.Context, initiatorID uuid.UUID) error {
 			fmt.Errorf("owner cannot refuse self"),
 		)
 	}
-	err = s.db.DeleteEmployee(ctx, own.UserID, own.DistributorID)
+	err = s.db.DeleteEmployee(ctx, own.UserID, own.CompanyID)
 	if err != nil {
 		return errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to refuse own employee, cause: %w", err),

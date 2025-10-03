@@ -27,8 +27,8 @@ type InviteAttributes struct {
 	Status string `json:"status"`
 	// role of the user in this city
 	Role string `json:"role"`
-	// distributor id
-	DistributorId uuid.UUID `json:"distributor_id"`
+	// company id
+	CompanyId uuid.UUID `json:"company_id"`
 	// unique token for the invite
 	Token string `json:"token"`
 	// timestamp when the invite will expire
@@ -43,11 +43,11 @@ type _InviteAttributes InviteAttributes
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewInviteAttributes(status string, role string, distributorId uuid.UUID, token string, expiresAt time.Time, createdAt time.Time) *InviteAttributes {
+func NewInviteAttributes(status string, role string, companyId uuid.UUID, token string, expiresAt time.Time, createdAt time.Time) *InviteAttributes {
 	this := InviteAttributes{}
 	this.Status = status
 	this.Role = role
-	this.DistributorId = distributorId
+	this.CompanyId = companyId
 	this.Token = token
 	this.ExpiresAt = expiresAt
 	this.CreatedAt = createdAt
@@ -110,28 +110,28 @@ func (o *InviteAttributes) SetRole(v string) {
 	o.Role = v
 }
 
-// GetDistributorId returns the DistributorId field value
-func (o *InviteAttributes) GetDistributorId() uuid.UUID {
+// GetCompanyId returns the CompanyId field value
+func (o *InviteAttributes) GetCompanyId() uuid.UUID {
 	if o == nil {
 		var ret uuid.UUID
 		return ret
 	}
 
-	return o.DistributorId
+	return o.CompanyId
 }
 
-// GetDistributorIdOk returns a tuple with the DistributorId field value
+// GetCompanyIdOk returns a tuple with the CompanyId field value
 // and a boolean to check if the value has been set.
-func (o *InviteAttributes) GetDistributorIdOk() (*uuid.UUID, bool) {
+func (o *InviteAttributes) GetCompanyIdOk() (*uuid.UUID, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.DistributorId, true
+	return &o.CompanyId, true
 }
 
-// SetDistributorId sets field value
-func (o *InviteAttributes) SetDistributorId(v uuid.UUID) {
-	o.DistributorId = v
+// SetCompanyId sets field value
+func (o *InviteAttributes) SetCompanyId(v uuid.UUID) {
+	o.CompanyId = v
 }
 
 // GetToken returns the Token field value
@@ -218,7 +218,7 @@ func (o InviteAttributes) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["status"] = o.Status
 	toSerialize["role"] = o.Role
-	toSerialize["distributor_id"] = o.DistributorId
+	toSerialize["company_id"] = o.CompanyId
 	toSerialize["token"] = o.Token
 	toSerialize["expires_at"] = o.ExpiresAt
 	toSerialize["created_at"] = o.CreatedAt
@@ -232,7 +232,7 @@ func (o *InviteAttributes) UnmarshalJSON(data []byte) (err error) {
 	requiredProperties := []string{
 		"status",
 		"role",
-		"distributor_id",
+		"company_id",
 		"token",
 		"expires_at",
 		"created_at",

@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Role** | **string** | The role of the employee within the distributor&#39;s organization (e.g., manager, staff). | 
+**Role** | **string** | The role of the employee within the company&#39;s organization (e.g., manager, staff). | 
 
 ## Methods
 

@@ -1,46 +1,46 @@
-# UpdateDistributorStatus
+# Updatecompaniestatus
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Data** | [**UpdateDistributorStatusData**](UpdateDistributorStatusData.md) |  | 
+**Data** | [**UpdatecompaniestatusData**](UpdatecompaniestatusData.md) |  | 
 
 ## Methods
 
-### NewUpdateDistributorStatus
+### NewUpdatecompaniestatus
 
-`func NewUpdateDistributorStatus(data UpdateDistributorStatusData, ) *UpdateDistributorStatus`
+`func NewUpdatecompaniestatus(data UpdatecompaniestatusData, ) *Updatecompaniestatus`
 
-NewUpdateDistributorStatus instantiates a new UpdateDistributorStatus object
+NewUpdatecompaniestatus instantiates a new Updatecompaniestatus object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewUpdateDistributorStatusWithDefaults
+### NewUpdatecompaniestatusWithDefaults
 
-`func NewUpdateDistributorStatusWithDefaults() *UpdateDistributorStatus`
+`func NewUpdatecompaniestatusWithDefaults() *Updatecompaniestatus`
 
-NewUpdateDistributorStatusWithDefaults instantiates a new UpdateDistributorStatus object
+NewUpdatecompaniestatusWithDefaults instantiates a new Updatecompaniestatus object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetData
 
-`func (o *UpdateDistributorStatus) GetData() UpdateDistributorStatusData`
+`func (o *Updatecompaniestatus) GetData() UpdatecompaniestatusData`
 
 GetData returns the Data field if non-nil, zero value otherwise.
 
 ### GetDataOk
 
-`func (o *UpdateDistributorStatus) GetDataOk() (*UpdateDistributorStatusData, bool)`
+`func (o *Updatecompaniestatus) GetDataOk() (*UpdatecompaniestatusData, bool)`
 
 GetDataOk returns a tuple with the Data field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetData
 
-`func (o *UpdateDistributorStatus) SetData(v UpdateDistributorStatusData)`
+`func (o *Updatecompaniestatus) SetData(v UpdatecompaniestatusData)`
 
 SetData sets Data field to given value.
 

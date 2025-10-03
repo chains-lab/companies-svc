@@ -8,9 +8,9 @@ import (
 	"syscall"
 
 	"github.com/alecthomas/kingpin"
-	cmd "github.com/chains-lab/distributors-svc/cmd"
-	"github.com/chains-lab/distributors-svc/cmd/migrations"
-	"github.com/chains-lab/distributors-svc/internal"
+	cmd "github.com/chains-lab/companies-svc/cmd"
+	"github.com/chains-lab/companies-svc/cmd/migrations"
+	"github.com/chains-lab/companies-svc/internal"
 	"github.com/chains-lab/logium"
 	"github.com/sirupsen/logrus"
 )
@@ -25,7 +25,7 @@ func Run(args []string) bool {
 	log.Info("Starting server...")
 
 	var (
-		service = kingpin.New("distributor-svc", "")
+		service = kingpin.New("company-svc", "")
 		runCmd  = service.Command("run", "run command")
 
 		serviceCmd     = runCmd.Command("service", "run service")

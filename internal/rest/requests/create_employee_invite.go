@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/chains-lab/distributors-svc/resources"
+	"github.com/chains-lab/companies-svc/resources"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 

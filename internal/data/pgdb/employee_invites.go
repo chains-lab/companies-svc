@@ -12,20 +12,18 @@ import (
 
 const invitesTable = "employee_invites"
 
-// Invite — модель строки из invites.
 type Invite struct {
-	ID            uuid.UUID     `db:"id"`
-	Status        string        `db:"status"` // 'sent' | 'accepted' |
-	Role          string        `db:"role"`   // enum employee_roles
-	DistributorID uuid.UUID     `db:"distributor_id"`
-	Token         string        `db:"token"`
-	UserID        uuid.NullUUID `db:"user_id"`     // может быть NULL до акцепта
-	AnsweredAt    sql.NullTime  `db:"answered_at"` // NULL для sent
-	ExpiresAt     time.Time     `db:"expires_at"`
-	CreatedAt     time.Time     `db:"created_at"`
+	ID         uuid.UUID     `db:"id"`
+	Status     string        `db:"status"` // 'sent' | 'accepted' |
+	Role       string        `db:"role"`   // enum employee_roles
+	CompanyID  uuid.UUID     `db:"company_id"`
+	Token      string        `db:"token"`
+	UserID     uuid.NullUUID `db:"user_id"`
+	AnsweredAt sql.NullTime  `db:"answered_at"`
+	ExpiresAt  time.Time     `db:"expires_at"`
+	CreatedAt  time.Time     `db:"created_at"`
 }
 
-// InvitesQ — билдер запросов к invites (в стиле твоих Q-структур).
 type InvitesQ struct {
 	db       *sql.DB
 	selector sq.SelectBuilder
@@ -50,16 +48,14 @@ func NewInvitesQ(db *sql.DB) InvitesQ {
 
 func (q InvitesQ) New() InvitesQ { return NewInvitesQ(q.db) }
 
-// Insert — вставка новой записи. Если ID == uuid.Nil, возьмётся из переданного значения (требуется задать снаружи).
-// created_at/updated_at можно не заполнять — если в схеме стоят DEFAULT, но ты их явно задаёшь в других местах.
 func (q InvitesQ) Insert(ctx context.Context, input Invite) error {
 	values := map[string]interface{}{
-		"id":             input.ID,
-		"status":         input.Status,
-		"role":           input.Role,
-		"distributor_id": input.DistributorID,
-		"token":          input.Token,
-		"expires_at":     input.ExpiresAt,
+		"id":         input.ID,
+		"status":     input.Status,
+		"role":       input.Role,
+		"company_id": input.CompanyID,
+		"token":      input.Token,
+		"expires_at": input.ExpiresAt,
 	}
 
 	if input.UserID.Valid {
@@ -85,7 +81,6 @@ func (q InvitesQ) Insert(ctx context.Context, input Invite) error {
 	return err
 }
 
-// Get — вернуть одну запись по текущим фильтрам.
 func (q InvitesQ) Get(ctx context.Context) (Invite, error) {
 	sqlStr, args, err := q.selector.Limit(1).ToSql()
 	if err != nil {
@@ -107,7 +102,7 @@ func (q InvitesQ) Get(ctx context.Context) (Invite, error) {
 		&m.ID,
 		&m.Status,
 		&m.Role,
-		&m.DistributorID,
+		&m.CompanyID,
 		&m.Token,
 		&userID,
 		&answeredAt,
@@ -127,7 +122,6 @@ func (q InvitesQ) Get(ctx context.Context) (Invite, error) {
 	return m, nil
 }
 
-// Select — выбрать множество по текущим фильтрам.
 func (q InvitesQ) Select(ctx context.Context) ([]Invite, error) {
 	sqlStr, args, err := q.selector.ToSql()
 	if err != nil {
@@ -154,7 +148,7 @@ func (q InvitesQ) Select(ctx context.Context) ([]Invite, error) {
 			&m.ID,
 			&m.Status,
 			&m.Role,
-			&m.DistributorID,
+			&m.CompanyID,
 			&m.Token,
 			&userID,
 			&answeredAt,
@@ -174,18 +168,15 @@ func (q InvitesQ) Select(ctx context.Context) ([]Invite, error) {
 	return out, nil
 }
 
-// UpdateInviteParams — частичное обновление (DAL без бизнес-логики).
 type UpdateInviteParams struct {
-	Status        *string
-	Role          *string
-	DistributorID *uuid.UUID
-	UserID        *uuid.NullUUID // двойной указатель, чтобы различать "не менять", "установить", "обнулить(nil)"
-	AnsweredAt    *sql.NullTime  // аналогично: nil — не менять; *nil — записать NULL; *&t — записать t
-	ExpiresAt     *time.Time
+	Status     *string
+	Role       *string
+	CompanyID  *uuid.UUID
+	UserID     *uuid.NullUUID
+	AnsweredAt *sql.NullTime
+	ExpiresAt  *time.Time
 }
 
-// Update — выполнит UPDATE по текущим фильтрам.
-// ВАЖНО: как и в твоих Q, без вызова Filter* получишь UPDATE всех строк — ответственность на слое выше.
 func (q InvitesQ) Update(ctx context.Context) error {
 	query, args, err := q.updater.ToSql()
 	if err != nil {
@@ -210,8 +201,8 @@ func (q InvitesQ) UpdateRole(role string) InvitesQ {
 	return q
 }
 
-func (q InvitesQ) UpdateDistributorID(distributorID uuid.UUID) InvitesQ {
-	q.updater = q.updater.Set("distributor_id", distributorID)
+func (q InvitesQ) UpdateCompanyID(companyID uuid.UUID) InvitesQ {
+	q.updater = q.updater.Set("company_id", companyID)
 	return q
 }
 
@@ -243,8 +234,6 @@ func (q InvitesQ) Delete(ctx context.Context) error {
 	return err
 }
 
-// --------- Фильтры ---------
-
 func (q InvitesQ) FilterID(id uuid.UUID) InvitesQ {
 	q.selector = q.selector.Where(sq.Eq{"id": id})
 	q.updater = q.updater.Where(sq.Eq{"id": id})
@@ -253,11 +242,11 @@ func (q InvitesQ) FilterID(id uuid.UUID) InvitesQ {
 	return q
 }
 
-func (q InvitesQ) FilterDistributorID(distributorID uuid.UUID) InvitesQ {
-	q.selector = q.selector.Where(sq.Eq{"distributor_id": distributorID})
-	q.updater = q.updater.Where(sq.Eq{"distributor_id": distributorID})
-	q.deleter = q.deleter.Where(sq.Eq{"distributor_id": distributorID})
-	q.counter = q.counter.Where(sq.Eq{"distributor_id": distributorID})
+func (q InvitesQ) FiltercompanyID(companyID uuid.UUID) InvitesQ {
+	q.selector = q.selector.Where(sq.Eq{"company_id": companyID})
+	q.updater = q.updater.Where(sq.Eq{"company_id": companyID})
+	q.deleter = q.deleter.Where(sq.Eq{"company_id": companyID})
+	q.counter = q.counter.Where(sq.Eq{"company_id": companyID})
 	return q
 }
 

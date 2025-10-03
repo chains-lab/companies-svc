@@ -1,0 +1,15 @@
+type: object
+required:
+  - id
+  - type
+  - attributes
+properties:
+  id:
+    type: string
+    format: uuid
+    description: "company id"
+  type:
+    type: string
+    enum: [ company ]
+  attributes:
+    $ref: './CompanyAttributes.yaml'

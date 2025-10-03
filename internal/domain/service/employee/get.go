@@ -4,15 +4,15 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/chains-lab/distributors-svc/internal/domain/errx"
-	"github.com/chains-lab/distributors-svc/internal/domain/models"
+	"github.com/chains-lab/companies-svc/internal/domain/errx"
+	"github.com/chains-lab/companies-svc/internal/domain/models"
 	"github.com/google/uuid"
 )
 
 type GetFilters struct {
-	UserID        *uuid.UUID
-	DistributorID *uuid.UUID
-	Role          *string
+	UserID    *uuid.UUID
+	CompanyID *uuid.UUID
+	Role      *string
 }
 
 func (s Service) Get(ctx context.Context, filters GetFilters) (models.Employee, error) {

@@ -5,15 +5,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/chains-lab/distributors-svc/internal/domain/errx"
-	"github.com/chains-lab/distributors-svc/internal/domain/models"
+	"github.com/chains-lab/companies-svc/internal/domain/errx"
+	"github.com/chains-lab/companies-svc/internal/domain/models"
 	"github.com/chains-lab/enum"
 	"github.com/google/uuid"
 )
 
 type SentInviteParams struct {
-	DistributorID uuid.UUID
-	Role          string
+	CompanyID uuid.UUID
+	Role      string
 }
 
 func (s Service) CreateInvite(ctx context.Context, InitiatorID uuid.UUID, params SentInviteParams) (models.Invite, error) {
@@ -22,9 +22,9 @@ func (s Service) CreateInvite(ctx context.Context, InitiatorID uuid.UUID, params
 		return models.Invite{}, err
 	}
 
-	if initiator.DistributorID != params.DistributorID {
-		return models.Invite{}, errx.ErrorInitiatorIsNotEmployeeOfThisDistributor.Raise(
-			fmt.Errorf("initiator distributor_id %s not equal to params distributor_id %s", initiator.DistributorID, params.DistributorID),
+	if initiator.CompanyID != params.CompanyID {
+		return models.Invite{}, errx.ErrorInitiatorIsNotEmployeeOfThiscompany.Raise(
+			fmt.Errorf("initiator company_id %s not equal to params company_id %s", initiator.CompanyID, params.CompanyID),
 		)
 	}
 
@@ -40,7 +40,7 @@ func (s Service) CreateInvite(ctx context.Context, InitiatorID uuid.UUID, params
 		)
 	}
 
-	if err = s.DistributorIsActive(ctx, initiator.DistributorID); err != nil {
+	if err = s.companyIsActive(ctx, initiator.CompanyID); err != nil {
 		return models.Invite{}, err
 	}
 
@@ -48,7 +48,7 @@ func (s Service) CreateInvite(ctx context.Context, InitiatorID uuid.UUID, params
 	exAt := time.Now().UTC().Add(24 * time.Hour)
 	now := time.Now().UTC()
 
-	token, err := s.jwt.CreateInviteToken(inviteID, params.Role, params.DistributorID, exAt)
+	token, err := s.jwt.CreateInviteToken(inviteID, params.Role, params.CompanyID, exAt)
 	if err != nil {
 		return models.Invite{}, errx.ErrorInternal.Raise(
 			fmt.Errorf("create invite token: %w", err),
@@ -63,13 +63,13 @@ func (s Service) CreateInvite(ctx context.Context, InitiatorID uuid.UUID, params
 	}
 
 	invite := models.Invite{
-		ID:            inviteID,
-		Status:        enum.InviteStatusSent,
-		Role:          params.Role,
-		DistributorID: initiator.DistributorID,
-		Token:         hash,
-		ExpiresAt:     exAt,
-		CreatedAt:     now,
+		ID:        inviteID,
+		Status:    enum.InviteStatusSent,
+		Role:      params.Role,
+		CompanyID: initiator.CompanyID,
+		Token:     hash,
+		ExpiresAt: exAt,
+		CreatedAt: now,
 	}
 
 	err = s.db.CreateInvite(ctx, invite)

@@ -1,157 +1,157 @@
-# DistributorBlockAttributes
+# companyBlockAttributes
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**DistributorId** | [**uuid.UUID**](uuid.UUID.md) | ID of the distributor being blocked | 
+**companyId** | [**uuid.UUID**](uuid.UUID.md) | ID of the company being blocked | 
 **InitiatorId** | [**uuid.UUID**](uuid.UUID.md) | ID of the user who initiated the block | 
-**Reason** | **string** | Reason for blocking the distributor | 
+**Reason** | **string** | Reason for blocking the company | 
 **Status** | **string** | Current status of the block | 
 **BlockedAt** | **time.Time** | Timestamp when the block was initiated | 
 **CancelledAt** | Pointer to **time.Time** | Timestamp when the block was lifted, if applicable | [optional] 
 
 ## Methods
 
-### NewDistributorBlockAttributes
+### NewcompanyBlockAttributes
 
-`func NewDistributorBlockAttributes(distributorId uuid.UUID, initiatorId uuid.UUID, reason string, status string, blockedAt time.Time, ) *DistributorBlockAttributes`
+`func NewcompanyBlockAttributes(companyId uuid.UUID, initiatorId uuid.UUID, reason string, status string, blockedAt time.Time, ) *companyBlockAttributes`
 
-NewDistributorBlockAttributes instantiates a new DistributorBlockAttributes object
+NewcompanyBlockAttributes instantiates a new companyBlockAttributes object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewDistributorBlockAttributesWithDefaults
+### NewcompanyBlockAttributesWithDefaults
 
-`func NewDistributorBlockAttributesWithDefaults() *DistributorBlockAttributes`
+`func NewcompanyBlockAttributesWithDefaults() *companyBlockAttributes`
 
-NewDistributorBlockAttributesWithDefaults instantiates a new DistributorBlockAttributes object
+NewcompanyBlockAttributesWithDefaults instantiates a new companyBlockAttributes object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
-### GetDistributorId
+### GetcompanyId
 
-`func (o *DistributorBlockAttributes) GetDistributorId() uuid.UUID`
+`func (o *companyBlockAttributes) GetcompanyId() uuid.UUID`
 
-GetDistributorId returns the DistributorId field if non-nil, zero value otherwise.
+GetcompanyId returns the companyId field if non-nil, zero value otherwise.
 
-### GetDistributorIdOk
+### GetcompanyIdOk
 
-`func (o *DistributorBlockAttributes) GetDistributorIdOk() (*uuid.UUID, bool)`
+`func (o *companyBlockAttributes) GetcompanyIdOk() (*uuid.UUID, bool)`
 
-GetDistributorIdOk returns a tuple with the DistributorId field if it's non-nil, zero value otherwise
+GetcompanyIdOk returns a tuple with the companyId field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetDistributorId
+### SetcompanyId
 
-`func (o *DistributorBlockAttributes) SetDistributorId(v uuid.UUID)`
+`func (o *companyBlockAttributes) SetcompanyId(v uuid.UUID)`
 
-SetDistributorId sets DistributorId field to given value.
+SetcompanyId sets companyId field to given value.
 
 
 ### GetInitiatorId
 
-`func (o *DistributorBlockAttributes) GetInitiatorId() uuid.UUID`
+`func (o *companyBlockAttributes) GetInitiatorId() uuid.UUID`
 
 GetInitiatorId returns the InitiatorId field if non-nil, zero value otherwise.
 
 ### GetInitiatorIdOk
 
-`func (o *DistributorBlockAttributes) GetInitiatorIdOk() (*uuid.UUID, bool)`
+`func (o *companyBlockAttributes) GetInitiatorIdOk() (*uuid.UUID, bool)`
 
 GetInitiatorIdOk returns a tuple with the InitiatorId field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetInitiatorId
 
-`func (o *DistributorBlockAttributes) SetInitiatorId(v uuid.UUID)`
+`func (o *companyBlockAttributes) SetInitiatorId(v uuid.UUID)`
 
 SetInitiatorId sets InitiatorId field to given value.
 
 
 ### GetReason
 
-`func (o *DistributorBlockAttributes) GetReason() string`
+`func (o *companyBlockAttributes) GetReason() string`
 
 GetReason returns the Reason field if non-nil, zero value otherwise.
 
 ### GetReasonOk
 
-`func (o *DistributorBlockAttributes) GetReasonOk() (*string, bool)`
+`func (o *companyBlockAttributes) GetReasonOk() (*string, bool)`
 
 GetReasonOk returns a tuple with the Reason field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetReason
 
-`func (o *DistributorBlockAttributes) SetReason(v string)`
+`func (o *companyBlockAttributes) SetReason(v string)`
 
 SetReason sets Reason field to given value.
 
 
 ### GetStatus
 
-`func (o *DistributorBlockAttributes) GetStatus() string`
+`func (o *companyBlockAttributes) GetStatus() string`
 
 GetStatus returns the Status field if non-nil, zero value otherwise.
 
 ### GetStatusOk
 
-`func (o *DistributorBlockAttributes) GetStatusOk() (*string, bool)`
+`func (o *companyBlockAttributes) GetStatusOk() (*string, bool)`
 
 GetStatusOk returns a tuple with the Status field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetStatus
 
-`func (o *DistributorBlockAttributes) SetStatus(v string)`
+`func (o *companyBlockAttributes) SetStatus(v string)`
 
 SetStatus sets Status field to given value.
 
 
 ### GetBlockedAt
 
-`func (o *DistributorBlockAttributes) GetBlockedAt() time.Time`
+`func (o *companyBlockAttributes) GetBlockedAt() time.Time`
 
 GetBlockedAt returns the BlockedAt field if non-nil, zero value otherwise.
 
 ### GetBlockedAtOk
 
-`func (o *DistributorBlockAttributes) GetBlockedAtOk() (*time.Time, bool)`
+`func (o *companyBlockAttributes) GetBlockedAtOk() (*time.Time, bool)`
 
 GetBlockedAtOk returns a tuple with the BlockedAt field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetBlockedAt
 
-`func (o *DistributorBlockAttributes) SetBlockedAt(v time.Time)`
+`func (o *companyBlockAttributes) SetBlockedAt(v time.Time)`
 
 SetBlockedAt sets BlockedAt field to given value.
 
 
 ### GetCancelledAt
 
-`func (o *DistributorBlockAttributes) GetCancelledAt() time.Time`
+`func (o *companyBlockAttributes) GetCancelledAt() time.Time`
 
 GetCancelledAt returns the CancelledAt field if non-nil, zero value otherwise.
 
 ### GetCancelledAtOk
 
-`func (o *DistributorBlockAttributes) GetCancelledAtOk() (*time.Time, bool)`
+`func (o *companyBlockAttributes) GetCancelledAtOk() (*time.Time, bool)`
 
 GetCancelledAtOk returns a tuple with the CancelledAt field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetCancelledAt
 
-`func (o *DistributorBlockAttributes) SetCancelledAt(v time.Time)`
+`func (o *companyBlockAttributes) SetCancelledAt(v time.Time)`
 
 SetCancelledAt sets CancelledAt field to given value.
 
 ### HasCancelledAt
 
-`func (o *DistributorBlockAttributes) HasCancelledAt() bool`
+`func (o *companyBlockAttributes) HasCancelledAt() bool`
 
 HasCancelledAt returns a boolean if a field has been set.
 

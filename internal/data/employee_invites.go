@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/chains-lab/distributors-svc/internal/data/pgdb"
-	"github.com/chains-lab/distributors-svc/internal/domain/models"
+	"github.com/chains-lab/companies-svc/internal/data/pgdb"
+	"github.com/chains-lab/companies-svc/internal/domain/models"
 	"github.com/google/uuid"
 )
 
@@ -36,13 +36,13 @@ func (d *Database) UpdateInviteStatus(ctx context.Context, ID, UserID uuid.UUID,
 
 func inviteModelToSchema(m models.Invite) pgdb.Invite {
 	res := pgdb.Invite{
-		ID:            m.ID,
-		Status:        m.Status,
-		Role:          m.Role,
-		DistributorID: m.DistributorID,
-		Token:         m.Token,
-		CreatedAt:     m.CreatedAt,
-		ExpiresAt:     m.ExpiresAt,
+		ID:        m.ID,
+		Status:    m.Status,
+		Role:      m.Role,
+		CompanyID: m.CompanyID,
+		Token:     m.Token,
+		CreatedAt: m.CreatedAt,
+		ExpiresAt: m.ExpiresAt,
 	}
 	if m.UserID != nil {
 		res.UserID = uuid.NullUUID{
@@ -62,13 +62,13 @@ func inviteModelToSchema(m models.Invite) pgdb.Invite {
 
 func inviteSchemaToModel(m pgdb.Invite) models.Invite {
 	res := models.Invite{
-		ID:            m.ID,
-		Status:        m.Status,
-		Role:          m.Role,
-		DistributorID: m.DistributorID,
-		Token:         m.Token,
-		CreatedAt:     m.CreatedAt,
-		ExpiresAt:     m.ExpiresAt,
+		ID:        m.ID,
+		Status:    m.Status,
+		Role:      m.Role,
+		CompanyID: m.CompanyID,
+		Token:     m.Token,
+		CreatedAt: m.CreatedAt,
+		ExpiresAt: m.ExpiresAt,
 	}
 	if m.UserID.Valid {
 		res.UserID = &m.UserID.UUID

@@ -1,130 +1,130 @@
-# DistributorAttributes
+# companyAttributes
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Icon** | **string** | URL to the distributor&#39;s icon image. | 
-**Name** | **string** | The name of the distributor. | 
-**Status** | **string** | The current status of the distributor (e.g., active, inactive). | 
-**UpdatedAt** | **time.Time** | The timestamp of the last update to the distributor&#39;s information. | 
+**Icon** | **string** | URL to the company&#39;s icon image. | 
+**Name** | **string** | The name of the company. | 
+**Status** | **string** | The current status of the company (e.g., active, inactive). | 
+**UpdatedAt** | **time.Time** | The timestamp of the last update to the company&#39;s information. | 
 **CreatedAt** | **time.Time** |  | 
 
 ## Methods
 
-### NewDistributorAttributes
+### NewcompanyAttributes
 
-`func NewDistributorAttributes(icon string, name string, status string, updatedAt time.Time, createdAt time.Time, ) *DistributorAttributes`
+`func NewcompanyAttributes(icon string, name string, status string, updatedAt time.Time, createdAt time.Time, ) *companyAttributes`
 
-NewDistributorAttributes instantiates a new DistributorAttributes object
+NewcompanyAttributes instantiates a new companyAttributes object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewDistributorAttributesWithDefaults
+### NewcompanyAttributesWithDefaults
 
-`func NewDistributorAttributesWithDefaults() *DistributorAttributes`
+`func NewcompanyAttributesWithDefaults() *companyAttributes`
 
-NewDistributorAttributesWithDefaults instantiates a new DistributorAttributes object
+NewcompanyAttributesWithDefaults instantiates a new companyAttributes object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetIcon
 
-`func (o *DistributorAttributes) GetIcon() string`
+`func (o *companyAttributes) GetIcon() string`
 
 GetIcon returns the Icon field if non-nil, zero value otherwise.
 
 ### GetIconOk
 
-`func (o *DistributorAttributes) GetIconOk() (*string, bool)`
+`func (o *companyAttributes) GetIconOk() (*string, bool)`
 
 GetIconOk returns a tuple with the Icon field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetIcon
 
-`func (o *DistributorAttributes) SetIcon(v string)`
+`func (o *companyAttributes) SetIcon(v string)`
 
 SetIcon sets Icon field to given value.
 
 
 ### GetName
 
-`func (o *DistributorAttributes) GetName() string`
+`func (o *companyAttributes) GetName() string`
 
 GetName returns the Name field if non-nil, zero value otherwise.
 
 ### GetNameOk
 
-`func (o *DistributorAttributes) GetNameOk() (*string, bool)`
+`func (o *companyAttributes) GetNameOk() (*string, bool)`
 
 GetNameOk returns a tuple with the Name field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetName
 
-`func (o *DistributorAttributes) SetName(v string)`
+`func (o *companyAttributes) SetName(v string)`
 
 SetName sets Name field to given value.
 
 
 ### GetStatus
 
-`func (o *DistributorAttributes) GetStatus() string`
+`func (o *companyAttributes) GetStatus() string`
 
 GetStatus returns the Status field if non-nil, zero value otherwise.
 
 ### GetStatusOk
 
-`func (o *DistributorAttributes) GetStatusOk() (*string, bool)`
+`func (o *companyAttributes) GetStatusOk() (*string, bool)`
 
 GetStatusOk returns a tuple with the Status field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetStatus
 
-`func (o *DistributorAttributes) SetStatus(v string)`
+`func (o *companyAttributes) SetStatus(v string)`
 
 SetStatus sets Status field to given value.
 
 
 ### GetUpdatedAt
 
-`func (o *DistributorAttributes) GetUpdatedAt() time.Time`
+`func (o *companyAttributes) GetUpdatedAt() time.Time`
 
 GetUpdatedAt returns the UpdatedAt field if non-nil, zero value otherwise.
 
 ### GetUpdatedAtOk
 
-`func (o *DistributorAttributes) GetUpdatedAtOk() (*time.Time, bool)`
+`func (o *companyAttributes) GetUpdatedAtOk() (*time.Time, bool)`
 
 GetUpdatedAtOk returns a tuple with the UpdatedAt field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetUpdatedAt
 
-`func (o *DistributorAttributes) SetUpdatedAt(v time.Time)`
+`func (o *companyAttributes) SetUpdatedAt(v time.Time)`
 
 SetUpdatedAt sets UpdatedAt field to given value.
 
 
 ### GetCreatedAt
 
-`func (o *DistributorAttributes) GetCreatedAt() time.Time`
+`func (o *companyAttributes) GetCreatedAt() time.Time`
 
 GetCreatedAt returns the CreatedAt field if non-nil, zero value otherwise.
 
 ### GetCreatedAtOk
 
-`func (o *DistributorAttributes) GetCreatedAtOk() (*time.Time, bool)`
+`func (o *companyAttributes) GetCreatedAtOk() (*time.Time, bool)`
 
 GetCreatedAtOk returns a tuple with the CreatedAt field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetCreatedAt
 
-`func (o *DistributorAttributes) SetCreatedAt(v time.Time)`
+`func (o *companyAttributes) SetCreatedAt(v time.Time)`
 
 SetCreatedAt sets CreatedAt field to given value.
 

@@ -1,88 +1,88 @@
-# DistributorBlockData
+# companyBlockData
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | [**uuid.UUID**](uuid.UUID.md) | distributor block id | 
+**Id** | [**uuid.UUID**](uuid.UUID.md) | company block id | 
 **Type** | **string** |  | 
-**Attributes** | [**DistributorBlockAttributes**](DistributorBlockAttributes.md) |  | 
+**Attributes** | [**companyBlockAttributes**](companyBlockAttributes.md) |  | 
 
 ## Methods
 
-### NewDistributorBlockData
+### NewcompanyBlockData
 
-`func NewDistributorBlockData(id uuid.UUID, type_ string, attributes DistributorBlockAttributes, ) *DistributorBlockData`
+`func NewcompanyBlockData(id uuid.UUID, type_ string, attributes companyBlockAttributes, ) *companyBlockData`
 
-NewDistributorBlockData instantiates a new DistributorBlockData object
+NewcompanyBlockData instantiates a new companyBlockData object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewDistributorBlockDataWithDefaults
+### NewcompanyBlockDataWithDefaults
 
-`func NewDistributorBlockDataWithDefaults() *DistributorBlockData`
+`func NewcompanyBlockDataWithDefaults() *companyBlockData`
 
-NewDistributorBlockDataWithDefaults instantiates a new DistributorBlockData object
+NewcompanyBlockDataWithDefaults instantiates a new companyBlockData object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetId
 
-`func (o *DistributorBlockData) GetId() uuid.UUID`
+`func (o *companyBlockData) GetId() uuid.UUID`
 
 GetId returns the Id field if non-nil, zero value otherwise.
 
 ### GetIdOk
 
-`func (o *DistributorBlockData) GetIdOk() (*uuid.UUID, bool)`
+`func (o *companyBlockData) GetIdOk() (*uuid.UUID, bool)`
 
 GetIdOk returns a tuple with the Id field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetId
 
-`func (o *DistributorBlockData) SetId(v uuid.UUID)`
+`func (o *companyBlockData) SetId(v uuid.UUID)`
 
 SetId sets Id field to given value.
 
 
 ### GetType
 
-`func (o *DistributorBlockData) GetType() string`
+`func (o *companyBlockData) GetType() string`
 
 GetType returns the Type field if non-nil, zero value otherwise.
 
 ### GetTypeOk
 
-`func (o *DistributorBlockData) GetTypeOk() (*string, bool)`
+`func (o *companyBlockData) GetTypeOk() (*string, bool)`
 
 GetTypeOk returns a tuple with the Type field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetType
 
-`func (o *DistributorBlockData) SetType(v string)`
+`func (o *companyBlockData) SetType(v string)`
 
 SetType sets Type field to given value.
 
 
 ### GetAttributes
 
-`func (o *DistributorBlockData) GetAttributes() DistributorBlockAttributes`
+`func (o *companyBlockData) GetAttributes() companyBlockAttributes`
 
 GetAttributes returns the Attributes field if non-nil, zero value otherwise.
 
 ### GetAttributesOk
 
-`func (o *DistributorBlockData) GetAttributesOk() (*DistributorBlockAttributes, bool)`
+`func (o *companyBlockData) GetAttributesOk() (*companyBlockAttributes, bool)`
 
 GetAttributesOk returns a tuple with the Attributes field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetAttributes
 
-`func (o *DistributorBlockData) SetAttributes(v DistributorBlockAttributes)`
+`func (o *companyBlockData) SetAttributes(v companyBlockAttributes)`
 
 SetAttributes sets Attributes field to given value.
 

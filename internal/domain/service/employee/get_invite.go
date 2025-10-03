@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/chains-lab/distributors-svc/internal/domain/errx"
-	"github.com/chains-lab/distributors-svc/internal/domain/models"
+	"github.com/chains-lab/companies-svc/internal/domain/errx"
+	"github.com/chains-lab/companies-svc/internal/domain/models"
 	"github.com/google/uuid"
 )
 

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/chains-lab/distributors-svc/internal/domain/errx"
+	"github.com/chains-lab/companies-svc/internal/domain/errx"
 	"github.com/chains-lab/enum"
 	"github.com/google/uuid"
 )
@@ -20,7 +20,7 @@ func TestCreateEmployee(t *testing.T) {
 
 	ctx := context.Background()
 
-	_, owner := CreateDistributor(t, s)
+	_, owner := Createcompany(t, s)
 
 	empOwn, err := s.app.GetEmployee(ctx, owner.UserID)
 	if err != nil {
@@ -36,9 +36,9 @@ func TestCreateEmployee(t *testing.T) {
 	}
 
 	emp, err := s.app.CreateInvite(ctx, app.CreateInviteParams{
-		InitiatorID:   owner.UserID,
-		DistributorID: owner.DistributorID,
-		Role:          enum.EmployeeRoleAdmin,
+		InitiatorID: owner.UserID,
+		companyID:   owner.CompanyID,
+		Role:        enum.EmployeeRoleAdmin,
 	})
 	if err != nil {
 		t.Fatalf("CreateInvite: %v", err)
@@ -59,7 +59,7 @@ func TestErrorCreateEmployee(t *testing.T) {
 
 	ctx := context.Background()
 
-	_, owner := CreateDistributor(t, s)
+	_, owner := Createcompany(t, s)
 
 	empOwn, err := s.app.GetEmployee(ctx, owner.UserID)
 	if err != nil {
@@ -75,34 +75,34 @@ func TestErrorCreateEmployee(t *testing.T) {
 	}
 
 	_, err = s.app.CreateInvite(ctx, app.CreateInviteParams{
-		InitiatorID:   owner.UserID,
-		DistributorID: owner.DistributorID,
-		Role:          enum.EmployeeRoleOwner,
+		InitiatorID: owner.UserID,
+		companyID:   owner.CompanyID,
+		Role:        enum.EmployeeRoleOwner,
 	})
 	if !errors.Is(err, errx.ErrorInitiatorHaveNotEnoughRights) {
 		t.Fatalf("expected error %v, got %v", errx.ErrorInitiatorHaveNotEnoughRights, err)
 	}
 
 	_, err = s.app.CreateInvite(ctx, app.CreateInviteParams{
-		InitiatorID:   uuid.New(),
-		DistributorID: owner.DistributorID,
-		Role:          enum.EmployeeRoleAdmin,
+		InitiatorID: uuid.New(),
+		companyID:   owner.CompanyID,
+		Role:        enum.EmployeeRoleAdmin,
 	})
 	if !errors.Is(err, errx.ErrorInitiatorIsNotEmployee) {
 		t.Fatalf("expected error %v, got %v", errx.ErrorInitiatorIsNotEmployee, err)
 	}
 
 	_, err = s.app.CreateInvite(ctx, app.CreateInviteParams{
-		InitiatorID:   owner.UserID,
-		DistributorID: uuid.New(),
-		Role:          enum.EmployeeRoleAdmin,
+		InitiatorID: owner.UserID,
+		companyID:   uuid.New(),
+		Role:        enum.EmployeeRoleAdmin,
 	})
-	if !errors.Is(err, errx.ErrorInitiatorIsNotThisDistributorEmployee) {
-		t.Fatalf("expected error %v, got %v", errx.ErrorInitiatorIsNotThisDistributorEmployee, err)
+	if !errors.Is(err, errx.ErrorInitiatorIsNotThiscompanyEmployee) {
+		t.Fatalf("expected error %v, got %v", errx.ErrorInitiatorIsNotThiscompanyEmployee, err)
 	}
 }
 
-func TestInvalidDistributorInvite(t *testing.T) {
+func TestInvalidcompanyInvite(t *testing.T) {
 	s, err := newSetup(t)
 	if err != nil {
 		t.Fatalf("newSetup: %v", err)
@@ -112,16 +112,16 @@ func TestInvalidDistributorInvite(t *testing.T) {
 
 	ctx := context.Background()
 
-	_, owner1 := CreateDistributor(t, s)
-	dist2, _ := CreateDistributor(t, s)
+	_, owner1 := Createcompany(t, s)
+	dist2, _ := Createcompany(t, s)
 
 	_, err = s.app.CreateInvite(ctx, app.CreateInviteParams{
-		InitiatorID:   owner1.UserID,
-		DistributorID: dist2.ID,
-		Role:          enum.EmployeeRoleAdmin,
+		InitiatorID: owner1.UserID,
+		companyID:   dist2.ID,
+		Role:        enum.EmployeeRoleAdmin,
 	})
-	if !errors.Is(err, errx.ErrorInitiatorIsNotThisDistributorEmployee) {
-		t.Fatalf("expected error %v, got %v", errx.ErrorInitiatorIsNotThisDistributorEmployee, err)
+	if !errors.Is(err, errx.ErrorInitiatorIsNotThiscompanyEmployee) {
+		t.Fatalf("expected error %v, got %v", errx.ErrorInitiatorIsNotThiscompanyEmployee, err)
 	}
 }
 
@@ -135,12 +135,12 @@ func TestCreateInvite(t *testing.T) {
 
 	ctx := context.Background()
 
-	_, owner := CreateDistributor(t, s)
+	_, owner := Createcompany(t, s)
 
 	inv, err := s.app.CreateInvite(ctx, app.CreateInviteParams{
-		InitiatorID:   owner.UserID,
-		DistributorID: owner.DistributorID,
-		Role:          enum.EmployeeRoleAdmin,
+		InitiatorID: owner.UserID,
+		companyID:   owner.CompanyID,
+		Role:        enum.EmployeeRoleAdmin,
 	})
 	if err != nil {
 		t.Fatalf("CreateInvite: %v", err)

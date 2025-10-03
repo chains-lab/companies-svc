@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/chains-lab/distributors-svc/internal/domain/errx"
-	"github.com/chains-lab/distributors-svc/internal/domain/models"
+	"github.com/chains-lab/companies-svc/internal/domain/errx"
+	"github.com/chains-lab/companies-svc/internal/domain/models"
 	"github.com/chains-lab/enum"
 	"github.com/google/uuid"
 )
@@ -55,16 +55,16 @@ func (s Service) AcceptInvite(ctx context.Context, userID uuid.UUID, token strin
 		return models.Invite{}, err
 	}
 
-	err = s.DistributorIsActive(ctx, inv.DistributorID)
+	err = s.companyIsActive(ctx, inv.CompanyID)
 	if err != nil {
 		return models.Invite{}, err
 	}
 
 	txErr := s.db.Transaction(ctx, func(ctx context.Context) error {
 		_, err = s.Create(ctx, CreateParams{
-			UserID:        userID,
-			DistributorID: inv.DistributorID,
-			Role:          inv.Role,
+			UserID:    userID,
+			CompanyID: inv.CompanyID,
+			Role:      inv.Role,
 		})
 		if err != nil {
 			return err

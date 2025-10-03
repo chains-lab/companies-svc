@@ -14,11 +14,11 @@ import (
 const employeesTable = "employees"
 
 type Employee struct {
-	UserID        uuid.UUID `db:"user_id"`
-	DistributorID uuid.UUID `db:"distributor_id"`
-	Role          string    `db:"role"`
-	UpdatedAt     time.Time `db:"updated_at"`
-	CreatedAt     time.Time `db:"created_at"`
+	UserID    uuid.UUID `db:"user_id"`
+	CompanyID uuid.UUID `db:"company_id"`
+	Role      string    `db:"role"`
+	UpdatedAt time.Time `db:"updated_at"`
+	CreatedAt time.Time `db:"created_at"`
 }
 
 type EmployeesQ struct {
@@ -49,8 +49,8 @@ func (q EmployeesQ) New() EmployeesQ {
 
 func (q EmployeesQ) Insert(ctx context.Context, in Employee) error {
 	qry, args, err := q.inserter.
-		Columns("user_id", "distributor_id", "role", "updated_at", "created_at").
-		Values(in.UserID, in.DistributorID, in.Role, in.UpdatedAt, in.CreatedAt).
+		Columns("user_id", "company_id", "role", "updated_at", "created_at").
+		Values(in.UserID, in.CompanyID, in.Role, in.UpdatedAt, in.CreatedAt).
 		ToSql()
 	if err != nil {
 		return fmt.Errorf("build insert %s: %w", employeesTable, err)
@@ -80,7 +80,7 @@ func (q EmployeesQ) Get(ctx context.Context) (Employee, error) {
 	var emp Employee
 	err = row.Scan(
 		&emp.UserID,
-		&emp.DistributorID,
+		&emp.CompanyID,
 		&emp.Role,
 		&emp.UpdatedAt,
 		&emp.CreatedAt,
@@ -114,7 +114,7 @@ func (q EmployeesQ) Select(ctx context.Context) ([]Employee, error) {
 		var emp Employee
 		if err := rows.Scan(
 			&emp.UserID,
-			&emp.DistributorID,
+			&emp.CompanyID,
 			&emp.Role,
 			&emp.UpdatedAt,
 			&emp.CreatedAt,
@@ -171,11 +171,11 @@ func (q EmployeesQ) FilterUserID(userID uuid.UUID) EmployeesQ {
 	return q
 }
 
-func (q EmployeesQ) FilterDistributorID(distributorID ...uuid.UUID) EmployeesQ {
-	q.selector = q.selector.Where(sq.Eq{"distributor_id": distributorID})
-	q.counter = q.counter.Where(sq.Eq{"distributor_id": distributorID})
-	q.updater = q.updater.Where(sq.Eq{"distributor_id": distributorID})
-	q.deleter = q.deleter.Where(sq.Eq{"distributor_id": distributorID})
+func (q EmployeesQ) FiltercompanyID(companyID ...uuid.UUID) EmployeesQ {
+	q.selector = q.selector.Where(sq.Eq{"company_id": companyID})
+	q.counter = q.counter.Where(sq.Eq{"company_id": companyID})
+	q.updater = q.updater.Where(sq.Eq{"company_id": companyID})
+	q.deleter = q.deleter.Where(sq.Eq{"company_id": companyID})
 	return q
 }
 

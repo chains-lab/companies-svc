@@ -5,12 +5,12 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/chains-lab/distributors-svc/internal/domain/errx"
+	"github.com/chains-lab/companies-svc/internal/domain/errx"
 	"github.com/chains-lab/enum"
 	"github.com/google/uuid"
 )
 
-func TestDistributorBlocks(t *testing.T) {
+func TestcompanyBlocks(t *testing.T) {
 	s, err := newSetup(t)
 	if err != nil {
 		t.Fatalf("newSetup: %v", err)
@@ -20,17 +20,17 @@ func TestDistributorBlocks(t *testing.T) {
 
 	ctx := context.Background()
 
-	dis, owner := CreateDistributor(t, s)
+	dis, owner := Createcompany(t, s)
 
 	adminID := uuid.New()
 
-	block, err := s.app.BlockDistributor(ctx, adminID, dis.ID, "Violation of terms")
+	block, err := s.app.Blockcompany(ctx, adminID, dis.ID, "Violation of terms")
 	if err != nil {
 		t.Fatalf("CreteBlock: %v", err)
 	}
 
-	if block.DistributorID != dis.ID {
-		t.Errorf("expected blocked distributor ID '%s', got '%s'", dis.ID, block.DistributorID)
+	if block.CompanyID != dis.ID {
+		t.Errorf("expected blocked company ID '%s', got '%s'", dis.ID, block.CompanyID)
 	}
 
 	owner, err = s.app.GetEmployee(ctx, owner.UserID)
@@ -38,16 +38,16 @@ func TestDistributorBlocks(t *testing.T) {
 		t.Fatalf("GetEmployee: %v", err)
 	}
 
-	dis, err = s.app.GetDistributor(ctx, dis.ID)
+	dis, err = s.app.Getcompany(ctx, dis.ID)
 	if err != nil {
 		t.Fatalf("Get: %v", err)
 	}
-	if dis.Status != enum.DistributorStatusBlocked {
-		t.Errorf("expected distributor to be blocked")
+	if dis.Status != enum.companiestatusBlocked {
+		t.Errorf("expected company to be blocked")
 	}
 }
 
-func TestUpdateBlockedDistributor(t *testing.T) {
+func TestUpdateBlockedcompany(t *testing.T) {
 	s, err := newSetup(t)
 	if err != nil {
 		t.Fatalf("newSetup: %v", err)
@@ -57,17 +57,17 @@ func TestUpdateBlockedDistributor(t *testing.T) {
 
 	ctx := context.Background()
 
-	dis, owner := CreateDistributor(t, s)
+	dis, owner := Createcompany(t, s)
 
 	adminID := uuid.New()
 
-	block, err := s.app.BlockDistributor(ctx, adminID, dis.ID, "Violation of terms")
+	block, err := s.app.Blockcompany(ctx, adminID, dis.ID, "Violation of terms")
 	if err != nil {
 		t.Fatalf("CreteBlock: %v", err)
 	}
 
-	if block.DistributorID != dis.ID {
-		t.Errorf("expected blocked distributor ID '%s', got '%s'", dis.ID, block.DistributorID)
+	if block.CompanyID != dis.ID {
+		t.Errorf("expected blocked company ID '%s', got '%s'", dis.ID, block.CompanyID)
 	}
 
 	owner, err = s.app.GetEmployee(ctx, owner.UserID)
@@ -75,31 +75,31 @@ func TestUpdateBlockedDistributor(t *testing.T) {
 		t.Fatalf("GetEmployee: %v", err)
 	}
 
-	dis, err = s.app.GetDistributor(ctx, dis.ID)
+	dis, err = s.app.Getcompany(ctx, dis.ID)
 	if err != nil {
 		t.Fatalf("Get: %v", err)
 	}
-	if dis.Status != enum.DistributorStatusBlocked {
-		t.Errorf("expected distributor to be blocked")
+	if dis.Status != enum.companiestatusBlocked {
+		t.Errorf("expected company to be blocked")
 	}
 
 	name := "New Name"
 	icon := "new_icon"
-	_, err = s.app.UpdateDistributor(ctx, owner.UserID, dis.ID, app.UpdateDistributorParams{
+	_, err = s.app.Updatecompany(ctx, owner.UserID, dis.ID, app.UpdatecompanyParams{
 		Name: &name,
 		Icon: &icon,
 	})
-	if !errors.Is(err, errx.ErrorDistributorIsBlocked) {
-		t.Fatalf("expected error %v, got %v", errx.ErrorDistributorIsBlocked, err)
+	if !errors.Is(err, errx.ErrorcompanyIsBlocked) {
+		t.Fatalf("expected error %v, got %v", errx.ErrorcompanyIsBlocked, err)
 	}
 
-	_, err = s.app.SetDistributorStatus(ctx, owner.UserID, dis.ID, enum.DistributorStatusActive)
-	if !errors.Is(err, errx.ErrorDistributorIsBlocked) {
-		t.Fatalf("expected error %v, got %v", errx.ErrorDistributorIsBlocked, err)
+	_, err = s.app.Setcompaniestatus(ctx, owner.UserID, dis.ID, enum.companiestatusActive)
+	if !errors.Is(err, errx.ErrorcompanyIsBlocked) {
+		t.Fatalf("expected error %v, got %v", errx.ErrorcompanyIsBlocked, err)
 	}
 
-	_, err = s.app.SetDistributorStatus(ctx, owner.UserID, dis.ID, enum.DistributorStatusInactive)
-	if !errors.Is(err, errx.ErrorDistributorIsBlocked) {
-		t.Fatalf("expected error %v, got %v", errx.ErrorDistributorIsBlocked, err)
+	_, err = s.app.Setcompaniestatus(ctx, owner.UserID, dis.ID, enum.companiestatusInactive)
+	if !errors.Is(err, errx.ErrorcompanyIsBlocked) {
+		t.Fatalf("expected error %v, got %v", errx.ErrorcompanyIsBlocked, err)
 	}
 }

@@ -14,7 +14,7 @@ paths:
           description: successfully
 components:
   schemas:
-    CreateDistributor:
+    CreateCompany:
       type: object
       required:
         - data
@@ -28,7 +28,7 @@ components:
             type:
               type: string
               enum:
-                - create_distributor
+                - create_company
             attributes:
               type: object
               required:
@@ -38,11 +38,11 @@ components:
                 icon:
                   type: string
                   format: uri
-                  description: URL to the distributor's icon image.
+                  description: URL to the company's icon image.
                 name:
                   type: string
-                  description: The name of the distributor.
-    CreateDistributorBlock:
+                  description: The name of the company.
+    CreateCompanyBlock:
       type: object
       required:
         - data
@@ -56,20 +56,20 @@ components:
             type:
               type: string
               enum:
-                - block_distributor
+                - block_company
             attributes:
               type: object
               required:
-                - distributor_id
+                - company_id
                 - reason
               properties:
-                distributor_id:
+                company_id:
                   type: string
                   format: uuid
-                  description: The UUID of the distributor to be blocked.
+                  description: The UUID of the company to be blocked.
                 reason:
                   type: string
-                  description: The reason for blocking the distributor.
+                  description: The reason for blocking the company.
     CreateEmployeeInvite:
       type: object
       required:
@@ -88,25 +88,25 @@ components:
             attributes:
               type: object
               required:
-                - distributor_id
+                - company_id
                 - user_id
                 - role
               properties:
-                distributor_id:
+                company_id:
                   type: string
                   format: uuid
-                  description: The UUID of the distributor to which the user is being invited.
+                  description: The UUID of the company to which the user is being invited.
                 user_id:
                   type: string
                   format: uuid
                   description: The UUID of the user being invited.
                 role:
                   type: string
-                  description: The role assigned to the invited user within the distributor.
+                  description: The role assigned to the invited user within the company.
                   enum:
                     - admin
                     - member
-    UpdateDistributor:
+    UpdateCompany:
       type: object
       required:
         - data
@@ -121,22 +121,22 @@ components:
             id:
               type: string
               format: uuid
-              description: The UUID of the distributor to be updated.
+              description: The UUID of the company to be updated.
             type:
               type: string
               enum:
-                - update_distributor
+                - update_company
             attributes:
               type: object
               properties:
                 icon:
                   type: string
                   format: uri
-                  description: URL to the distributor's icon image.
+                  description: URL to the company's icon image.
                 name:
                   type: string
-                  description: The name of the distributor.
-    UpdateDistributorStatus:
+                  description: The name of the company.
+    UpdateCompanyStatus:
       type: object
       required:
         - data
@@ -151,11 +151,11 @@ components:
             id:
               type: string
               format: uuid
-              description: The UUID of the distributor to be updated.
+              description: The UUID of the company to be updated.
             type:
               type: string
               enum:
-                - update_distributor_status
+                - update_company_status
             attributes:
               type: object
               required:
@@ -166,7 +166,7 @@ components:
                   enum:
                     - active
                     - inactive
-                  description: The new status of the distributor.
+                  description: The new status of the company.
     PaginationData:
       type: object
       required:
@@ -250,18 +250,18 @@ components:
     EmployeeAttributes:
       type: object
       required:
-        - distributor_id
+        - company_id
         - role
         - created_at
         - updated_at
       properties:
-        distributor_id:
+        company_id:
           type: string
           format: uuid
-          description: The unique identifier for the distributor associated with the employee.
+          description: The unique identifier for the company associated with the employee.
         role:
           type: string
-          description: 'The role of the employee within the distributor''s organization (e.g., manager, staff).'
+          description: 'The role of the employee within the company''s organization (e.g., manager, staff).'
         created_at:
           type: string
           format: date-time
@@ -303,7 +303,7 @@ components:
         type:
           type: string
           enum:
-            - distributor_invite
+            - company_invite
         attributes:
           $ref: '#/components/schemas/InviteAttributes'
     InviteAttributes:
@@ -311,7 +311,7 @@ components:
       required:
         - status
         - role
-        - distributor_id
+        - company_id
         - token
         - expires_at
         - created_at
@@ -322,10 +322,10 @@ components:
         role:
           type: string
           description: role of the user in this city
-        distributor_id:
+        company_id:
           type: string
           format: uuid
-          description: distributor id
+          description: company id
         token:
           type: string
           description: unique token for the invite
@@ -356,28 +356,28 @@ components:
             type:
               type: string
               enum:
-                - distributor_invite
+                - company_invite
             attributes:
               type: object
               required:
-                - distributor_id
+                - company_id
                 - role
               properties:
-                distributor_id:
+                company_id:
                   type: string
                   format: uuid
-                  description: ID of the distributor the invite is for
+                  description: ID of the company the invite is for
                 role:
                   type: string
                   description: Role assigned to the invited user
-    Distributor:
+    Company:
       type: object
       required:
         - data
       properties:
         data:
-          $ref: '#/components/schemas/DistributorData'
-    DistributorData:
+          $ref: '#/components/schemas/CompanyData'
+    CompanyData:
       type: object
       required:
         - id
@@ -387,14 +387,14 @@ components:
         id:
           type: string
           format: uuid
-          description: distributor id
+          description: company id
         type:
           type: string
           enum:
-            - distributor
+            - company
         attributes:
-          $ref: '#/components/schemas/DistributorAttributes'
-    DistributorAttributes:
+          $ref: '#/components/schemas/CompanyAttributes'
+    CompanyAttributes:
       type: object
       required:
         - icon
@@ -406,21 +406,21 @@ components:
         icon:
           type: string
           format: uri
-          description: URL to the distributor's icon image.
+          description: URL to the company's icon image.
         name:
           type: string
-          description: The name of the distributor.
+          description: The name of the company.
         status:
           type: string
-          description: 'The current status of the distributor (e.g., active, inactive).'
+          description: 'The current status of the company (e.g., active, inactive).'
         updated_at:
           type: string
           format: date-time
-          description: The timestamp of the last update to the distributor's information.
+          description: The timestamp of the last update to the company's information.
         created_at:
           type: string
           format: date-time
-    DistributorsCollection:
+    CompaniesCollection:
       type: object
       required:
         - data
@@ -429,17 +429,17 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/DistributorData'
+            $ref: '#/components/schemas/CompanyData'
         links:
           $ref: '#/components/schemas/PaginationData'
-    DistributorBlock:
+    CompanyBlock:
       type: object
       required:
         - data
       properties:
         data:
-          $ref: '#/components/schemas/DistributorBlockData'
-    DistributorBlockData:
+          $ref: '#/components/schemas/CompanyBlockData'
+    CompanyBlockData:
       type: object
       required:
         - id
@@ -449,26 +449,26 @@ components:
         id:
           type: string
           format: uuid
-          description: distributor block id
+          description: company block id
         type:
           type: string
           enum:
-            - distributor_block
+            - company_block
         attributes:
-          $ref: '#/components/schemas/DistributorBlockAttributes'
-    DistributorBlockAttributes:
+          $ref: '#/components/schemas/CompanyBlockAttributes'
+    CompanyBlockAttributes:
       type: object
       required:
-        - distributor_id
+        - company_id
         - initiator_id
         - reason
         - status
         - blocked_at
       properties:
-        distributor_id:
+        company_id:
           type: string
           format: uuid
-          description: ID of the distributor being blocked
+          description: ID of the company being blocked
           example: 550e8400-e29b-41d4-a716-446655440000
         initiator_id:
           type: string
@@ -477,7 +477,7 @@ components:
           example: 660e8400-e29b-41d4-a716-446655440000
         reason:
           type: string
-          description: Reason for blocking the distributor
+          description: Reason for blocking the company
           example: Violation of terms of service
         status:
           type: string
@@ -493,7 +493,7 @@ components:
           format: date-time
           description: 'Timestamp when the block was lifted, if applicable'
           example: '2023-10-15T12:00:00Z'
-    DistributorBlocksCollection:
+    CompanyBlocksCollection:
       type: object
       required:
         - data
@@ -502,6 +502,6 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/DistributorBlockData'
+            $ref: '#/components/schemas/CompanyBlockData'
         links:
           $ref: '#/components/schemas/PaginationData'

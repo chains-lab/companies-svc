@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/chains-lab/distributors-svc/internal/domain/errx"
-	"github.com/chains-lab/distributors-svc/internal/domain/models"
+	"github.com/chains-lab/companies-svc/internal/domain/errx"
+	"github.com/chains-lab/companies-svc/internal/domain/models"
 	"github.com/chains-lab/enum"
 	"github.com/google/uuid"
 )
@@ -29,9 +29,9 @@ func (s Service) UpdateEmployeeRole(
 		return models.Employee{}, err
 	}
 
-	if initiator.DistributorID != user.DistributorID {
-		return models.Employee{}, errx.ErrorInitiatorIsNotEmployeeOfThisDistributor.Raise(
-			fmt.Errorf("initiator %s and chosen employee %s have different distributors", initiatorID, userID),
+	if initiator.CompanyID != user.CompanyID {
+		return models.Employee{}, errx.ErrorInitiatorIsNotEmployeeOfThiscompany.Raise(
+			fmt.Errorf("initiator %s and chosen employee %s have different companies", initiatorID, userID),
 		)
 	}
 
@@ -69,10 +69,10 @@ func (s Service) UpdateEmployeeRole(
 	}
 
 	return models.Employee{
-		UserID:        user.UserID,
-		DistributorID: user.DistributorID,
-		Role:          newRole,
-		UpdatedAt:     now,
-		CreatedAt:     user.CreatedAt,
+		UserID:    user.UserID,
+		CompanyID: user.CompanyID,
+		Role:      newRole,
+		UpdatedAt: now,
+		CreatedAt: user.CreatedAt,
 	}, nil
 }

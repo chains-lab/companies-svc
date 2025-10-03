@@ -1,4 +1,4 @@
-module github.com/chains-lab/distributors-svc
+module github.com/chains-lab/companies-svc
 
 go 1.24.6
 

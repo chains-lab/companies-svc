@@ -2,7 +2,7 @@ type: object
 required:
   - status
   - role
-  - distributor_id
+  - company_id
   - token
   - expires_at
   - created_at
@@ -13,10 +13,10 @@ properties:
   role:
     type: string
     description: "role of the user in this city"
-  distributor_id:
+  company_id:
     type: string
     format: uuid
-    description: "distributor id"
+    description: "company id"
   token:
     type: string
     description: "unique token for the invite"

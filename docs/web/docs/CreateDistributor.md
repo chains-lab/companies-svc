@@ -1,46 +1,46 @@
-# CreateDistributor
+# Createcompany
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Data** | [**CreateDistributorData**](CreateDistributorData.md) |  | 
+**Data** | [**CreatecompanyData**](CreatecompanyData.md) |  | 
 
 ## Methods
 
-### NewCreateDistributor
+### NewCreatecompany
 
-`func NewCreateDistributor(data CreateDistributorData, ) *CreateDistributor`
+`func NewCreatecompany(data CreatecompanyData, ) *Createcompany`
 
-NewCreateDistributor instantiates a new CreateDistributor object
+NewCreatecompany instantiates a new Createcompany object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewCreateDistributorWithDefaults
+### NewCreatecompanyWithDefaults
 
-`func NewCreateDistributorWithDefaults() *CreateDistributor`
+`func NewCreatecompanyWithDefaults() *Createcompany`
 
-NewCreateDistributorWithDefaults instantiates a new CreateDistributor object
+NewCreatecompanyWithDefaults instantiates a new Createcompany object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetData
 
-`func (o *CreateDistributor) GetData() CreateDistributorData`
+`func (o *Createcompany) GetData() CreatecompanyData`
 
 GetData returns the Data field if non-nil, zero value otherwise.
 
 ### GetDataOk
 
-`func (o *CreateDistributor) GetDataOk() (*CreateDistributorData, bool)`
+`func (o *Createcompany) GetDataOk() (*CreatecompanyData, bool)`
 
 GetDataOk returns a tuple with the Data field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetData
 
-`func (o *CreateDistributor) SetData(v CreateDistributorData)`
+`func (o *Createcompany) SetData(v CreatecompanyData)`
 
 SetData sets Data field to given value.
 

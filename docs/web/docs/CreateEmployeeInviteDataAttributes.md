@@ -4,15 +4,15 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**DistributorId** | [**uuid.UUID**](uuid.UUID.md) | The UUID of the distributor to which the user is being invited. | 
+**CompanyId** | [**uuid.UUID**](uuid.UUID.md) | The UUID of the company to which the user is being invited. | 
 **UserId** | [**uuid.UUID**](uuid.UUID.md) | The UUID of the user being invited. | 
-**Role** | **string** | The role assigned to the invited user within the distributor. | 
+**Role** | **string** | The role assigned to the invited user within the company. | 
 
 ## Methods
 
 ### NewCreateEmployeeInviteDataAttributes
 
-`func NewCreateEmployeeInviteDataAttributes(distributorId uuid.UUID, userId uuid.UUID, role string, ) *CreateEmployeeInviteDataAttributes`
+`func NewCreateEmployeeInviteDataAttributes(companyId uuid.UUID, userId uuid.UUID, role string, ) *CreateEmployeeInviteDataAttributes`
 
 NewCreateEmployeeInviteDataAttributes instantiates a new CreateEmployeeInviteDataAttributes object
 This constructor will assign default values to properties that have it defined,
@@ -27,24 +27,24 @@ NewCreateEmployeeInviteDataAttributesWithDefaults instantiates a new CreateEmplo
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
-### GetDistributorId
+### GetCompanyId
 
-`func (o *CreateEmployeeInviteDataAttributes) GetDistributorId() uuid.UUID`
+`func (o *CreateEmployeeInviteDataAttributes) GetCompanyId() uuid.UUID`
 
-GetDistributorId returns the DistributorId field if non-nil, zero value otherwise.
+GetCompanyId returns the CompanyId field if non-nil, zero value otherwise.
 
-### GetDistributorIdOk
+### GetCompanyIdOk
 
-`func (o *CreateEmployeeInviteDataAttributes) GetDistributorIdOk() (*uuid.UUID, bool)`
+`func (o *CreateEmployeeInviteDataAttributes) GetCompanyIdOk() (*uuid.UUID, bool)`
 
-GetDistributorIdOk returns a tuple with the DistributorId field if it's non-nil, zero value otherwise
+GetCompanyIdOk returns a tuple with the CompanyId field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetDistributorId
+### SetCompanyId
 
-`func (o *CreateEmployeeInviteDataAttributes) SetDistributorId(v uuid.UUID)`
+`func (o *CreateEmployeeInviteDataAttributes) SetCompanyId(v uuid.UUID)`
 
-SetDistributorId sets DistributorId field to given value.
+SetCompanyId sets CompanyId field to given value.
 
 
 ### GetUserId

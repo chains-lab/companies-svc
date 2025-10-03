@@ -1,46 +1,46 @@
-# CreateDistributorBlock
+# CreatecompanyBlock
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Data** | [**CreateDistributorBlockData**](CreateDistributorBlockData.md) |  | 
+**Data** | [**CreatecompanyBlockData**](CreatecompanyBlockData.md) |  | 
 
 ## Methods
 
-### NewCreateDistributorBlock
+### NewCreatecompanyBlock
 
-`func NewCreateDistributorBlock(data CreateDistributorBlockData, ) *CreateDistributorBlock`
+`func NewCreatecompanyBlock(data CreatecompanyBlockData, ) *CreatecompanyBlock`
 
-NewCreateDistributorBlock instantiates a new CreateDistributorBlock object
+NewCreatecompanyBlock instantiates a new CreatecompanyBlock object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewCreateDistributorBlockWithDefaults
+### NewCreatecompanyBlockWithDefaults
 
-`func NewCreateDistributorBlockWithDefaults() *CreateDistributorBlock`
+`func NewCreatecompanyBlockWithDefaults() *CreatecompanyBlock`
 
-NewCreateDistributorBlockWithDefaults instantiates a new CreateDistributorBlock object
+NewCreatecompanyBlockWithDefaults instantiates a new CreatecompanyBlock object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetData
 
-`func (o *CreateDistributorBlock) GetData() CreateDistributorBlockData`
+`func (o *CreatecompanyBlock) GetData() CreatecompanyBlockData`
 
 GetData returns the Data field if non-nil, zero value otherwise.
 
 ### GetDataOk
 
-`func (o *CreateDistributorBlock) GetDataOk() (*CreateDistributorBlockData, bool)`
+`func (o *CreatecompanyBlock) GetDataOk() (*CreatecompanyBlockData, bool)`
 
 GetDataOk returns a tuple with the Data field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetData
 
-`func (o *CreateDistributorBlock) SetData(v CreateDistributorBlockData)`
+`func (o *CreatecompanyBlock) SetData(v CreatecompanyBlockData)`
 
 SetData sets Data field to given value.
 

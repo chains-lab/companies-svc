@@ -1,78 +1,78 @@
-# UpdateDistributorDataAttributes
+# UpdatecompanyDataAttributes
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Icon** | Pointer to **string** | URL to the distributor&#39;s icon image. | [optional] 
-**Name** | Pointer to **string** | The name of the distributor. | [optional] 
+**Icon** | Pointer to **string** | URL to the company&#39;s icon image. | [optional] 
+**Name** | Pointer to **string** | The name of the company. | [optional] 
 
 ## Methods
 
-### NewUpdateDistributorDataAttributes
+### NewUpdatecompanyDataAttributes
 
-`func NewUpdateDistributorDataAttributes() *UpdateDistributorDataAttributes`
+`func NewUpdatecompanyDataAttributes() *UpdatecompanyDataAttributes`
 
-NewUpdateDistributorDataAttributes instantiates a new UpdateDistributorDataAttributes object
+NewUpdatecompanyDataAttributes instantiates a new UpdatecompanyDataAttributes object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewUpdateDistributorDataAttributesWithDefaults
+### NewUpdatecompanyDataAttributesWithDefaults
 
-`func NewUpdateDistributorDataAttributesWithDefaults() *UpdateDistributorDataAttributes`
+`func NewUpdatecompanyDataAttributesWithDefaults() *UpdatecompanyDataAttributes`
 
-NewUpdateDistributorDataAttributesWithDefaults instantiates a new UpdateDistributorDataAttributes object
+NewUpdatecompanyDataAttributesWithDefaults instantiates a new UpdatecompanyDataAttributes object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetIcon
 
-`func (o *UpdateDistributorDataAttributes) GetIcon() string`
+`func (o *UpdatecompanyDataAttributes) GetIcon() string`
 
 GetIcon returns the Icon field if non-nil, zero value otherwise.
 
 ### GetIconOk
 
-`func (o *UpdateDistributorDataAttributes) GetIconOk() (*string, bool)`
+`func (o *UpdatecompanyDataAttributes) GetIconOk() (*string, bool)`
 
 GetIconOk returns a tuple with the Icon field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetIcon
 
-`func (o *UpdateDistributorDataAttributes) SetIcon(v string)`
+`func (o *UpdatecompanyDataAttributes) SetIcon(v string)`
 
 SetIcon sets Icon field to given value.
 
 ### HasIcon
 
-`func (o *UpdateDistributorDataAttributes) HasIcon() bool`
+`func (o *UpdatecompanyDataAttributes) HasIcon() bool`
 
 HasIcon returns a boolean if a field has been set.
 
 ### GetName
 
-`func (o *UpdateDistributorDataAttributes) GetName() string`
+`func (o *UpdatecompanyDataAttributes) GetName() string`
 
 GetName returns the Name field if non-nil, zero value otherwise.
 
 ### GetNameOk
 
-`func (o *UpdateDistributorDataAttributes) GetNameOk() (*string, bool)`
+`func (o *UpdatecompanyDataAttributes) GetNameOk() (*string, bool)`
 
 GetNameOk returns a tuple with the Name field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetName
 
-`func (o *UpdateDistributorDataAttributes) SetName(v string)`
+`func (o *UpdatecompanyDataAttributes) SetName(v string)`
 
 SetName sets Name field to given value.
 
 ### HasName
 
-`func (o *UpdateDistributorDataAttributes) HasName() bool`
+`func (o *UpdatecompanyDataAttributes) HasName() bool`
 
 HasName returns a boolean if a field has been set.
 

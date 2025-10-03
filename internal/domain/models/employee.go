@@ -7,11 +7,11 @@ import (
 )
 
 type Employee struct {
-	UserID        uuid.UUID `json:"user_id"`
-	DistributorID uuid.UUID `json:"distributor_id"`
-	Role          string    `json:"role"`
-	UpdatedAt     time.Time `json:"updated_at"`
-	CreatedAt     time.Time `json:"created_at"`
+	UserID    uuid.UUID `json:"user_id"`
+	CompanyID uuid.UUID `json:"company_id"`
+	Role      string    `json:"role"`
+	UpdatedAt time.Time `json:"updated_at"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 func (e Employee) IsNil() bool {

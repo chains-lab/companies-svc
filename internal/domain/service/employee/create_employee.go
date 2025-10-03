@@ -6,16 +6,16 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/chains-lab/distributors-svc/internal/domain/errx"
-	"github.com/chains-lab/distributors-svc/internal/domain/models"
+	"github.com/chains-lab/companies-svc/internal/domain/errx"
+	"github.com/chains-lab/companies-svc/internal/domain/models"
 	"github.com/chains-lab/enum"
 	"github.com/google/uuid"
 )
 
 type CreateParams struct {
-	UserID        uuid.UUID
-	DistributorID uuid.UUID
-	Role          string
+	UserID    uuid.UUID
+	CompanyID uuid.UUID
+	Role      string
 }
 
 func (s Service) Create(ctx context.Context, params CreateParams) (models.Employee, error) {
@@ -43,11 +43,11 @@ func (s Service) Create(ctx context.Context, params CreateParams) (models.Employ
 	}
 
 	emp = models.Employee{
-		UserID:        params.UserID,
-		DistributorID: params.DistributorID,
-		Role:          params.Role,
-		CreatedAt:     now,
-		UpdatedAt:     now,
+		UserID:    params.UserID,
+		CompanyID: params.CompanyID,
+		Role:      params.Role,
+		CreatedAt: now,
+		UpdatedAt: now,
 	}
 
 	err = s.db.CreateEmployee(ctx, emp)

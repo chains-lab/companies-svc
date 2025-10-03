@@ -1,67 +1,67 @@
-# InitDistributorBlockDataAttributes
+# InitcompanyBlockDataAttributes
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**DistributorId** | **string** | The UUID of the distributor to be blocked. | 
-**Reason** | **string** | The reason for blocking the distributor. | 
+**companyId** | **string** | The UUID of the company to be blocked. | 
+**Reason** | **string** | The reason for blocking the company. | 
 
 ## Methods
 
-### NewInitDistributorBlockDataAttributes
+### NewInitcompanyBlockDataAttributes
 
-`func NewInitDistributorBlockDataAttributes(distributorId string, reason string, ) *InitDistributorBlockDataAttributes`
+`func NewInitcompanyBlockDataAttributes(companyId string, reason string, ) *InitcompanyBlockDataAttributes`
 
-NewInitDistributorBlockDataAttributes instantiates a new InitDistributorBlockDataAttributes object
+NewInitcompanyBlockDataAttributes instantiates a new InitcompanyBlockDataAttributes object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewInitDistributorBlockDataAttributesWithDefaults
+### NewInitcompanyBlockDataAttributesWithDefaults
 
-`func NewInitDistributorBlockDataAttributesWithDefaults() *InitDistributorBlockDataAttributes`
+`func NewInitcompanyBlockDataAttributesWithDefaults() *InitcompanyBlockDataAttributes`
 
-NewInitDistributorBlockDataAttributesWithDefaults instantiates a new InitDistributorBlockDataAttributes object
+NewInitcompanyBlockDataAttributesWithDefaults instantiates a new InitcompanyBlockDataAttributes object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
-### GetDistributorId
+### GetcompanyId
 
-`func (o *InitDistributorBlockDataAttributes) GetDistributorId() string`
+`func (o *InitcompanyBlockDataAttributes) GetcompanyId() string`
 
-GetDistributorId returns the DistributorId field if non-nil, zero value otherwise.
+GetcompanyId returns the companyId field if non-nil, zero value otherwise.
 
-### GetDistributorIdOk
+### GetcompanyIdOk
 
-`func (o *InitDistributorBlockDataAttributes) GetDistributorIdOk() (*string, bool)`
+`func (o *InitcompanyBlockDataAttributes) GetcompanyIdOk() (*string, bool)`
 
-GetDistributorIdOk returns a tuple with the DistributorId field if it's non-nil, zero value otherwise
+GetcompanyIdOk returns a tuple with the companyId field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetDistributorId
+### SetcompanyId
 
-`func (o *InitDistributorBlockDataAttributes) SetDistributorId(v string)`
+`func (o *InitcompanyBlockDataAttributes) SetcompanyId(v string)`
 
-SetDistributorId sets DistributorId field to given value.
+SetcompanyId sets companyId field to given value.
 
 
 ### GetReason
 
-`func (o *InitDistributorBlockDataAttributes) GetReason() string`
+`func (o *InitcompanyBlockDataAttributes) GetReason() string`
 
 GetReason returns the Reason field if non-nil, zero value otherwise.
 
 ### GetReasonOk
 
-`func (o *InitDistributorBlockDataAttributes) GetReasonOk() (*string, bool)`
+`func (o *InitcompanyBlockDataAttributes) GetReasonOk() (*string, bool)`
 
 GetReasonOk returns a tuple with the Reason field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetReason
 
-`func (o *InitDistributorBlockDataAttributes) SetReason(v string)`
+`func (o *InitcompanyBlockDataAttributes) SetReason(v string)`
 
 SetReason sets Reason field to given value.
 

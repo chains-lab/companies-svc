@@ -18,4 +18,4 @@ var ErrorInitiatorHaveNotEnoughRights = ape.DeclareError("INITIATOR_HAVE_NOT_ENO
 
 var ErrorInitiatorIsNotEmployee = ape.DeclareError("INITIATOR_NOT_EMPLOYEE")
 
-var ErrorInitiatorIsNotEmployeeOfThisDistributor = ape.DeclareError("INITIATOR_NOT_EMPLOYEE_OF_THIS_DISTRIBUTOR")
+var ErrorInitiatorIsNotEmployeeOfThiscompany = ape.DeclareError("INITIATOR_NOT_EMPLOYEE_OF_THIS_company")

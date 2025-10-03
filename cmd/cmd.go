@@ -5,13 +5,13 @@ import (
 	"database/sql"
 	"sync"
 
-	"github.com/chains-lab/distributors-svc/internal"
-	"github.com/chains-lab/distributors-svc/internal/data"
-	"github.com/chains-lab/distributors-svc/internal/domain/service/distributor"
-	"github.com/chains-lab/distributors-svc/internal/domain/service/employee"
-	"github.com/chains-lab/distributors-svc/internal/infra/jwtmanager"
-	"github.com/chains-lab/distributors-svc/internal/rest"
-	"github.com/chains-lab/distributors-svc/internal/rest/controller"
+	"github.com/chains-lab/companies-svc/internal"
+	"github.com/chains-lab/companies-svc/internal/data"
+	"github.com/chains-lab/companies-svc/internal/domain/service/company"
+	"github.com/chains-lab/companies-svc/internal/domain/service/employee"
+	"github.com/chains-lab/companies-svc/internal/infra/jwtmanager"
+	"github.com/chains-lab/companies-svc/internal/rest"
+	"github.com/chains-lab/companies-svc/internal/rest/controller"
 	"github.com/chains-lab/logium"
 )
 
@@ -32,10 +32,10 @@ func Start(ctx context.Context, cfg internal.Config, log logium.Logger, wg *sync
 	database := data.NewDatabase(pg)
 
 	jwtInviteManager := jwtmanager.NewManager(cfg)
-	distributorSvc := distributor.NewService(database)
+	companiesvc := company.NewService(database)
 	employeeSvc := employee.NewService(database, jwtInviteManager)
 
-	ctrl := controller.New(log, distributorSvc, employeeSvc)
+	ctrl := controller.New(log, companiesvc, employeeSvc)
 
 	run(func() { rest.Run(ctx, cfg, log, ctrl) })
 }

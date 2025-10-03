@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"testing"
 
-	"github.com/chains-lab/distributors-svc/cmd/migrations"
-	"github.com/chains-lab/distributors-svc/internal"
+	"github.com/chains-lab/companies-svc/cmd/migrations"
+	"github.com/chains-lab/companies-svc/internal"
 
 	"github.com/chains-lab/logium"
 )

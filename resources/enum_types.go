@@ -1,15 +1,15 @@
 package resources
 
 const (
-	DistributorType       = "distributor"
-	CreateDistributorType = "create_distributor"
-	UpdateDistributorType = "update_distributor"
+	CompanyType       = "company"
+	CreatecompanyType = "create_company"
+	UpdatecompanyType = "update_company"
 
-	DistributorBlockType       = "distributor_block"
-	CreateDistributorBlockType = "create_distributor_block"
+	CompanyBlockType       = "company_block"
+	CreatecompanyBlockType = "create_company_block"
 
 	EmployeeType = "employee"
 
-	InviteType               = "distributor_invite"
+	InviteType               = "company_invite"
 	CreateEmployeeInviteType = "create_employee_invite"
 )

@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/chains-lab/distributors-svc/internal"
-	"github.com/chains-lab/distributors-svc/internal/rest/meta"
+	"github.com/chains-lab/companies-svc/internal"
+	"github.com/chains-lab/companies-svc/internal/rest/meta"
 	"github.com/chains-lab/enum"
 	"github.com/chains-lab/gatekit/mdlv"
 	"github.com/chains-lab/gatekit/roles"
@@ -14,19 +14,19 @@ import (
 )
 
 type Handlers interface {
-	CanceledDistributorBlock(w http.ResponseWriter, r *http.Request)
-	CreateDistributorBlock(w http.ResponseWriter, r *http.Request)
-	CreateDistributor(w http.ResponseWriter, r *http.Request)
+	CanceledCompanyBlock(w http.ResponseWriter, r *http.Request)
+	CreateCompanyBlock(w http.ResponseWriter, r *http.Request)
+	CreateCompany(w http.ResponseWriter, r *http.Request)
 	DeleteEmployee(w http.ResponseWriter, r *http.Request)
-	GetActiveDistributorBlock(w http.ResponseWriter, r *http.Request)
-	GetDistributor(w http.ResponseWriter, r *http.Request)
+	GetActiveCompanyBlock(w http.ResponseWriter, r *http.Request)
+	GetCompany(w http.ResponseWriter, r *http.Request)
 	GetEmployee(w http.ResponseWriter, r *http.Request)
 	ListBlockages(w http.ResponseWriter, r *http.Request)
-	ListDistributors(w http.ResponseWriter, r *http.Request)
+	ListCompanies(w http.ResponseWriter, r *http.Request)
 	ListEmployees(w http.ResponseWriter, r *http.Request)
 	CreateInvite(w http.ResponseWriter, r *http.Request)
-	UpdateDistributor(w http.ResponseWriter, r *http.Request)
-	UpdateDistributorStatus(w http.ResponseWriter, r *http.Request)
+	UpdateCompany(w http.ResponseWriter, r *http.Request)
+	UpdateCompaniesStatus(w http.ResponseWriter, r *http.Request)
 	AcceptInvite(w http.ResponseWriter, r *http.Request)
 	GetBlock(w http.ResponseWriter, r *http.Request)
 }
@@ -45,21 +45,21 @@ func Run(ctx context.Context, cfg internal.Config, log logium.Logger, h Handlers
 
 	log.WithField("module", "api").Info("Starting API server")
 
-	r.Route("/distributor-svc/", func(r chi.Router) {
+	r.Route("/company-svc/", func(r chi.Router) {
 		r.Use(svc)
 
 		r.Route("/v1", func(r chi.Router) {
-			r.Route("/distributors", func(r chi.Router) {
-				r.Get("/", h.ListDistributors)
-				r.With(auth, user).Post("/", h.CreateDistributor)
+			r.Route("/companies", func(r chi.Router) {
+				r.Get("/", h.ListCompanies)
+				r.With(auth, user).Post("/", h.CreateCompany)
 
-				r.Route("/{distributor_id}", func(r chi.Router) {
-					r.Get("/", h.GetDistributor)
-					r.With(auth, user).Post("/", h.UpdateDistributor)
+				r.Route("/{company_id}", func(r chi.Router) {
+					r.Get("/", h.GetCompany)
+					r.With(auth, user).Post("/", h.UpdateCompany)
 
 					r.Route("/status", func(r chi.Router) {
-						r.With(auth, user).Post("/", h.UpdateDistributorStatus)
-						r.With(auth, sysadmin).Post("/", h.CreateDistributorBlock)
+						r.With(auth, user).Post("/", h.UpdateCompaniesStatus)
+						r.With(auth, sysadmin).Post("/", h.CreateCompanyBlock)
 					})
 				})
 			})
@@ -80,12 +80,12 @@ func Run(ctx context.Context, cfg internal.Config, log logium.Logger, h Handlers
 
 			r.Route("/blocks", func(r chi.Router) {
 				r.Get("/", h.ListBlockages)
-				r.With(auth, sysadmin).Post("/", h.CreateDistributorBlock)
-				r.Get("/active", h.GetActiveDistributorBlock)
+				r.With(auth, sysadmin).Post("/", h.CreateCompanyBlock)
+				r.Get("/active", h.GetActiveCompanyBlock)
 
 				r.Route("/{block_id}", func(r chi.Router) {
 					r.Get("/", h.GetBlock)
-					r.With(auth, sysadmin).Post("/", h.CanceledDistributorBlock)
+					r.With(auth, sysadmin).Post("/", h.CanceledCompanyBlock)
 				})
 			})
 		})

@@ -6,7 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Status** | **string** | status of the invite | 
 **Role** | **string** | role of the user in this city | 
-**DistributorId** | [**uuid.UUID**](uuid.UUID.md) | distributor id | 
+**CompanyId** | [**uuid.UUID**](uuid.UUID.md) | company id | 
 **Token** | **string** | unique token for the invite | 
 **ExpiresAt** | **time.Time** | timestamp when the invite will expire | 
 **CreatedAt** | **time.Time** | timestamp when the invite was created | 
@@ -15,7 +15,7 @@ Name | Type | Description | Notes
 
 ### NewInviteAttributes
 
-`func NewInviteAttributes(status string, role string, distributorId uuid.UUID, token string, expiresAt time.Time, createdAt time.Time, ) *InviteAttributes`
+`func NewInviteAttributes(status string, role string, companyId uuid.UUID, token string, expiresAt time.Time, createdAt time.Time, ) *InviteAttributes`
 
 NewInviteAttributes instantiates a new InviteAttributes object
 This constructor will assign default values to properties that have it defined,
@@ -70,24 +70,24 @@ and a boolean to check if the value has been set.
 SetRole sets Role field to given value.
 
 
-### GetDistributorId
+### GetCompanyId
 
-`func (o *InviteAttributes) GetDistributorId() uuid.UUID`
+`func (o *InviteAttributes) GetCompanyId() uuid.UUID`
 
-GetDistributorId returns the DistributorId field if non-nil, zero value otherwise.
+GetCompanyId returns the CompanyId field if non-nil, zero value otherwise.
 
-### GetDistributorIdOk
+### GetCompanyIdOk
 
-`func (o *InviteAttributes) GetDistributorIdOk() (*uuid.UUID, bool)`
+`func (o *InviteAttributes) GetCompanyIdOk() (*uuid.UUID, bool)`
 
-GetDistributorIdOk returns a tuple with the DistributorId field if it's non-nil, zero value otherwise
+GetCompanyIdOk returns a tuple with the CompanyId field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetDistributorId
+### SetCompanyId
 
-`func (o *InviteAttributes) SetDistributorId(v uuid.UUID)`
+`func (o *InviteAttributes) SetCompanyId(v uuid.UUID)`
 
-SetDistributorId sets DistributorId field to given value.
+SetCompanyId sets CompanyId field to given value.
 
 
 ### GetToken

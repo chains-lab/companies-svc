@@ -4,14 +4,14 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/chains-lab/distributors-svc/internal/domain/errx"
-	"github.com/chains-lab/distributors-svc/internal/domain/models"
+	"github.com/chains-lab/companies-svc/internal/domain/errx"
+	"github.com/chains-lab/companies-svc/internal/domain/models"
 	"github.com/google/uuid"
 )
 
 type Filter struct {
-	DistributorID *uuid.UUID
-	Roles         []string
+	CompanyID *uuid.UUID
+	Roles     []string
 }
 
 func (s Service) Filter(

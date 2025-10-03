@@ -4,10 +4,10 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**DistributorId** | **string** | The unique identifier for the distributor associated with the employee invite. | 
+**companyId** | **string** | The unique identifier for the company associated with the employee invite. | 
 **UserId** | **string** | The unique identifier for the user being invited as an employee. | 
 **InvitedBy** | **string** | The unique identifier for the user who sent the invitation. | 
-**Role** | **string** | The role of the invited employee within the distributor&#39;s organization (e.g., manager, staff). | 
+**Role** | **string** | The role of the invited employee within the company&#39;s organization (e.g., manager, staff). | 
 **Status** | **string** | The current status of the employee invitation. | 
 **AnsweredAt** | Pointer to **time.Time** | The timestamp when the invitation was responded to (accepted or declined). | [optional] 
 **CreatedAt** | **time.Time** | The timestamp when the employee invite was created. | 
@@ -16,7 +16,7 @@ Name | Type | Description | Notes
 
 ### NewEmployeeInviteAttributes
 
-`func NewEmployeeInviteAttributes(distributorId string, userId string, invitedBy string, role string, status string, createdAt time.Time, ) *EmployeeInviteAttributes`
+`func NewEmployeeInviteAttributes(companyId string, userId string, invitedBy string, role string, status string, createdAt time.Time, ) *EmployeeInviteAttributes`
 
 NewEmployeeInviteAttributes instantiates a new EmployeeInviteAttributes object
 This constructor will assign default values to properties that have it defined,
@@ -31,24 +31,24 @@ NewEmployeeInviteAttributesWithDefaults instantiates a new EmployeeInviteAttribu
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
-### GetDistributorId
+### GetcompanyId
 
-`func (o *EmployeeInviteAttributes) GetDistributorId() string`
+`func (o *EmployeeInviteAttributes) GetcompanyId() string`
 
-GetDistributorId returns the DistributorId field if non-nil, zero value otherwise.
+GetcompanyId returns the companyId field if non-nil, zero value otherwise.
 
-### GetDistributorIdOk
+### GetcompanyIdOk
 
-`func (o *EmployeeInviteAttributes) GetDistributorIdOk() (*string, bool)`
+`func (o *EmployeeInviteAttributes) GetcompanyIdOk() (*string, bool)`
 
-GetDistributorIdOk returns a tuple with the DistributorId field if it's non-nil, zero value otherwise
+GetcompanyIdOk returns a tuple with the companyId field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetDistributorId
+### SetcompanyId
 
-`func (o *EmployeeInviteAttributes) SetDistributorId(v string)`
+`func (o *EmployeeInviteAttributes) SetcompanyId(v string)`
 
-SetDistributorId sets DistributorId field to given value.
+SetcompanyId sets companyId field to given value.
 
 
 ### GetUserId

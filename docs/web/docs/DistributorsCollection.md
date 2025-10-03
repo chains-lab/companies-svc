@@ -1,67 +1,67 @@
-# DistributorsCollection
+# companiesCollection
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Data** | [**[]DistributorData**](DistributorData.md) |  | 
+**Data** | [**[]companyData**](companyData.md) |  | 
 **Links** | [**PaginationData**](PaginationData.md) |  | 
 
 ## Methods
 
-### NewDistributorsCollection
+### NewcompaniesCollection
 
-`func NewDistributorsCollection(data []DistributorData, links PaginationData, ) *DistributorsCollection`
+`func NewcompaniesCollection(data []companyData, links PaginationData, ) *companiesCollection`
 
-NewDistributorsCollection instantiates a new DistributorsCollection object
+NewcompaniesCollection instantiates a new companiesCollection object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewDistributorsCollectionWithDefaults
+### NewcompaniesCollectionWithDefaults
 
-`func NewDistributorsCollectionWithDefaults() *DistributorsCollection`
+`func NewcompaniesCollectionWithDefaults() *companiesCollection`
 
-NewDistributorsCollectionWithDefaults instantiates a new DistributorsCollection object
+NewcompaniesCollectionWithDefaults instantiates a new companiesCollection object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetData
 
-`func (o *DistributorsCollection) GetData() []DistributorData`
+`func (o *companiesCollection) GetData() []companyData`
 
 GetData returns the Data field if non-nil, zero value otherwise.
 
 ### GetDataOk
 
-`func (o *DistributorsCollection) GetDataOk() (*[]DistributorData, bool)`
+`func (o *companiesCollection) GetDataOk() (*[]companyData, bool)`
 
 GetDataOk returns a tuple with the Data field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetData
 
-`func (o *DistributorsCollection) SetData(v []DistributorData)`
+`func (o *companiesCollection) SetData(v []companyData)`
 
 SetData sets Data field to given value.
 
 
 ### GetLinks
 
-`func (o *DistributorsCollection) GetLinks() PaginationData`
+`func (o *companiesCollection) GetLinks() PaginationData`
 
 GetLinks returns the Links field if non-nil, zero value otherwise.
 
 ### GetLinksOk
 
-`func (o *DistributorsCollection) GetLinksOk() (*PaginationData, bool)`
+`func (o *companiesCollection) GetLinksOk() (*PaginationData, bool)`
 
 GetLinksOk returns a tuple with the Links field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetLinks
 
-`func (o *DistributorsCollection) SetLinks(v PaginationData)`
+`func (o *companiesCollection) SetLinks(v PaginationData)`
 
 SetLinks sets Links field to given value.
 

@@ -6,8 +6,8 @@ import (
 
 	"github.com/chains-lab/ape"
 	"github.com/chains-lab/ape/problems"
-	"github.com/chains-lab/distributors-svc/internal/domain/errx"
-	"github.com/chains-lab/distributors-svc/internal/rest/meta"
+	"github.com/chains-lab/companies-svc/internal/domain/errx"
+	"github.com/chains-lab/companies-svc/internal/rest/meta"
 	"github.com/go-chi/chi/v5"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/google/uuid"
@@ -32,24 +32,24 @@ func (a Service) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	distributorID, err := uuid.Parse(chi.URLParam(r, "distributor_id"))
+	companyID, err := uuid.Parse(chi.URLParam(r, "company_id"))
 	if err != nil {
-		a.log.WithError(err).Errorf("invalid distributor ID format")
+		a.log.WithError(err).Errorf("invalid company ID format")
 		ape.RenderErr(w, problems.BadRequest(validation.Errors{
-			"distributor_id": err,
+			"company_id": err,
 		})...)
 
 		return
 	}
 
-	err = a.domain.employee.Delete(r.Context(), initiator.ID, userID, distributorID)
+	err = a.domain.employee.Delete(r.Context(), initiator.ID, userID, companyID)
 	if err != nil {
 		a.log.WithError(err).Errorf("failed to delete employee with user_id: %s", userID)
 		switch {
 		case errors.Is(err, errx.ErrorInitiatorHaveNotEnoughRights):
 			ape.RenderErr(w, problems.Forbidden("initiator employee have not enough rights"))
-		case errors.Is(err, errx.ErrorDistributorNotFound):
-			ape.RenderErr(w, problems.NotFound("distributor not found"))
+		case errors.Is(err, errx.ErrorcompanyNotFound):
+			ape.RenderErr(w, problems.NotFound("company not found"))
 		case errors.Is(err, errx.ErrorEmployeeNotFound):
 			ape.RenderErr(w, problems.NotFound("employee not found"))
 		default:

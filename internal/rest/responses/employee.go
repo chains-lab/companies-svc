@@ -1,8 +1,8 @@
 package responses
 
 import (
-	"github.com/chains-lab/distributors-svc/internal/domain/models"
-	"github.com/chains-lab/distributors-svc/resources"
+	"github.com/chains-lab/companies-svc/internal/domain/models"
+	"github.com/chains-lab/companies-svc/resources"
 )
 
 func Employee(m models.Employee) resources.Employee {
@@ -11,10 +11,10 @@ func Employee(m models.Employee) resources.Employee {
 			Id:   m.UserID,
 			Type: resources.EmployeeType,
 			Attributes: resources.EmployeeAttributes{
-				DistributorId: m.DistributorID,
-				Role:          m.Role,
-				CreatedAt:     m.CreatedAt,
-				UpdatedAt:     m.UpdatedAt,
+				CompanyId: m.CompanyID,
+				Role:      m.Role,
+				CreatedAt: m.CreatedAt,
+				UpdatedAt: m.UpdatedAt,
 			},
 		},
 	}

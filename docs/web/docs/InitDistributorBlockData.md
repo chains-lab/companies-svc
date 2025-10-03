@@ -1,67 +1,67 @@
-# InitDistributorBlockData
+# InitcompanyBlockData
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Type** | **string** |  | 
-**Attributes** | [**InitDistributorBlockDataAttributes**](InitDistributorBlockDataAttributes.md) |  | 
+**Attributes** | [**InitcompanyBlockDataAttributes**](InitcompanyBlockDataAttributes.md) |  | 
 
 ## Methods
 
-### NewInitDistributorBlockData
+### NewInitcompanyBlockData
 
-`func NewInitDistributorBlockData(type_ string, attributes InitDistributorBlockDataAttributes, ) *InitDistributorBlockData`
+`func NewInitcompanyBlockData(type_ string, attributes InitcompanyBlockDataAttributes, ) *InitcompanyBlockData`
 
-NewInitDistributorBlockData instantiates a new InitDistributorBlockData object
+NewInitcompanyBlockData instantiates a new InitcompanyBlockData object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewInitDistributorBlockDataWithDefaults
+### NewInitcompanyBlockDataWithDefaults
 
-`func NewInitDistributorBlockDataWithDefaults() *InitDistributorBlockData`
+`func NewInitcompanyBlockDataWithDefaults() *InitcompanyBlockData`
 
-NewInitDistributorBlockDataWithDefaults instantiates a new InitDistributorBlockData object
+NewInitcompanyBlockDataWithDefaults instantiates a new InitcompanyBlockData object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetType
 
-`func (o *InitDistributorBlockData) GetType() string`
+`func (o *InitcompanyBlockData) GetType() string`
 
 GetType returns the Type field if non-nil, zero value otherwise.
 
 ### GetTypeOk
 
-`func (o *InitDistributorBlockData) GetTypeOk() (*string, bool)`
+`func (o *InitcompanyBlockData) GetTypeOk() (*string, bool)`
 
 GetTypeOk returns a tuple with the Type field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetType
 
-`func (o *InitDistributorBlockData) SetType(v string)`
+`func (o *InitcompanyBlockData) SetType(v string)`
 
 SetType sets Type field to given value.
 
 
 ### GetAttributes
 
-`func (o *InitDistributorBlockData) GetAttributes() InitDistributorBlockDataAttributes`
+`func (o *InitcompanyBlockData) GetAttributes() InitcompanyBlockDataAttributes`
 
 GetAttributes returns the Attributes field if non-nil, zero value otherwise.
 
 ### GetAttributesOk
 
-`func (o *InitDistributorBlockData) GetAttributesOk() (*InitDistributorBlockDataAttributes, bool)`
+`func (o *InitcompanyBlockData) GetAttributesOk() (*InitcompanyBlockDataAttributes, bool)`
 
 GetAttributesOk returns a tuple with the Attributes field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetAttributes
 
-`func (o *InitDistributorBlockData) SetAttributes(v InitDistributorBlockDataAttributes)`
+`func (o *InitcompanyBlockData) SetAttributes(v InitcompanyBlockDataAttributes)`
 
 SetAttributes sets Attributes field to given value.
 

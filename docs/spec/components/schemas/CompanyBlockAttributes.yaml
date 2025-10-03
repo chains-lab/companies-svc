@@ -1,0 +1,37 @@
+type: object
+required:
+  - company_id
+  - initiator_id
+  - reason
+  - status
+  - blocked_at
+properties:
+    company_id:
+        type: string
+        format: uuid
+        description: "ID of the company being blocked"
+        example: "550e8400-e29b-41d4-a716-446655440000"
+    initiator_id:
+        type: string
+        format: uuid
+        description: "ID of the user who initiated the block"
+        example: "660e8400-e29b-41d4-a716-446655440000"
+    reason:
+        type: string
+        description: "Reason for blocking the company"
+        example: "Violation of terms of service"
+    status:
+        type: string
+        description: "Current status of the block"
+        example: active
+    blocked_at:
+        type: string
+        format: date-time
+        description: "Timestamp when the block was initiated"
+        example: "2023-10-01T12:00:00Z"
+    cancelled_at:
+        type: string
+        format: date-time
+        description: "Timestamp when the block was lifted, if applicable"
+        example: "2023-10-15T12:00:00Z"
+

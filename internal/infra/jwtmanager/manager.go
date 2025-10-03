@@ -3,7 +3,7 @@ package jwtmanager
 import (
 	"crypto/sha256"
 
-	"github.com/chains-lab/distributors-svc/internal"
+	"github.com/chains-lab/companies-svc/internal"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"

@@ -1,46 +1,46 @@
-# UpdateDistributor
+# Updatecompany
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Data** | [**UpdateDistributorData**](UpdateDistributorData.md) |  | 
+**Data** | [**UpdatecompanyData**](UpdatecompanyData.md) |  | 
 
 ## Methods
 
-### NewUpdateDistributor
+### NewUpdatecompany
 
-`func NewUpdateDistributor(data UpdateDistributorData, ) *UpdateDistributor`
+`func NewUpdatecompany(data UpdatecompanyData, ) *Updatecompany`
 
-NewUpdateDistributor instantiates a new UpdateDistributor object
+NewUpdatecompany instantiates a new Updatecompany object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewUpdateDistributorWithDefaults
+### NewUpdatecompanyWithDefaults
 
-`func NewUpdateDistributorWithDefaults() *UpdateDistributor`
+`func NewUpdatecompanyWithDefaults() *Updatecompany`
 
-NewUpdateDistributorWithDefaults instantiates a new UpdateDistributor object
+NewUpdatecompanyWithDefaults instantiates a new Updatecompany object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetData
 
-`func (o *UpdateDistributor) GetData() UpdateDistributorData`
+`func (o *Updatecompany) GetData() UpdatecompanyData`
 
 GetData returns the Data field if non-nil, zero value otherwise.
 
 ### GetDataOk
 
-`func (o *UpdateDistributor) GetDataOk() (*UpdateDistributorData, bool)`
+`func (o *Updatecompany) GetDataOk() (*UpdatecompanyData, bool)`
 
 GetDataOk returns a tuple with the Data field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetData
 
-`func (o *UpdateDistributor) SetData(v UpdateDistributorData)`
+`func (o *Updatecompany) SetData(v UpdatecompanyData)`
 
 SetData sets Data field to given value.
 

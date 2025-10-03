@@ -35,16 +35,16 @@ paths:
 components:
   schemas:
     #requests
-    CreateDistributor:
-      $ref: './spec/components/schemas/CreateDistributor.yaml'
-    CreateDistributorBlock:
-      $ref: './spec/components/schemas/CreateDistributorBlock.yaml'
+    CreateCompany:
+      $ref: './spec/components/schemas/CreateCompany.yaml'
+    CreateCompanyBlock:
+      $ref: './spec/components/schemas/CreateCompanyBlock.yaml'
     CreateEmployeeInvite:
       $ref: './spec/components/schemas/CreateEmployeeInvite.yaml'
-    UpdateDistributor:
-      $ref: './spec/components/schemas/UpdateDistributor.yaml'
-    UpdateDistributorStatus:
-      $ref: './spec/components/schemas/UpdateDistributorStatus.yaml'
+    UpdateCompany:
+      $ref: './spec/components/schemas/UpdateCompany.yaml'
+    UpdateCompanyStatus:
+      $ref: './spec/components/schemas/UpdateCompanyStatus.yaml'
 
 
     #responses
@@ -68,19 +68,19 @@ components:
       $ref: './spec/components/schemas/InviteAttributes.yaml'
     SentInvite:
       $ref: './spec/components/schemas/SentInvite.yaml'
-    Distributor:
-        $ref: './spec/components/schemas/Distributor.yaml'
-    DistributorData:
-        $ref: './spec/components/schemas/DistributorData.yaml'
-    DistributorAttributes:
-        $ref: './spec/components/schemas/DistributorAttributes.yaml'
-    DistributorsCollection:
-        $ref: './spec/components/schemas/DistributorsCollection.yaml'
-    DistributorBlock:
-        $ref: './spec/components/schemas/DistributorBlock.yaml'
-    DistributorBlockData:
-        $ref: './spec/components/schemas/DistributorBlockData.yaml'
-    DistributorBlockAttributes:
-        $ref: './spec/components/schemas/DistributorBlockAttributes.yaml'
-    DistributorBlocksCollection:
-       $ref: './spec/components/schemas/DistributorBlocksCollection.yaml'
+    Company:
+        $ref: './spec/components/schemas/Company.yaml'
+    CompanyData:
+        $ref: './spec/components/schemas/CompanyData.yaml'
+    CompanyAttributes:
+        $ref: './spec/components/schemas/CompanyAttributes.yaml'
+    CompaniesCollection:
+        $ref: './spec/components/schemas/CompaniesCollection.yaml'
+    CompanyBlock:
+        $ref: './spec/components/schemas/CompanyBlock.yaml'
+    CompanyBlockData:
+        $ref: './spec/components/schemas/CompanyBlockData.yaml'
+    CompanyBlockAttributes:
+        $ref: './spec/components/schemas/CompanyBlockAttributes.yaml'
+    CompanyBlocksCollection:
+       $ref: './spec/components/schemas/CompanyBlocksCollection.yaml'

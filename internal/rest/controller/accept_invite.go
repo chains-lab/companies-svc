@@ -6,9 +6,9 @@ import (
 
 	"github.com/chains-lab/ape"
 	"github.com/chains-lab/ape/problems"
-	"github.com/chains-lab/distributors-svc/internal/domain/errx"
-	"github.com/chains-lab/distributors-svc/internal/rest/meta"
-	"github.com/chains-lab/distributors-svc/internal/rest/responses"
+	"github.com/chains-lab/companies-svc/internal/domain/errx"
+	"github.com/chains-lab/companies-svc/internal/rest/meta"
+	"github.com/chains-lab/companies-svc/internal/rest/responses"
 	"github.com/go-chi/chi/v5"
 )
 

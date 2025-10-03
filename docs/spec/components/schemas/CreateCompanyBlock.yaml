@@ -1,0 +1,26 @@
+type: object
+required:
+  - data
+properties:
+  data:
+    type: object
+    required:
+      - type
+      - attributes
+    properties:
+      type:
+        type: string
+        enum: [ block_company ]
+      attributes:
+        type: object
+        required:
+          - company_id
+          - reason
+        properties:
+          company_id:
+            type: string
+            format: uuid
+            description: The UUID of the company to be blocked.
+          reason:
+            type: string
+            description: The reason for blocking the company.

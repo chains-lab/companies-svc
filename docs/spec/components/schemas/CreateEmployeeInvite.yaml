@@ -14,19 +14,19 @@ properties:
       attributes:
         type: object
         required:
-          - distributor_id
+          - company_id
           - user_id
           - role
         properties:
-          distributor_id:
+          company_id:
             type: string
             format: uuid
-            description: The UUID of the distributor to which the user is being invited.
+            description: The UUID of the company to which the user is being invited.
           user_id:
             type: string
             format: uuid
             description: The UUID of the user being invited.
           role:
             type: string
-            description: The role assigned to the invited user within the distributor.
+            description: The role assigned to the invited user within the company.
             enum: [ admin, member ]
