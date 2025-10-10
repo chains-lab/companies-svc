@@ -171,7 +171,7 @@ func (q EmployeesQ) FilterUserID(userID uuid.UUID) EmployeesQ {
 	return q
 }
 
-func (q EmployeesQ) FiltercompanyID(companyID ...uuid.UUID) EmployeesQ {
+func (q EmployeesQ) FilterCompanyID(companyID ...uuid.UUID) EmployeesQ {
 	q.selector = q.selector.Where(sq.Eq{"company_id": companyID})
 	q.counter = q.counter.Where(sq.Eq{"company_id": companyID})
 	q.updater = q.updater.Where(sq.Eq{"company_id": companyID})

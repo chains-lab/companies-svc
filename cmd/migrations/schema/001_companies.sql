@@ -23,7 +23,7 @@ CREATE TYPE blocked_company_status AS ENUM (
 
 CREATE TABLE company_blocks (
     id             UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    company_id UUID NOT NULL REFERENCES companies("id") ON DELETE CASCADE,
+    company_id     UUID NOT NULL REFERENCES companies("id") ON DELETE CASCADE,
     initiator_id   UUID NOT NULL,
     reason         varchar(8192) NOT NULL,
     status         blocked_company_status NOT NULL DEFAULT 'active',

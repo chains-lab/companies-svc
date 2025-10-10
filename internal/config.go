@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-type ServerConfig struct {
+type ServiceConfig struct {
 	Name string `mapstructure:"name"`
 }
 
@@ -56,10 +56,9 @@ type SwaggerConfig struct {
 }
 
 type Config struct {
-	Service  ServerConfig   `mapstructure:"service"`
+	Service  ServiceConfig  `mapstructure:"service"`
 	Log      LogConfig      `mapstructure:"log"`
 	Rest     RestConfig     `mapstructure:"rest"`
-	Server   ServerConfig   `mapstructure:"server"`
 	JWT      JWTConfig      `mapstructure:"jwt"`
 	Database DatabaseConfig `mapstructure:"database"`
 	Swagger  SwaggerConfig  `mapstructure:"swagger"`

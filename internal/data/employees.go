@@ -35,7 +35,7 @@ func (d *Database) GetEmployeeByCompanyAndUser(
 	ctx context.Context,
 	companyID, userID uuid.UUID,
 ) (models.Employee, error) {
-	row, err := d.sql.employees.New().FiltercompanyID(companyID).FilterUserID(userID).Get(ctx)
+	row, err := d.sql.employees.New().FilterCompanyID(companyID).FilterUserID(userID).Get(ctx)
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
 		return models.Employee{}, nil
@@ -51,7 +51,7 @@ func (d *Database) GetEmployeeByCompanyAndUserAndRole(
 	companyID, userID uuid.UUID,
 	role string,
 ) (models.Employee, error) {
-	row, err := d.sql.employees.New().FiltercompanyID(companyID).FilterUserID(userID).FilterRole(role).Get(ctx)
+	row, err := d.sql.employees.New().FilterCompanyID(companyID).FilterUserID(userID).FilterRole(role).Get(ctx)
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
 		return models.Employee{}, nil
@@ -72,7 +72,7 @@ func (d *Database) GetEmployee(
 		query = query.FilterUserID(*params.UserID)
 	}
 	if params.CompanyID != nil {
-		query = query.FiltercompanyID(*params.CompanyID)
+		query = query.FilterCompanyID(*params.CompanyID)
 	}
 	if params.Role != nil {
 		query = query.FilterRole(*params.Role)
@@ -99,7 +99,7 @@ func (d *Database) FilterEmployees(
 	query := d.sql.employees.New()
 
 	if filter.CompanyID != nil {
-		query = query.FiltercompanyID(*filter.CompanyID)
+		query = query.FilterCompanyID(*filter.CompanyID)
 	}
 	if filter.Roles != nil && len(filter.Roles) > 0 {
 		query = query.FilterRole(filter.Roles...)
@@ -143,5 +143,5 @@ func (d *Database) UpdateEmployeeRole(
 }
 
 func (d *Database) DeleteEmployee(ctx context.Context, userID, companyID uuid.UUID) error {
-	return d.sql.employees.New().FilterUserID(userID).FiltercompanyID(companyID).Delete(ctx)
+	return d.sql.employees.New().FilterUserID(userID).FilterCompanyID(companyID).Delete(ctx)
 }
