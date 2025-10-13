@@ -33,7 +33,7 @@ func (a Service) CanceledCompanyBlock(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dis, err := a.domain.block.Cancel(r.Context(), companyID)
+	comp, err := a.domain.block.Cancel(r.Context(), companyID)
 	if err != nil {
 		a.log.WithError(err).Errorf("failed to canceled block company")
 		switch {
@@ -48,5 +48,5 @@ func (a Service) CanceledCompanyBlock(w http.ResponseWriter, r *http.Request) {
 
 	a.log.Infof("company block %s canceled successfully by user %s", companyID, initiator.ID)
 
-	ape.Render(w, http.StatusOK, responses.Company(dis))
+	ape.Render(w, http.StatusOK, responses.Company(comp))
 }

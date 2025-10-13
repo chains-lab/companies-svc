@@ -31,7 +31,7 @@ CREATE TABLE company_blocks (
     cancelled_at   timestamp
 );
 
-CREATE UNIQUE INDEX blocked_companies_one_active_per_dist
+CREATE UNIQUE INDEX blocked_companies_one_active_per_comp
     ON company_blocks(company_id)
     WHERE status = 'active';
 
@@ -42,6 +42,6 @@ DROP TABLE IF EXISTS company_blocks CASCADE;
 DROP TYPE IF EXISTS companies_status CASCADE;
 DROP TYPE IF EXISTS blocked_company_status CASCADE;
 
-DROP INDEX IF EXISTS blocked_companies_one_active_per_dist;
+DROP INDEX IF EXISTS blocked_companies_one_active_per_comp;
 
 DROP EXTENSION IF EXISTS "uuid-ossp";

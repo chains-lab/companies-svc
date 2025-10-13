@@ -23,7 +23,7 @@ func (s Service) Create(
 ) (models.Company, error) {
 	now := time.Now().UTC()
 
-	dis := models.Company{
+	comp := models.Company{
 		ID:        uuid.New(),
 		Name:      params.Name,
 		Icon:      params.Icon,
@@ -45,7 +45,7 @@ func (s Service) Create(
 	}
 
 	if err = s.db.Transaction(ctx, func(ctx context.Context) error {
-		_, err = s.db.CreateCompany(ctx, dis)
+		_, err = s.db.CreateCompany(ctx, comp)
 		if err != nil {
 			return errx.ErrorInternal.Raise(
 				fmt.Errorf("failed to create company, cause: %w", err),
@@ -54,7 +54,7 @@ func (s Service) Create(
 
 		emp := models.Employee{
 			UserID:    initiatorID,
-			CompanyID: dis.ID,
+			CompanyID: comp.ID,
 			Role:      enum.EmployeeRoleOwner,
 			CreatedAt: now,
 			UpdatedAt: now,
@@ -71,5 +71,5 @@ func (s Service) Create(
 		return models.Company{}, err
 	}
 
-	return dis, err
+	return comp, err
 }

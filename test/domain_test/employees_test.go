@@ -116,10 +116,10 @@ func TestInvalidCompanyInvite(t *testing.T) {
 	ctx := context.Background()
 
 	_, owner1 := CreateCompany(t, s)
-	dist2, _ := CreateCompany(t, s)
+	comp2, _ := CreateCompany(t, s)
 
 	_, err = s.domain.invite.Create(ctx, owner1.UserID, invite.CreateParams{
-		CompanyID: dist2.ID,
+		CompanyID: comp2.ID,
 		Role:      enum.EmployeeRoleAdmin,
 	})
 	if !errors.Is(err, errx.ErrorInitiatorIsNotEmployeeOfThiscompany) {

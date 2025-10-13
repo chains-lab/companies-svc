@@ -20,7 +20,7 @@ func CreateCompany(t *testing.T, s Setup) (models.Company, models.Employee) {
 	ownerID := uuid.New()
 	ctx := context.Background()
 
-	dist, err := s.domain.company.Create(ctx, ownerID, company.CreateParams{
+	comp, err := s.domain.company.Create(ctx, ownerID, company.CreateParams{
 		Name: "companyID 1",
 		Icon: "icon",
 	})
@@ -33,7 +33,7 @@ func CreateCompany(t *testing.T, s Setup) (models.Company, models.Employee) {
 		t.Fatalf("GetEmployee: %v", err)
 	}
 
-	return dist, owner
+	return comp, owner
 }
 
 func CreateEmployee(t *testing.T, s Setup, initiatorID, companyID uuid.UUID, role string) models.Employee {
@@ -73,7 +73,7 @@ func TestCreateCompany(t *testing.T) {
 	ctx := context.Background()
 
 	ownerID := uuid.New()
-	dist, err := s.domain.company.Create(ctx, ownerID, company.CreateParams{
+	comp, err := s.domain.company.Create(ctx, ownerID, company.CreateParams{
 		Name: "companyID 1",
 		Icon: "icon",
 	})
@@ -81,7 +81,7 @@ func TestCreateCompany(t *testing.T) {
 		t.Fatalf("CreateCompany: %v", err)
 	}
 
-	dist, err = s.domain.company.Get(ctx, dist.ID)
+	comp, err = s.domain.company.Get(ctx, comp.ID)
 	if err != nil {
 		t.Fatalf("getCompany: %v", err)
 	}
@@ -100,8 +100,8 @@ func TestCreateCompany(t *testing.T) {
 		t.Errorf("expected owner ID '%s', got '%s'", ownerID, owner.UserID)
 	}
 
-	if dist.Name != "companyID 1" {
-		t.Errorf("expected company name 'companyID 1', got '%s'", dist.Name)
+	if comp.Name != "companyID 1" {
+		t.Errorf("expected company name 'companyID 1', got '%s'", comp.Name)
 	}
 
 	if owner.Role != enum.EmployeeRoleOwner {

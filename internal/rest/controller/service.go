@@ -88,12 +88,12 @@ type Service struct {
 	log    logium.Logger
 }
 
-func New(log logium.Logger, dis companySvc, emp employeeSvc, inv inviteSvc, blc blockSvc) Service {
+func New(log logium.Logger, comp companySvc, emp employeeSvc, inv inviteSvc, blc blockSvc) Service {
 	return Service{
 		log: log,
 		domain: domain{
 			employee: emp,
-			company:  dis,
+			company:  comp,
 			invite:   inv,
 			block:    blc,
 		},
