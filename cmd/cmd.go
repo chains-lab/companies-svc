@@ -14,6 +14,7 @@ import (
 	"github.com/chains-lab/companies-svc/internal/infra/jwtmanager"
 	"github.com/chains-lab/companies-svc/internal/rest"
 	"github.com/chains-lab/companies-svc/internal/rest/controller"
+	"github.com/chains-lab/companies-svc/internal/rest/middlewares"
 	"github.com/chains-lab/logium"
 )
 
@@ -40,6 +41,7 @@ func Start(ctx context.Context, cfg internal.Config, log logium.Logger, wg *sync
 	blockSvc := block.NewService(database)
 
 	ctrl := controller.New(log, companiesSvc, employeeSvc, inviteSvc, blockSvc)
+	mdlv := middlewares.New(log)
 
-	run(func() { rest.Run(ctx, cfg, log, ctrl) })
+	run(func() { rest.Run(ctx, cfg, log, mdlv, ctrl) })
 }

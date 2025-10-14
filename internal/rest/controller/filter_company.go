@@ -8,7 +8,7 @@ import (
 	"github.com/chains-lab/ape/problems"
 	"github.com/chains-lab/companies-svc/internal/domain/service/company"
 	"github.com/chains-lab/companies-svc/internal/rest/responses"
-	"github.com/chains-lab/pagi"
+	"github.com/chains-lab/restkit/pagi"
 )
 
 func (a Service) FilterCompanies(w http.ResponseWriter, r *http.Request) {

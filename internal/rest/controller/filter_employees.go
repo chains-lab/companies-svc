@@ -9,7 +9,7 @@ import (
 
 	"github.com/chains-lab/companies-svc/internal/domain/service/employee"
 	"github.com/chains-lab/companies-svc/internal/rest/responses"
-	"github.com/chains-lab/pagi"
+	"github.com/chains-lab/restkit/pagi"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/google/uuid"
 )

@@ -8,7 +8,7 @@ import (
 
 	"github.com/chains-lab/companies-svc/internal/domain/models"
 	"github.com/chains-lab/companies-svc/internal/domain/service/employee"
-	"github.com/chains-lab/pagi"
+	"github.com/chains-lab/restkit/pagi"
 	"github.com/google/uuid"
 )
 

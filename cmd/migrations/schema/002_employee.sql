@@ -7,7 +7,7 @@ CREATE TYPE employee_roles AS ENUM (
 
 CREATE TABLE "employees" (
     user_id    UUID           PRIMARY KEY NOT NULL,
-    company_id UUID           NOT NULL,
+    company_id UUID           NOT NULL REFERENCES companies("id") ON DELETE CASCADE,
     role       employee_roles NOT NULL,
     updated_at TIMESTAMP      NOT NULL  DEFAULT (now() AT TIME ZONE 'UTC'),
     created_at TIMESTAMP      NOT NULL  DEFAULT (now() AT TIME ZONE 'UTC')
