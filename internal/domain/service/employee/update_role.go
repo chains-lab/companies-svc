@@ -16,45 +16,45 @@ func (s Service) UpdateEmployeeRole(
 	initiatorID uuid.UUID,
 	userID uuid.UUID,
 	newRole string,
-) (models.Employee, error) {
+) (models.EmployeeWithUserData, error) {
 	initiator, err := s.GetInitiator(ctx, initiatorID)
 	if err != nil {
-		return models.Employee{}, err
+		return models.EmployeeWithUserData{}, err
 	}
 
 	user, err := s.Get(ctx, GetParams{
 		UserID: &userID,
 	})
 	if err != nil {
-		return models.Employee{}, err
+		return models.EmployeeWithUserData{}, err
 	}
 
 	if initiator.CompanyID != user.CompanyID {
-		return models.Employee{}, errx.ErrorInitiatorIsNotEmployeeOfThiscompany.Raise(
+		return models.EmployeeWithUserData{}, errx.ErrorInitiatorIsNotEmployeeOfThiscompany.Raise(
 			fmt.Errorf("initiator %s and chosen employee %s have different companies", initiatorID, userID),
 		)
 	}
 
 	allowed, err := enum.CompareEmployeeRoles(initiator.Role, user.Role)
 	if err != nil {
-		return models.Employee{}, errx.EmployeeInvalidRole.Raise(
+		return models.EmployeeWithUserData{}, errx.EmployeeInvalidRole.Raise(
 			fmt.Errorf("new role is invalid: %w", err),
 		)
 	}
 	if allowed != 1 {
-		return models.Employee{}, errx.ErrorInitiatorHaveNotEnoughRights.Raise(
+		return models.EmployeeWithUserData{}, errx.ErrorInitiatorHaveNotEnoughRights.Raise(
 			fmt.Errorf("initiator have not enough rights to update employee role"),
 		)
 	}
 
 	allowed, err = enum.CompareEmployeeRoles(initiator.Role, newRole)
 	if err != nil {
-		return models.Employee{}, errx.EmployeeInvalidRole.Raise(
+		return models.EmployeeWithUserData{}, errx.EmployeeInvalidRole.Raise(
 			fmt.Errorf("new role is invalid: %w", err),
 		)
 	}
 	if allowed != 1 {
-		return models.Employee{}, errx.ErrorInitiatorHaveNotEnoughRights.Raise(
+		return models.EmployeeWithUserData{}, errx.ErrorInitiatorHaveNotEnoughRights.Raise(
 			fmt.Errorf("initiator have not enough rights to update employee role"),
 		)
 	}
@@ -63,13 +63,22 @@ func (s Service) UpdateEmployeeRole(
 
 	err = s.db.UpdateEmployeeRole(ctx, userID, newRole, now)
 	if err != nil {
-		return models.Employee{}, errx.ErrorInternal.Raise(
+		return models.EmployeeWithUserData{}, errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to update employee role, cause: %w", err),
 		)
 	}
 
-	return models.Employee{
+	profiles, err := s.userGuesser.Guess(ctx, userID)
+	if err != nil {
+		return models.EmployeeWithUserData{}, errx.ErrorInternal.Raise(
+			fmt.Errorf("failed to guess employee, cause: %w", err),
+		)
+	}
+
+	return models.EmployeeWithUserData{
 		UserID:    user.UserID,
+		Username:  profiles[user.UserID].Username,
+		Avatar:    profiles[user.UserID].Avatar,
 		CompanyID: user.CompanyID,
 		Role:      newRole,
 		UpdatedAt: now,

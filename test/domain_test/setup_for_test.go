@@ -14,6 +14,7 @@ import (
 	"github.com/chains-lab/companies-svc/internal/domain/service/employee"
 	"github.com/chains-lab/companies-svc/internal/domain/service/invite"
 	"github.com/chains-lab/companies-svc/internal/infra/jwtmanager"
+	"github.com/chains-lab/companies-svc/internal/infra/usrguesser"
 	"github.com/chains-lab/companies-svc/test"
 	"github.com/google/uuid"
 )
@@ -37,21 +38,21 @@ type companySvc interface {
 }
 
 type employeeSvc interface {
-	Create(ctx context.Context, params employee.CreateParams) (models.Employee, error)
+	Create(ctx context.Context, params employee.CreateParams) (models.EmployeeWithUserData, error)
 
-	Get(ctx context.Context, params employee.GetParams) (models.Employee, error)
+	Get(ctx context.Context, params employee.GetParams) (models.EmployeeWithUserData, error)
 	Filter(
 		ctx context.Context,
 		filters employee.FilterParams,
 		page, size uint64,
-	) (models.EmployeeCollection, error)
+	) (models.EmployeeWithUserDataCollection, error)
 
 	UpdateEmployeeRole(
 		ctx context.Context,
 		initiatorID uuid.UUID,
 		userID uuid.UUID,
 		newRole string,
-	) (models.Employee, error)
+	) (models.EmployeeWithUserData, error)
 
 	Delete(ctx context.Context, initiatorID, userID, companyID uuid.UUID) error
 	RefuseOwn(ctx context.Context, initiatorID uuid.UUID) error
@@ -108,6 +109,9 @@ func newSetup(t *testing.T) (Setup, error) {
 				URL: test.TestDatabaseURL,
 			},
 		},
+		Profile: internal.ProfileConfig{
+			Url: "http://localhost:8001/profiles-svc/v1/profiles",
+		},
 	}
 
 	pg, err := sql.Open("postgres", cfg.Database.SQL.URL)
@@ -116,10 +120,11 @@ func newSetup(t *testing.T) (Setup, error) {
 	}
 
 	database := data.NewDatabase(pg)
-
 	jwtInviteManager := jwtmanager.NewManager(cfg)
+	userGuesser := usrguesser.NewService(cfg.Profile.Url, nil)
+
 	companiesSvc := company.NewService(database)
-	employeeSvc := employee.NewService(database, jwtInviteManager)
+	employeeSvc := employee.NewService(database, jwtInviteManager, userGuesser)
 	inviteSvc := invite.NewService(database, jwtInviteManager)
 	blockSvc := block.NewService(database)
 

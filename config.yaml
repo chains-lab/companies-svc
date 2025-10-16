@@ -1,5 +1,8 @@
-server:
+service:
   name: "company-svc"
+
+profile:
+  url: "http://localhost:8002/profiles-svc/v1/profiles"
 
 rest:
   port: ":8004"

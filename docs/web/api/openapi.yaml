@@ -110,6 +110,13 @@ components:
       type: object
     EmployeeAttributes:
       properties:
+        username:
+          description: The username of the employee within the company's system.
+          type: string
+        avatar:
+          description: A URL pointing to the employee's avatar image.
+          format: uri
+          type: string
         company_id:
           description: The unique identifier for the company associated with the employee.
           format: uuid
@@ -127,10 +134,12 @@ components:
           format: date-time
           type: string
       required:
+      - avatar
       - company_id
       - created_at
       - role
       - updated_at
+      - username
       type: object
     EmployeesCollection:
       properties:

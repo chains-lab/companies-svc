@@ -23,6 +23,10 @@ var _ MappedNullable = &EmployeeAttributes{}
 
 // EmployeeAttributes struct for EmployeeAttributes
 type EmployeeAttributes struct {
+	// The username of the employee within the company's system.
+	Username string `json:"username"`
+	// A URL pointing to the employee's avatar image.
+	Avatar string `json:"avatar"`
 	// The unique identifier for the company associated with the employee.
 	CompanyId uuid.UUID `json:"company_id"`
 	// The role of the employee within the company's organization (e.g., manager, staff).
@@ -39,8 +43,10 @@ type _EmployeeAttributes EmployeeAttributes
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewEmployeeAttributes(companyId uuid.UUID, role string, createdAt time.Time, updatedAt time.Time) *EmployeeAttributes {
+func NewEmployeeAttributes(username string, avatar string, companyId uuid.UUID, role string, createdAt time.Time, updatedAt time.Time) *EmployeeAttributes {
 	this := EmployeeAttributes{}
+	this.Username = username
+	this.Avatar = avatar
 	this.CompanyId = companyId
 	this.Role = role
 	this.CreatedAt = createdAt
@@ -54,6 +60,54 @@ func NewEmployeeAttributes(companyId uuid.UUID, role string, createdAt time.Time
 func NewEmployeeAttributesWithDefaults() *EmployeeAttributes {
 	this := EmployeeAttributes{}
 	return &this
+}
+
+// GetUsername returns the Username field value
+func (o *EmployeeAttributes) GetUsername() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.Username
+}
+
+// GetUsernameOk returns a tuple with the Username field value
+// and a boolean to check if the value has been set.
+func (o *EmployeeAttributes) GetUsernameOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Username, true
+}
+
+// SetUsername sets field value
+func (o *EmployeeAttributes) SetUsername(v string) {
+	o.Username = v
+}
+
+// GetAvatar returns the Avatar field value
+func (o *EmployeeAttributes) GetAvatar() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.Avatar
+}
+
+// GetAvatarOk returns a tuple with the Avatar field value
+// and a boolean to check if the value has been set.
+func (o *EmployeeAttributes) GetAvatarOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Avatar, true
+}
+
+// SetAvatar sets field value
+func (o *EmployeeAttributes) SetAvatar(v string) {
+	o.Avatar = v
 }
 
 // GetCompanyId returns the CompanyId field value
@@ -162,6 +216,8 @@ func (o EmployeeAttributes) MarshalJSON() ([]byte, error) {
 
 func (o EmployeeAttributes) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	toSerialize["username"] = o.Username
+	toSerialize["avatar"] = o.Avatar
 	toSerialize["company_id"] = o.CompanyId
 	toSerialize["role"] = o.Role
 	toSerialize["created_at"] = o.CreatedAt
@@ -174,6 +230,8 @@ func (o *EmployeeAttributes) UnmarshalJSON(data []byte) (err error) {
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
+		"username",
+		"avatar",
 		"company_id",
 		"role",
 		"created_at",

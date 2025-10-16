@@ -5,7 +5,7 @@ import (
 	"github.com/chains-lab/companies-svc/resources"
 )
 
-func Employee(m models.Employee) resources.Employee {
+func Employee(m models.EmployeeWithUserData) resources.Employee {
 	resp := resources.Employee{
 		Data: resources.EmployeeData{
 			Id:   m.UserID,
@@ -22,7 +22,7 @@ func Employee(m models.Employee) resources.Employee {
 	return resp
 }
 
-func EmployeeCollection(ms models.EmployeeCollection) resources.EmployeesCollection {
+func EmployeeCollection(ms models.EmployeeWithUserDataCollection) resources.EmployeesCollection {
 	items := make([]resources.EmployeeData, 0, len(ms.Data))
 	for _, m := range ms.Data {
 		items = append(items, Employee(m).Data)

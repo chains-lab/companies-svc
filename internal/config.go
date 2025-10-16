@@ -13,6 +13,10 @@ type ServiceConfig struct {
 	Name string `mapstructure:"name"`
 }
 
+type ProfileConfig struct {
+	Url string `mapstructure:"url"`
+}
+
 type LogConfig struct {
 	Level  string `mapstructure:"level"`
 	Format string `mapstructure:"format"`
@@ -57,6 +61,7 @@ type SwaggerConfig struct {
 
 type Config struct {
 	Service  ServiceConfig  `mapstructure:"service"`
+	Profile  ProfileConfig  `mapstructure:"profile"`
 	Log      LogConfig      `mapstructure:"log"`
 	Rest     RestConfig     `mapstructure:"rest"`
 	JWT      JWTConfig      `mapstructure:"jwt"`

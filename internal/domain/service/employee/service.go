@@ -22,15 +22,21 @@ type JwtManager interface {
 	VerifyInviteToken(tokenStr, hashed string) error
 }
 
-type Service struct {
-	db  database
-	jwt JwtManager
+type UserGuesser interface {
+	Guess(ctx context.Context, userIDs ...uuid.UUID) (map[uuid.UUID]models.Profile, error)
 }
 
-func NewService(db database, jwt JwtManager) Service {
+type Service struct {
+	db          database
+	jwt         JwtManager
+	userGuesser UserGuesser
+}
+
+func NewService(db database, jwt JwtManager, userGuesser UserGuesser) Service {
 	return Service{
-		db:  db,
-		jwt: jwt,
+		db:          db,
+		jwt:         jwt,
+		userGuesser: userGuesser,
 	}
 }
 
