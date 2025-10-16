@@ -16,7 +16,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func CreateCompany(t *testing.T, s Setup) (models.Company, models.Employee) {
+func CreateCompany(t *testing.T, s Setup) (models.Company, models.EmployeeWithUserData) {
 	ownerID := uuid.New()
 	ctx := context.Background()
 
@@ -36,7 +36,7 @@ func CreateCompany(t *testing.T, s Setup) (models.Company, models.Employee) {
 	return comp, owner
 }
 
-func CreateEmployee(t *testing.T, s Setup, initiatorID, companyID uuid.UUID, role string) models.Employee {
+func CreateEmployee(t *testing.T, s Setup, initiatorID, companyID uuid.UUID, role string) models.EmployeeWithUserData {
 	ctx := context.Background()
 
 	userID := uuid.New()

@@ -71,7 +71,7 @@ func (s Service) UpdateEmployeeRole(
 	profiles, err := s.userGuesser.Guess(ctx, userID)
 	if err != nil {
 		return models.EmployeeWithUserData{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("failed to guess employee, cause: %w", err),
+			fmt.Errorf("failed to guess employee profile data, cause: %w", err),
 		)
 	}
 

@@ -32,7 +32,7 @@ func (s Service) Get(ctx context.Context, params GetParams) (models.EmployeeWith
 	profiles, err := s.userGuesser.Guess(ctx, res.UserID)
 	if err != nil {
 		return models.EmployeeWithUserData{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("failed to guess employee, cause: %w", err),
+			fmt.Errorf("failed to guess employee profile data, cause: %w", err),
 		)
 	}
 

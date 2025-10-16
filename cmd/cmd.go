@@ -38,7 +38,7 @@ func Start(ctx context.Context, cfg internal.Config, log logium.Logger, wg *sync
 	userGuesser := usrguesser.NewService(cfg.Profile.Url, nil)
 
 	companiesSvc := company.NewService(database)
-	employeeSvc := employee.NewService(database, jwtInviteManager, userGuesser)
+	employeeSvc := employee.NewService(database, userGuesser)
 	inviteSvc := invite.NewService(database, jwtInviteManager)
 	blockSvc := block.NewService(database)
 

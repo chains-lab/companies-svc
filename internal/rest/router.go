@@ -2,7 +2,9 @@ package rest
 
 import (
 	"context"
+	"errors"
 	"net/http"
+	"time"
 
 	"github.com/chains-lab/companies-svc/internal"
 	"github.com/chains-lab/companies-svc/internal/rest/meta"
@@ -30,19 +32,14 @@ type Handlers interface {
 }
 
 type Middlewares interface {
-	ServiceGrant(serviceName, skService string) func(http.Handler) http.Handler
 	Auth(userCtxKey interface{}, skUser string) func(http.Handler) http.Handler
 	RoleGrant(userCtxKey interface{}, allowedRoles map[string]bool) func(http.Handler) http.Handler
 }
 
 func Run(ctx context.Context, cfg internal.Config, log logium.Logger, m Middlewares, h Handlers) {
-	svc := m.ServiceGrant(cfg.Service.Name, cfg.JWT.Service.SecretKey)
 	auth := m.Auth(meta.UserCtxKey, cfg.JWT.User.AccessToken.SecretKey)
 	sysadmin := m.RoleGrant(meta.UserCtxKey, map[string]bool{
 		roles.Admin: true,
-	})
-	user := m.RoleGrant(meta.UserCtxKey, map[string]bool{
-		roles.User: true,
 	})
 
 	r := chi.NewRouter()
@@ -50,19 +47,17 @@ func Run(ctx context.Context, cfg internal.Config, log logium.Logger, m Middlewa
 	log.WithField("module", "api").Info("Starting API server")
 
 	r.Route("/company-svc/", func(r chi.Router) {
-		r.Use(svc)
-
 		r.Route("/v1", func(r chi.Router) {
 			r.Route("/companies", func(r chi.Router) {
 				r.Get("/", h.FilterCompanies)
-				r.With(auth, user).Post("/", h.CreateCompany)
+				r.With(auth).Post("/", h.CreateCompany)
 
 				r.Route("/{company_id}", func(r chi.Router) {
 					r.Get("/", h.GetCompany)
-					r.With(auth, user).Post("/", h.UpdateCompany)
+					r.With(auth).Post("/", h.UpdateCompany)
 
 					r.Route("/status", func(r chi.Router) {
-						r.With(auth, user).Post("/", h.UpdateCompaniesStatus)
+						r.With(auth).Post("/", h.UpdateCompaniesStatus)
 						r.With(auth, sysadmin).Post("/", h.CreateCompanyBlock)
 					})
 				})
@@ -73,11 +68,11 @@ func Run(ctx context.Context, cfg internal.Config, log logium.Logger, m Middlewa
 
 				r.Route("/{user_id}", func(r chi.Router) {
 					r.Get("/", h.GetEmployee)
-					r.With(auth, user).Delete("/", h.DeleteEmployee)
+					r.With(auth).Delete("/", h.DeleteEmployee)
 				})
 			})
 
-			r.With(auth, user).Route("/invite", func(r chi.Router) {
+			r.With(auth).Route("/invite", func(r chi.Router) {
 				r.Post("/", h.CreateInvite)
 				r.Post("/{token}", h.AcceptInvite)
 			})
@@ -95,9 +90,40 @@ func Run(ctx context.Context, cfg internal.Config, log logium.Logger, m Middlewa
 		})
 	})
 
+	srv := &http.Server{
+		Addr:              cfg.Rest.Port,
+		Handler:           r,
+		ReadTimeout:       cfg.Rest.Timeouts.Read,
+		ReadHeaderTimeout: cfg.Rest.Timeouts.ReadHeader,
+		WriteTimeout:      cfg.Rest.Timeouts.Write,
+		IdleTimeout:       cfg.Rest.Timeouts.Idle,
+	}
+
 	log.Infof("starting REST service on %s", cfg.Rest.Port)
 
-	<-ctx.Done()
+	errCh := make(chan error, 1)
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			errCh <- err
+		} else {
+			errCh <- nil
+		}
+	}()
 
-	log.Info("shutting down REST service")
+	select {
+	case <-ctx.Done():
+		log.Info("shutting down REST service...")
+	case err := <-errCh:
+		if err != nil {
+			log.Errorf("REST server error: %v", err)
+		}
+	}
+
+	shCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(shCtx); err != nil {
+		log.Errorf("REST shutdown error: %v", err)
+	} else {
+		log.Info("REST server stopped")
+	}
 }

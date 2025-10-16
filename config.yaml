@@ -1,5 +1,5 @@
 service:
-  name: "company-svc"
+  name: "companies-svc"
 
 profile:
   url: "http://localhost:8002/profiles-svc/v1/profiles"
@@ -7,15 +7,14 @@ profile:
 rest:
   port: ":8004"
   timeouts:
-    read: 15 #seconds
-    read_header: 15 #seconds
-    write: 15 #seconds
-    idle: 60 #seconds
+    read: 15s #seconds
+    read_header: 15s #seconds
+    write: 15s #seconds
+    idle: 60s #seconds
 
 log:
   level: "debug"
   format: "text"
-
 
 database:
   sql:
@@ -26,8 +25,6 @@ jwt:
     access_token:
       secret_key: "supersecretkey"
       token_lifetime: 900
-  service:
-    secret_key: "servicesuperkey"
   employee-invites:
     secret_key: "invitesuperkey"
 

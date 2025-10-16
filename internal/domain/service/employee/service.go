@@ -8,34 +8,18 @@ import (
 	"github.com/google/uuid"
 )
 
-type JwtManager interface {
-	CreateInviteToken(
-		inviteID uuid.UUID,
-		role string,
-		cityID uuid.UUID,
-		ExpiredAt time.Time,
-	) (string, error)
-
-	DecryptInviteToken(tokenStr string) (models.InviteTokenData, error)
-
-	HashInviteToken(tokenStr string) (string, error)
-	VerifyInviteToken(tokenStr, hashed string) error
-}
-
 type UserGuesser interface {
 	Guess(ctx context.Context, userIDs ...uuid.UUID) (map[uuid.UUID]models.Profile, error)
 }
 
 type Service struct {
 	db          database
-	jwt         JwtManager
 	userGuesser UserGuesser
 }
 
-func NewService(db database, jwt JwtManager, userGuesser UserGuesser) Service {
+func NewService(db database, userGuesser UserGuesser) Service {
 	return Service{
 		db:          db,
-		jwt:         jwt,
 		userGuesser: userGuesser,
 	}
 }
