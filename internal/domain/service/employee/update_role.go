@@ -30,7 +30,7 @@ func (s Service) UpdateEmployeeRole(
 	}
 
 	if initiator.CompanyID != user.CompanyID {
-		return models.EmployeeWithUserData{}, errx.ErrorInitiatorIsNotEmployeeOfThiscompany.Raise(
+		return models.EmployeeWithUserData{}, errx.ErrorInitiatorIsNotEmployeeOfThisCompany.Raise(
 			fmt.Errorf("initiator %s and chosen employee %s have different companies", initiatorID, userID),
 		)
 	}

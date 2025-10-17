@@ -19,10 +19,11 @@ type CreateParams struct {
 func (s Service) Create(ctx context.Context, InitiatorID uuid.UUID, params CreateParams) (models.Invite, error) {
 	initiator, err := s.db.GetEmployeeByUserID(ctx, InitiatorID)
 	if err != nil {
-		return models.Invite{}, errx.ErrorInternal.Raise(
+		return models.Invite{}, errx.ErrorInitiatorIsNotEmployee.Raise(
 			fmt.Errorf("failed to get initiator employee by user id %s, cause: %w", InitiatorID, err),
 		)
 	}
+
 	if initiator.IsNil() {
 		return models.Invite{}, errx.ErrorInitiatorIsNotEmployee.Raise(
 			fmt.Errorf("initiator employee with user id %s not found", InitiatorID),
@@ -30,7 +31,7 @@ func (s Service) Create(ctx context.Context, InitiatorID uuid.UUID, params Creat
 	}
 
 	if initiator.CompanyID != params.CompanyID {
-		return models.Invite{}, errx.ErrorInitiatorIsNotEmployeeOfThiscompany.Raise(
+		return models.Invite{}, errx.ErrorInitiatorIsNotEmployeeOfThisCompany.Raise(
 			fmt.Errorf("initiator company_id %s not equal to params company_id %s", initiator.CompanyID, params.CompanyID),
 		)
 	}

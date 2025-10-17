@@ -30,7 +30,7 @@ func (s Service) Delete(ctx context.Context, initiatorID, userID, companyID uuid
 	}
 
 	if initiator.CompanyID != user.CompanyID {
-		return errx.ErrorInitiatorIsNotEmployeeOfThiscompany.Raise(
+		return errx.ErrorInitiatorIsNotEmployeeOfThisCompany.Raise(
 			fmt.Errorf("initiator %s and chosen employee %s have different companies", initiatorID, userID),
 		)
 	}

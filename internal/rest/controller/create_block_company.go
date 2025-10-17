@@ -29,25 +29,6 @@ func (a Service) CreateCompanyBlock(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//if req.Data.Attributes.CompanyID != chi.URLParam(r, "company_id") {
-	//	ape.RenderErr(w,
-	//		problems.InvalidParameter("company_id", fmt.Errorf("path ID and body ID do not match")),
-	//		problems.InvalidPointer("/data/attributes.company_id", fmt.Errorf("path ID and body ID do not match")),
-	//	)
-	//
-	//	return
-	//}
-	//
-	//companyID, err := uuid.Parse(req.Data.Attributes.CompanyID)
-	//if err != nil {
-	//	a.log.WithError(err).Errorf("invalid company id: %s", req.Data.Attributes.CompanyID)
-	//	ape.RenderErr(w, problems.BadRequest(validation.Errors{
-	//		"company_id": err,
-	//	})...)
-	//
-	//	return
-	//}
-
 	block, err := a.domain.block.Crete(r.Context(), initiator.ID, req.Data.Attributes.CompanyId, req.Data.Attributes.Reason)
 	if err != nil {
 		a.log.WithError(err).Errorf("failed to block company")

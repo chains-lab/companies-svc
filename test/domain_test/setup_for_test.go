@@ -55,7 +55,7 @@ type employeeSvc interface {
 	) (models.EmployeeWithUserData, error)
 
 	Delete(ctx context.Context, initiatorID, userID, companyID uuid.UUID) error
-	RefuseOwn(ctx context.Context, initiatorID uuid.UUID) error
+	RefuseMe(ctx context.Context, initiatorID uuid.UUID) error
 }
 
 type inviteSvc interface {

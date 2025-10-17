@@ -100,8 +100,8 @@ func TestErrorCreateEmployee(t *testing.T) {
 		CompanyID: uuid.New(),
 		Role:      enum.EmployeeRoleAdmin,
 	})
-	if !errors.Is(err, errx.ErrorInitiatorIsNotEmployeeOfThiscompany) {
-		t.Fatalf("expected error %v, got %v", errx.ErrorInitiatorIsNotEmployeeOfThiscompany, err)
+	if !errors.Is(err, errx.ErrorInitiatorIsNotEmployeeOfThisCompany) {
+		t.Fatalf("expected error %v, got %v", errx.ErrorInitiatorIsNotEmployeeOfThisCompany, err)
 	}
 }
 
@@ -122,8 +122,8 @@ func TestInvalidCompanyInvite(t *testing.T) {
 		CompanyID: comp2.ID,
 		Role:      enum.EmployeeRoleAdmin,
 	})
-	if !errors.Is(err, errx.ErrorInitiatorIsNotEmployeeOfThiscompany) {
-		t.Fatalf("expected error %v, got %v", errx.ErrorInitiatorIsNotEmployeeOfThiscompany, err)
+	if !errors.Is(err, errx.ErrorInitiatorIsNotEmployeeOfThisCompany) {
+		t.Fatalf("expected error %v, got %v", errx.ErrorInitiatorIsNotEmployeeOfThisCompany, err)
 	}
 }
 

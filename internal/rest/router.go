@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/chains-lab/companies-svc/internal"
+	"github.com/chains-lab/companies-svc/internal/domain/enum"
 	"github.com/chains-lab/companies-svc/internal/rest/meta"
 	"github.com/chains-lab/logium"
 	"github.com/chains-lab/restkit/roles"
@@ -14,26 +15,43 @@ import (
 )
 
 type Handlers interface {
-	CanceledCompanyBlock(w http.ResponseWriter, r *http.Request)
 	CreateCompanyBlock(w http.ResponseWriter, r *http.Request)
-	CreateCompany(w http.ResponseWriter, r *http.Request)
-	DeleteEmployee(w http.ResponseWriter, r *http.Request)
+	GetBlock(w http.ResponseWriter, r *http.Request)
 	GetActiveCompanyBlock(w http.ResponseWriter, r *http.Request)
-	GetCompany(w http.ResponseWriter, r *http.Request)
-	GetEmployee(w http.ResponseWriter, r *http.Request)
 	FilterBlockages(w http.ResponseWriter, r *http.Request)
+	CanceledCompanyBlock(w http.ResponseWriter, r *http.Request)
+
+	CreateCompany(w http.ResponseWriter, r *http.Request)
+	GetCompany(w http.ResponseWriter, r *http.Request)
 	FilterCompanies(w http.ResponseWriter, r *http.Request)
-	ListEmployees(w http.ResponseWriter, r *http.Request)
-	CreateInvite(w http.ResponseWriter, r *http.Request)
 	UpdateCompany(w http.ResponseWriter, r *http.Request)
 	UpdateCompaniesStatus(w http.ResponseWriter, r *http.Request)
+
+	ListEmployees(w http.ResponseWriter, r *http.Request)
+	GetEmployee(w http.ResponseWriter, r *http.Request)
+	DeleteEmployee(w http.ResponseWriter, r *http.Request)
+
+	GetMyEmployee(w http.ResponseWriter, r *http.Request)
+	RefuseMyEmployee(w http.ResponseWriter, r *http.Request)
+
+	CreateInvite(w http.ResponseWriter, r *http.Request)
 	AcceptInvite(w http.ResponseWriter, r *http.Request)
-	GetBlock(w http.ResponseWriter, r *http.Request)
 }
 
 type Middlewares interface {
 	Auth(userCtxKey interface{}, skUser string) func(http.Handler) http.Handler
 	RoleGrant(userCtxKey interface{}, allowedRoles map[string]bool) func(http.Handler) http.Handler
+
+	CompanyMember(
+		UserCtxKey interface{},
+		allowedCompanyRoles map[string]bool,
+	) func(http.Handler) http.Handler
+
+	CompanyMemberOrAdmin(
+		UserCtxKey interface{},
+		allowedCompanyRoles map[string]bool,
+		allowedAdminRoles map[string]bool,
+	) func(http.Handler) http.Handler
 }
 
 func Run(ctx context.Context, cfg internal.Config, log logium.Logger, m Middlewares, h Handlers) {
@@ -42,24 +60,33 @@ func Run(ctx context.Context, cfg internal.Config, log logium.Logger, m Middlewa
 		roles.Admin: true,
 	})
 
+	companyAdmin := m.CompanyMember(meta.UserCtxKey, map[string]bool{
+		enum.EmployeeRoleOwner: true,
+		enum.EmployeeRoleAdmin: true,
+	})
+	companyMember := m.CompanyMember(meta.UserCtxKey, map[string]bool{
+		enum.EmployeeRoleOwner:     true,
+		enum.EmployeeRoleAdmin:     true,
+		enum.EmployeeRoleModerator: true,
+	})
+
 	r := chi.NewRouter()
 
 	log.WithField("module", "api").Info("Starting API server")
 
 	r.Route("/company-svc/", func(r chi.Router) {
 		r.Route("/v1", func(r chi.Router) {
+
 			r.Route("/companies", func(r chi.Router) {
 				r.Get("/", h.FilterCompanies)
 				r.With(auth).Post("/", h.CreateCompany)
 
 				r.Route("/{company_id}", func(r chi.Router) {
 					r.Get("/", h.GetCompany)
-					r.With(auth).Post("/", h.UpdateCompany)
+					r.With(auth, companyAdmin).Post("/", h.UpdateCompany)
 
-					r.Route("/status", func(r chi.Router) {
-						r.With(auth).Post("/", h.UpdateCompaniesStatus)
-						r.With(auth, sysadmin).Post("/", h.CreateCompanyBlock)
-					})
+					r.With(auth, companyAdmin).Post("/status", h.UpdateCompaniesStatus)
+					r.With(auth, sysadmin).Post("/block", h.CreateCompanyBlock)
 				})
 			})
 
@@ -68,7 +95,12 @@ func Run(ctx context.Context, cfg internal.Config, log logium.Logger, m Middlewa
 
 				r.Route("/{user_id}", func(r chi.Router) {
 					r.Get("/", h.GetEmployee)
-					r.With(auth).Delete("/", h.DeleteEmployee)
+					r.With(auth, companyAdmin).Delete("/", h.DeleteEmployee)
+				})
+
+				r.With(auth, companyMember).Route("/me", func(r chi.Router) {
+					r.Get("/", h.GetMyEmployee)
+					r.Delete("/", h.RefuseMyEmployee)
 				})
 			})
 
@@ -80,7 +112,7 @@ func Run(ctx context.Context, cfg internal.Config, log logium.Logger, m Middlewa
 			r.Route("/blocks", func(r chi.Router) {
 				r.Get("/", h.FilterBlockages)
 				r.With(auth, sysadmin).Post("/", h.CreateCompanyBlock)
-				r.Get("/active", h.GetActiveCompanyBlock)
+				r.Get("/{company_id}", h.GetActiveCompanyBlock)
 
 				r.Route("/{block_id}", func(r chi.Router) {
 					r.Get("/", h.GetBlock)

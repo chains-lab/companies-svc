@@ -248,9 +248,9 @@ func TestInactiveCompany(t *testing.T) {
 		t.Errorf("expected company status '%s', got '%s'", enum.CompanyStatusInactive, comp.Status)
 	}
 
-	err = s.domain.employee.RefuseOwn(ctx, admin.UserID)
+	err = s.domain.employee.RefuseMe(ctx, admin.UserID)
 	if err != nil {
-		t.Fatalf("RefuseOwn: %v", err)
+		t.Fatalf("RefuseMe: %v", err)
 	}
 
 	emps, err = s.domain.employee.Filter(ctx, employee.FilterParams{

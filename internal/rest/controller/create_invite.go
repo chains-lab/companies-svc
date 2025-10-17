@@ -37,6 +37,8 @@ func (a Service) CreateInvite(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		a.log.WithError(err).Errorf("failed to create employee invite")
 		switch {
+		case errors.Is(err, errx.ErrorInitiatorIsNotEmployee):
+			ape.RenderErr(w, problems.Forbidden("initiator is not employee"))
 		case errors.Is(err, errx.ErrorcompanyNotFound):
 			ape.RenderErr(w, problems.NotFound("company not found"))
 		case errors.Is(err, errx.ErrorcompanyIsBlocked):

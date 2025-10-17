@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s Service) RefuseOwn(ctx context.Context, initiatorID uuid.UUID) error {
+func (s Service) RefuseMe(ctx context.Context, initiatorID uuid.UUID) error {
 	own, err := s.GetInitiator(ctx, initiatorID)
 	if err != nil {
 		return err
