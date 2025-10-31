@@ -52,5 +52,11 @@ func (s Service) Delete(ctx context.Context, initiatorID, userID, companyID uuid
 		)
 	}
 
+	if err = s.eve.UpdateEmployee(ctx, userID, nil, nil); err != nil {
+		return errx.ErrorInternal.Raise(
+			fmt.Errorf("failed to refuse own employee be kafka, cause: %w", err),
+		)
+	}
+
 	return nil
 }

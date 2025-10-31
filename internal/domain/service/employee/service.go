@@ -12,13 +12,24 @@ type UserGuesser interface {
 	Guess(ctx context.Context, userIDs ...uuid.UUID) (map[uuid.UUID]models.Profile, error)
 }
 
+type EventWriter interface {
+	UpdateEmployee(
+		ctx context.Context,
+		userID uuid.UUID,
+		companyID *uuid.UUID,
+		role *string,
+	) error
+}
+
 type Service struct {
+	eve         EventWriter
 	db          database
 	userGuesser UserGuesser
 }
 
-func NewService(db database, userGuesser UserGuesser) Service {
+func NewService(db database, userGuesser UserGuesser, eve EventWriter) Service {
 	return Service{
+		eve:         eve,
 		db:          db,
 		userGuesser: userGuesser,
 	}

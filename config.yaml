@@ -18,19 +18,18 @@ log:
 
 database:
   sql:
-    url: "postgresql://postgres:postgres@localhost:7777/postgres?sslmode=disable"
+    url: "postgresql://postgres:postgres@localhost:7004/postgres?sslmode=disable"
 
 jwt:
   user:
     access_token:
-      secret_key: "supersecretkey"
+      secret_key: "UnG06MAU2i1Mvqf8"
       token_lifetime: 900
   employee-invites:
     secret_key: "invitesuperkey"
 
 kafka:
-  brokers:
-    - "re-news-kafka:XXXX"
+  broker: "localhost:19092"
 
 swagger:
   enabled: true

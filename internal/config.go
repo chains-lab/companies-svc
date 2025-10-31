@@ -38,6 +38,10 @@ type DatabaseConfig struct {
 	} `mapstructure:"sql"`
 }
 
+type KafkaConfig struct {
+	Broker string `mapstructure:"broker"`
+}
+
 type JWTConfig struct {
 	User struct {
 		AccessToken struct {
@@ -65,6 +69,7 @@ type Config struct {
 	Log      LogConfig      `mapstructure:"log"`
 	Rest     RestConfig     `mapstructure:"rest"`
 	JWT      JWTConfig      `mapstructure:"jwt"`
+	Kafka    KafkaConfig    `mapstructure:"kafka"`
 	Database DatabaseConfig `mapstructure:"database"`
 	Swagger  SwaggerConfig  `mapstructure:"swagger"`
 }

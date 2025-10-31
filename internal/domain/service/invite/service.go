@@ -25,15 +25,26 @@ type JwtManager interface {
 	VerifyInviteToken(tokenStr, hashed string) error
 }
 
+type EventWriter interface {
+	UpdateEmployee(
+		ctx context.Context,
+		userID uuid.UUID,
+		companyID *uuid.UUID,
+		role *string,
+	) error
+}
+
 type Service struct {
 	db  database
 	jwt JwtManager
+	eve EventWriter
 }
 
-func NewService(db database, jwt JwtManager) Service {
+func NewService(db database, jwt JwtManager, eve EventWriter) Service {
 	return Service{
 		db:  db,
 		jwt: jwt,
+		eve: eve,
 	}
 }
 

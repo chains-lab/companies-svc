@@ -71,5 +71,12 @@ func (s Service) Create(
 		return models.Company{}, err
 	}
 
+	role := enum.EmployeeRoleOwner
+	if err = s.eve.UpdateEmployee(ctx, initiatorID, &comp.ID, &role); err != nil {
+		return models.Company{}, errx.ErrorInternal.Raise(
+			fmt.Errorf("failed to update employee with kafka, cause: %w", err),
+		)
+	}
+
 	return comp, err
 }

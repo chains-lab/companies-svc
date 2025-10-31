@@ -68,6 +68,12 @@ func (s Service) UpdateEmployeeRole(
 		)
 	}
 
+	if err = s.eve.UpdateEmployee(ctx, userID, &user.CompanyID, &newRole); err != nil {
+		return models.EmployeeWithUserData{}, errx.ErrorInternal.Raise(
+			fmt.Errorf("failed to refuse own employee be kafka, cause: %w", err),
+		)
+	}
+
 	profiles, err := s.userGuesser.Guess(ctx, userID)
 	if err != nil {
 		return models.EmployeeWithUserData{}, errx.ErrorInternal.Raise(

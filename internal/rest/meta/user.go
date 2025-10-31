@@ -4,24 +4,17 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/google/uuid"
+	"github.com/chains-lab/restkit/token"
 )
 
-type UserData struct {
-	ID        uuid.UUID `json:"sub,omitempty"`
-	SessionID uuid.UUID `json:"session_id,omitempty"`
-	Verified  bool      `json:"verified,omitempty"`
-	Role      string    `json:"role,omitempty"`
-}
-
-func User(ctx context.Context) (UserData, error) {
+func User(ctx context.Context) (token.UserData, error) {
 	if ctx == nil {
-		return UserData{}, fmt.Errorf("mising context")
+		return token.UserData{}, fmt.Errorf("mising context")
 	}
 
-	userData, ok := ctx.Value(UserCtxKey).(UserData)
+	userData, ok := ctx.Value(UserCtxKey).(token.UserData)
 	if !ok {
-		return UserData{}, fmt.Errorf("mising context")
+		return token.UserData{}, fmt.Errorf("mising context")
 	}
 
 	return userData, nil

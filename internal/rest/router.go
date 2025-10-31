@@ -74,19 +74,30 @@ func Run(ctx context.Context, cfg internal.Config, log logium.Logger, m Middlewa
 
 	log.WithField("module", "api").Info("Starting API server")
 
-	r.Route("/company-svc/", func(r chi.Router) {
+	r.Route("/companies-svc/", func(r chi.Router) {
 		r.Route("/v1", func(r chi.Router) {
 
 			r.Route("/companies", func(r chi.Router) {
 				r.Get("/", h.FilterCompanies)
-				r.With(auth).Post("/", h.CreateCompany)
 
-				r.Route("/{company_id}", func(r chi.Router) {
-					r.Get("/", h.GetCompany)
-					r.With(auth, companyAdmin).Post("/", h.UpdateCompany)
+				// всё, что ниже — под auth
+				r.Group(func(r chi.Router) {
+					r.Use(auth)
+					r.Post("/", h.CreateCompany)
 
-					r.With(auth, companyAdmin).Post("/status", h.UpdateCompaniesStatus)
-					r.With(auth, sysadmin).Post("/block", h.CreateCompanyBlock)
+					r.Route("/{company_id}", func(r chi.Router) {
+						r.Get("/", h.GetCompany) // публичный? оставь снаружи, иначе перенеси выше
+
+						// админ компании
+						r.Group(func(r chi.Router) {
+							r.Use(companyAdmin) // порядок важен: сначала auth, потом проверка роли участника
+							r.Post("/", h.UpdateCompany)
+							r.Post("/status", h.UpdateCompaniesStatus)
+
+							// системный админ
+							r.With(sysadmin).Post("/block", h.CreateCompanyBlock)
+						})
+					})
 				})
 			})
 
@@ -94,29 +105,37 @@ func Run(ctx context.Context, cfg internal.Config, log logium.Logger, m Middlewa
 				r.Get("/", h.ListEmployees)
 
 				r.Route("/{user_id}", func(r chi.Router) {
-					r.Get("/", h.GetEmployee)
-					r.With(auth, companyAdmin).Delete("/", h.DeleteEmployee)
+					r.Get("/", h.GetEmployee) // публичный?
+					r.Group(func(r chi.Router) {
+						r.Use(auth, companyAdmin)
+						r.Delete("/", h.DeleteEmployee)
+					})
 				})
 
-				r.With(auth, companyMember).Route("/me", func(r chi.Router) {
+				r.Route("/me", func(r chi.Router) {
+					r.Use(auth, companyMember)
 					r.Get("/", h.GetMyEmployee)
 					r.Delete("/", h.RefuseMyEmployee)
 				})
 			})
 
-			r.With(auth).Route("/invite", func(r chi.Router) {
+			r.Route("/invite", func(r chi.Router) {
+				r.Use(auth)
 				r.Post("/", h.CreateInvite)
 				r.Post("/{token}", h.AcceptInvite)
 			})
 
 			r.Route("/blocks", func(r chi.Router) {
 				r.Get("/", h.FilterBlockages)
-				r.With(auth, sysadmin).Post("/", h.CreateCompanyBlock)
 				r.Get("/{company_id}", h.GetActiveCompanyBlock)
 
-				r.Route("/{block_id}", func(r chi.Router) {
-					r.Get("/", h.GetBlock)
-					r.With(auth, sysadmin).Post("/", h.CanceledCompanyBlock)
+				r.Group(func(r chi.Router) {
+					r.Use(auth, sysadmin) // один раз на группу
+					r.Post("/", h.CreateCompanyBlock)
+					r.Route("/{block_id}", func(r chi.Router) {
+						r.Get("/", h.GetBlock)
+						r.Post("/", h.CanceledCompanyBlock)
+					})
 				})
 			})
 		})

@@ -13,8 +13,8 @@ import (
 	"github.com/chains-lab/companies-svc/internal/domain/service/company"
 	"github.com/chains-lab/companies-svc/internal/domain/service/employee"
 	"github.com/chains-lab/companies-svc/internal/domain/service/invite"
-	"github.com/chains-lab/companies-svc/internal/infra/jwtmanager"
-	"github.com/chains-lab/companies-svc/internal/infra/usrguesser"
+	"github.com/chains-lab/companies-svc/internal/jwtmanager"
+	"github.com/chains-lab/companies-svc/internal/usrguesser"
 	"github.com/chains-lab/companies-svc/test"
 	"github.com/google/uuid"
 )

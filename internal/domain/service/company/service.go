@@ -8,13 +8,24 @@ import (
 	"github.com/google/uuid"
 )
 
-type Service struct {
-	db database
+type EventWriter interface {
+	UpdateEmployee(
+		ctx context.Context,
+		userID uuid.UUID,
+		companyID *uuid.UUID,
+		role *string,
+	) error
 }
 
-func NewService(db database) Service {
+type Service struct {
+	eve EventWriter
+	db  database
+}
+
+func NewService(db database, eve EventWriter) Service {
 	return Service{
-		db: db,
+		eve: eve,
+		db:  db,
 	}
 }
 

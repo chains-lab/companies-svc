@@ -82,6 +82,12 @@ func (s Service) Accept(ctx context.Context, userID uuid.UUID, token string) (mo
 		return models.Invite{}, err
 	}
 
+	if err = s.eve.UpdateEmployee(ctx, userID, &inv.CompanyID, &inv.Role); err != nil {
+		return models.Invite{}, errx.ErrorInternal.Raise(
+			fmt.Errorf("failed to update employee with event, cause: %w", err),
+		)
+	}
+
 	inv.Status = enum.InviteStatusAccepted
 	inv.UserID = &userID
 	inv.AnsweredAt = &now
