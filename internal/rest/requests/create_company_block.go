@@ -15,7 +15,7 @@ func CreateCompanyBlock(r *http.Request) (req resources.CreateCompanyBlock, err 
 	}
 
 	errs := validation.Errors{
-		"data/type":       validation.Validate(req.Data.Type, validation.Required, validation.In(resources.CreatecompanyBlockType)),
+		"data/type":       validation.Validate(req.Data.Type, validation.Required, validation.In(resources.CompanyBlockType)),
 		"data/attributes": validation.Validate(req.Data.Attributes, validation.Required),
 	}
 	return req, errs.Filter()

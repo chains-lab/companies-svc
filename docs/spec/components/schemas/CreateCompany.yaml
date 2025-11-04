@@ -10,7 +10,7 @@ properties:
     properties:
       type:
         type: string
-        enum: [ create_company ]
+        enum: [ company ]
       attributes:
         type: object
         required:

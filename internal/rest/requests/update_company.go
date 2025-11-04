@@ -15,7 +15,7 @@ func UpdateCompany(r *http.Request) (req resources.UpdateCompany, err error) {
 	}
 
 	errs := validation.Errors{
-		"data/type":       validation.Validate(req.Data.Type, validation.Required, validation.In(resources.UpdatecompanyType)),
+		"data/type":       validation.Validate(req.Data.Type, validation.Required, validation.In(resources.CompanyType)),
 		"data/attributes": validation.Validate(req.Data.Attributes, validation.Required),
 	}
 	return req, errs.Filter()

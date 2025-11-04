@@ -22,7 +22,7 @@ func (a Service) CreateInvite(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req, err := requests.CreateEmployeeInvite(r)
+	req, err := requests.CreateInvite(r)
 	if err != nil {
 		a.log.WithError(err).Errorf("invalid create employee invite request")
 		ape.RenderErr(w, problems.BadRequest(err)...)
@@ -32,6 +32,7 @@ func (a Service) CreateInvite(w http.ResponseWriter, r *http.Request) {
 
 	res, err := a.domain.invite.Create(r.Context(), initiator.ID, invite.CreateParams{
 		CompanyID: req.Data.Attributes.CompanyId,
+		UserID:    req.Data.Attributes.UserId,
 		Role:      req.Data.Attributes.Role,
 	})
 	if err != nil {
@@ -39,9 +40,13 @@ func (a Service) CreateInvite(w http.ResponseWriter, r *http.Request) {
 		switch {
 		case errors.Is(err, errx.ErrorInitiatorIsNotEmployee):
 			ape.RenderErr(w, problems.Forbidden("initiator is not employee"))
-		case errors.Is(err, errx.ErrorcompanyNotFound):
+		case errors.Is(err, errx.ErrorUserAlreadyEmployee):
+			ape.RenderErr(w, problems.Conflict("user is already employee"))
+		case errors.Is(err, errx.ErrorInitiatorHaveNotEnoughRights):
+			ape.RenderErr(w, problems.Forbidden("initiator have not enough rights"))
+		case errors.Is(err, errx.ErrorCompanyNotFound):
 			ape.RenderErr(w, problems.NotFound("company not found"))
-		case errors.Is(err, errx.ErrorcompanyIsBlocked):
+		case errors.Is(err, errx.ErrorCompanyIsBlocked):
 			ape.RenderErr(w, problems.Conflict("company is blocked"))
 		default:
 			ape.RenderErr(w, problems.InternalError())

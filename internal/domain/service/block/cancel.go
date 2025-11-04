@@ -12,12 +12,12 @@ import (
 )
 
 func (s Service) Cancel(ctx context.Context, companyID uuid.UUID) (models.Company, error) {
-	dis, err := s.getCompany(ctx, companyID)
+	company, err := s.getCompany(ctx, companyID)
 	if err != nil {
 		return models.Company{}, err
 	}
 
-	_, err = s.GetActiveCompanyBlock(ctx, companyID)
+	block, err := s.GetActiveCompanyBlock(ctx, companyID)
 	if err != nil {
 		return models.Company{}, err
 	}
@@ -44,8 +44,15 @@ func (s Service) Cancel(ctx context.Context, companyID uuid.UUID) (models.Compan
 		return models.Company{}, err
 	}
 
-	dis.Status = enum.CompanyStatusInactive
-	dis.UpdatedAt = now
+	err = s.event.PublishCompanyUnblocked(ctx, block)
+	if err != nil {
+		return models.Company{}, errx.ErrorInternal.Raise(
+			fmt.Errorf("failed to publish company unblocked event, cause: %w", err),
+		)
+	}
 
-	return dis, nil
+	company.Status = enum.CompanyStatusInactive
+	company.UpdatedAt = now
+
+	return company, nil
 }

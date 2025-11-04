@@ -15,7 +15,7 @@ properties:
         description: The UUID of the company to be updated.
       type:
         type: string
-        enum: [ update_company_status ]
+        enum: [ company ]
       attributes:
         type: object
         required:

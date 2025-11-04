@@ -95,17 +95,17 @@ func TestUpdateBlockedCompany(t *testing.T) {
 		Name: &name,
 		Icon: &icon,
 	})
-	if !errors.Is(err, errx.ErrorcompanyIsBlocked) {
-		t.Fatalf("expected error %v, got %v", errx.ErrorcompanyIsBlocked, err)
+	if !errors.Is(err, errx.ErrorCompanyIsBlocked) {
+		t.Fatalf("expected error %v, got %v", errx.ErrorCompanyIsBlocked, err)
 	}
 
 	_, err = s.domain.company.UpdateStatus(ctx, comp.ID, enum.CompanyStatusActive)
-	if !errors.Is(err, errx.ErrorcompanyIsBlocked) {
-		t.Fatalf("expected error %v, got %v", errx.ErrorcompanyIsBlocked, err)
+	if !errors.Is(err, errx.ErrorCompanyIsBlocked) {
+		t.Fatalf("expected error %v, got %v", errx.ErrorCompanyIsBlocked, err)
 	}
 
 	_, err = s.domain.company.UpdateStatus(ctx, comp.ID, enum.CompanyStatusInactive)
-	if !errors.Is(err, errx.ErrorcompanyIsBlocked) {
-		t.Fatalf("expected error %v, got %v", errx.ErrorcompanyIsBlocked, err)
+	if !errors.Is(err, errx.ErrorCompanyIsBlocked) {
+		t.Fatalf("expected error %v, got %v", errx.ErrorCompanyIsBlocked, err)
 	}
 }

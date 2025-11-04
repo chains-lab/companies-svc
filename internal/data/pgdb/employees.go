@@ -14,11 +14,13 @@ import (
 const employeesTable = "employees"
 
 type Employee struct {
-	UserID    uuid.UUID `db:"user_id"`
-	CompanyID uuid.UUID `db:"company_id"`
-	Role      string    `db:"role"`
-	UpdatedAt time.Time `db:"updated_at"`
-	CreatedAt time.Time `db:"created_at"`
+	UserID    uuid.UUID      `db:"user_id"`
+	CompanyID uuid.UUID      `db:"company_id"`
+	Role      string         `db:"role"`
+	Position  sql.NullString `db:"position"`
+	Label     sql.NullString `db:"label"`
+	UpdatedAt time.Time      `db:"updated_at"`
+	CreatedAt time.Time      `db:"created_at"`
 }
 
 type EmployeesQ struct {
@@ -48,18 +50,31 @@ func (q EmployeesQ) New() EmployeesQ {
 }
 
 func (q EmployeesQ) Insert(ctx context.Context, in Employee) error {
-	qry, args, err := q.inserter.
-		Columns("user_id", "company_id", "role", "updated_at", "created_at").
-		Values(in.UserID, in.CompanyID, in.Role, in.UpdatedAt, in.CreatedAt).
-		ToSql()
+	values := map[string]interface{}{
+		"user_id":    in.UserID,
+		"company_id": in.CompanyID,
+		"role":       in.Role,
+		"updated_at": in.UpdatedAt,
+	}
+	if in.Position.Valid {
+		values["position"] = in.Position.String
+	}
+	if in.Label.Valid {
+		values["label"] = in.Label.String
+	}
+	if !in.CreatedAt.IsZero() {
+		values["created_at"] = in.CreatedAt
+	}
+
+	sqlStr, args, err := q.inserter.SetMap(values).ToSql()
 	if err != nil {
 		return fmt.Errorf("build insert %s: %w", employeesTable, err)
 	}
 
 	if tx, ok := TxFromCtx(ctx); ok {
-		_, err = tx.ExecContext(ctx, qry, args...)
+		_, err = tx.ExecContext(ctx, sqlStr, args...)
 	} else {
-		_, err = q.db.ExecContext(ctx, qry, args...)
+		_, err = q.db.ExecContext(ctx, sqlStr, args...)
 	}
 	return err
 }
@@ -148,6 +163,16 @@ func (q EmployeesQ) UpdateRole(role string) EmployeesQ {
 	return q
 }
 
+func (q EmployeesQ) UpdatePosition(position *string) EmployeesQ {
+	q.updater = q.updater.Set("position", position)
+	return q
+}
+
+func (q EmployeesQ) UpdateLabel(label *string) EmployeesQ {
+	q.updater = q.updater.Set("label", label)
+	return q
+}
+
 func (q EmployeesQ) Delete(ctx context.Context) error {
 	query, args, err := q.deleter.ToSql()
 	if err != nil {
@@ -163,7 +188,28 @@ func (q EmployeesQ) Delete(ctx context.Context) error {
 	return err
 }
 
-func (q EmployeesQ) FilterUserID(userID uuid.UUID) EmployeesQ {
+func (q EmployeesQ) Exist(ctx context.Context) (bool, error) {
+	sqlStr, args, err := q.counter.Limit(1).ToSql()
+	if err != nil {
+		return false, fmt.Errorf("build exist query for employees: %w", err)
+	}
+
+	var n int
+	var row *sql.Row
+	if tx, ok := TxFromCtx(ctx); ok {
+		row = tx.QueryRowContext(ctx, sqlStr, args...)
+	} else {
+		row = q.db.QueryRowContext(ctx, sqlStr, args...)
+	}
+
+	if err := row.Scan(&n); err != nil {
+		return false, fmt.Errorf("scan exist query: %w", err)
+	}
+
+	return n > 0, nil
+}
+
+func (q EmployeesQ) FilterUserID(userID ...uuid.UUID) EmployeesQ {
 	q.selector = q.selector.Where(sq.Eq{"user_id": userID})
 	q.counter = q.counter.Where(sq.Eq{"user_id": userID})
 	q.updater = q.updater.Where(sq.Eq{"user_id": userID})

@@ -8,30 +8,15 @@ import (
 	"github.com/google/uuid"
 )
 
-type UserGuesser interface {
-	Guess(ctx context.Context, userIDs ...uuid.UUID) (map[uuid.UUID]models.Profile, error)
-}
-
-type EventWriter interface {
-	UpdateEmployee(
-		ctx context.Context,
-		userID uuid.UUID,
-		companyID *uuid.UUID,
-		role *string,
-	) error
-}
-
 type Service struct {
-	eve         EventWriter
-	db          database
-	userGuesser UserGuesser
+	event EventPublisher
+	db    database
 }
 
-func NewService(db database, userGuesser UserGuesser, eve EventWriter) Service {
+func NewService(db database, publisher EventPublisher) Service {
 	return Service{
-		eve:         eve,
-		db:          db,
-		userGuesser: userGuesser,
+		event: publisher,
+		db:    db,
 	}
 }
 
@@ -41,33 +26,19 @@ type database interface {
 	GetCompanyByID(ctx context.Context, ID uuid.UUID) (models.Company, error)
 
 	CreateEmployee(ctx context.Context, input models.Employee) error
+
+	GetEmployee(ctx context.Context, params GetParams) (models.Employee, error)
+	GetEmployeeByUserID(ctx context.Context, userID uuid.UUID) (models.Employee, error)
+	GetEmployeeByCompanyAndUser(ctx context.Context, companyID, userID uuid.UUID) (models.Employee, error)
+	GetEmployeeByCompanyAndUserAndRole(ctx context.Context, companyID, userID uuid.UUID, role string) (models.Employee, error)
 	FilterEmployees(ctx context.Context, filters FilterParams, page, size uint64) (models.EmployeeCollection, error)
 
-	GetEmployeeByUserID(
-		ctx context.Context,
-		userID uuid.UUID,
-	) (models.Employee, error)
-
-	GetEmployeeByCompanyAndUser(
-		ctx context.Context,
-		companyID, userID uuid.UUID,
-	) (models.Employee, error)
-
-	GetEmployeeByCompanyAndUserAndRole(
-		ctx context.Context,
-		companyID, userID uuid.UUID,
-		role string,
-	) (models.Employee, error)
-
-	GetEmployee(
-		ctx context.Context,
-		params GetParams,
-	) (models.Employee, error)
-
-	UpdateEmployeeRole(ctx context.Context, userID uuid.UUID, newRole string, updatedAt time.Time) error
+	UpdateEmployee(ctx context.Context, userID uuid.UUID, params UpdateEmployeeParams, updatedAt time.Time) error
 	DeleteEmployee(ctx context.Context, userID, companyID uuid.UUID) error
+}
 
-	CreateInvite(ctx context.Context, input models.Invite) error
-	GetInvite(ctx context.Context, ID uuid.UUID) (models.Invite, error)
-	UpdateInviteStatus(ctx context.Context, ID, UserID uuid.UUID, status string, acceptedAt time.Time) error
+type EventPublisher interface {
+	PublishEmployeeCreated(ctx context.Context, employee models.Employee) error
+	PublishEmployeeUpdated(ctx context.Context, employee models.Employee) error
+	PublishEmployeeDeleted(ctx context.Context, employee models.Employee) error
 }

@@ -39,11 +39,12 @@ func (s Service) Create(
 		)
 	}
 	if !user.IsNil() {
-		return models.Company{}, errx.ErrorCurrentEmployeeCannotCreatecompany.Raise(
+		return models.Company{}, errx.ErrorCurrentEmployeeCannotCreateCompany.Raise(
 			fmt.Errorf("user is already an employee of company: %s", user.CompanyID),
 		)
 	}
 
+	var employee models.Employee
 	if err = s.db.Transaction(ctx, func(ctx context.Context) error {
 		_, err = s.db.CreateCompany(ctx, comp)
 		if err != nil {
@@ -52,14 +53,14 @@ func (s Service) Create(
 			)
 		}
 
-		emp := models.Employee{
+		employee = models.Employee{
 			UserID:    initiatorID,
 			CompanyID: comp.ID,
 			Role:      enum.EmployeeRoleOwner,
 			CreatedAt: now,
 			UpdatedAt: now,
 		}
-		err = s.db.CreateEmployee(ctx, emp)
+		err = s.db.CreateEmployee(ctx, employee)
 		if err != nil {
 			return errx.ErrorInternal.Raise(
 				fmt.Errorf("failed to create employee for company, cause: %w", err),
@@ -71,10 +72,15 @@ func (s Service) Create(
 		return models.Company{}, err
 	}
 
-	role := enum.EmployeeRoleOwner
-	if err = s.eve.UpdateEmployee(ctx, initiatorID, &comp.ID, &role); err != nil {
+	if err = s.event.PublishEmployeeCreated(ctx, employee); err != nil {
 		return models.Company{}, errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to update employee with kafka, cause: %w", err),
+		)
+	}
+
+	if err = s.event.PublishCompanyCreated(ctx, comp); err != nil {
+		return models.Company{}, errx.ErrorInternal.Raise(
+			fmt.Errorf("failed to publish company created event, cause: %w", err),
 		)
 	}
 

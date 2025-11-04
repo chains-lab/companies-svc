@@ -5,6 +5,9 @@ api/openapi.yaml
 api_test_.go
 client.go
 configuration.go
+docs/AnswerInvite.md
+docs/AnswerInviteData.md
+docs/AnswerInviteDataAttributes.md
 docs/CompaniesCollection.md
 docs/Company.md
 docs/CompanyAttributes.md
@@ -19,9 +22,9 @@ docs/CreateCompanyBlockData.md
 docs/CreateCompanyBlockDataAttributes.md
 docs/CreateCompanyData.md
 docs/CreateCompanyDataAttributes.md
-docs/CreateEmployeeInvite.md
-docs/CreateEmployeeInviteData.md
-docs/CreateEmployeeInviteDataAttributes.md
+docs/CreateInvite.md
+docs/CreateInviteData.md
+docs/CreateInviteDataAttributes.md
 docs/Employee.md
 docs/EmployeeAttributes.md
 docs/EmployeeData.md
@@ -32,9 +35,6 @@ docs/Invite.md
 docs/InviteAttributes.md
 docs/InviteData.md
 docs/PaginationData.md
-docs/SentInvite.md
-docs/SentInviteData.md
-docs/SentInviteDataAttributes.md
 docs/TestAPI.md
 docs/UpdateCompany.md
 docs/UpdateCompanyData.md
@@ -45,6 +45,9 @@ docs/UpdateCompanyStatusDataAttributes.md
 git_push.sh
 go.mod
 go.sum
+model_answer_invite.go
+model_answer_invite_data.go
+model_answer_invite_data_attributes.go
 model_companies_collection.go
 model_company.go
 model_company_attributes.go
@@ -59,9 +62,9 @@ model_create_company_block_data.go
 model_create_company_block_data_attributes.go
 model_create_company_data.go
 model_create_company_data_attributes.go
-model_create_employee_invite.go
-model_create_employee_invite_data.go
-model_create_employee_invite_data_attributes.go
+model_create_invite.go
+model_create_invite_data.go
+model_create_invite_data_attributes.go
 model_employee.go
 model_employee_attributes.go
 model_employee_data.go
@@ -72,9 +75,6 @@ model_invite.go
 model_invite_attributes.go
 model_invite_data.go
 model_pagination_data.go
-model_sent_invite.go
-model_sent_invite_data.go
-model_sent_invite_data_attributes.go
 model_update_company.go
 model_update_company_data.go
 model_update_company_data_attributes.go

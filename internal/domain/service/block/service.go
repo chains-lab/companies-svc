@@ -11,12 +11,14 @@ import (
 )
 
 type Service struct {
-	db database
+	db    database
+	event EventPublisher
 }
 
-func NewService(db database) Service {
+func NewService(db database, publisher EventPublisher) Service {
 	return Service{
-		db: db,
+		db:    db,
+		event: publisher,
 	}
 }
 
@@ -40,6 +42,11 @@ type database interface {
 	CancelActiveCompanyBlock(ctx context.Context, companyID uuid.UUID, canceledAt time.Time) error
 }
 
+type EventPublisher interface {
+	PublishCompanyBlocked(ctx context.Context, block models.CompanyBlock) error
+	PublishCompanyUnblocked(ctx context.Context, block models.CompanyBlock) error
+}
+
 func (s Service) getCompany(ctx context.Context, ID uuid.UUID) (models.Company, error) {
 	company, err := s.db.GetCompanyByID(ctx, ID)
 	if err != nil {
@@ -49,7 +56,7 @@ func (s Service) getCompany(ctx context.Context, ID uuid.UUID) (models.Company, 
 	}
 
 	if company.IsNil() {
-		return models.Company{}, errx.ErrorcompanyNotFound.Raise(
+		return models.Company{}, errx.ErrorCompanyNotFound.Raise(
 			fmt.Errorf("company with ID %s not found", ID),
 		)
 	}

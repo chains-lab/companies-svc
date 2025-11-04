@@ -27,7 +27,7 @@ func (a Service) GetCompany(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		a.log.WithError(err).Error("failed to get company")
 		switch {
-		case errors.Is(err, errx.ErrorcompanyNotFound):
+		case errors.Is(err, errx.ErrorCompanyNotFound):
 			ape.RenderErr(w, problems.NotFound("companyID not found"))
 		default:
 			ape.RenderErr(w, problems.InternalError())

@@ -10,7 +10,7 @@ import (
 )
 
 func (s Service) Delete(ctx context.Context, initiatorID, userID, companyID uuid.UUID) error {
-	user, err := s.Get(ctx, GetParams{
+	employee, err := s.Get(ctx, GetParams{
 		UserID:    &userID,
 		CompanyID: &companyID,
 	})
@@ -29,13 +29,13 @@ func (s Service) Delete(ctx context.Context, initiatorID, userID, companyID uuid
 		)
 	}
 
-	if initiator.CompanyID != user.CompanyID {
+	if initiator.CompanyID != employee.CompanyID {
 		return errx.ErrorInitiatorIsNotEmployeeOfThisCompany.Raise(
 			fmt.Errorf("initiator %s and chosen employee %s have different companies", initiatorID, userID),
 		)
 	}
 
-	allowed, err := enum.CompareEmployeeRoles(initiator.Role, user.Role)
+	allowed, err := enum.CompareEmployeeRoles(initiator.Role, employee.Role)
 	if err != nil {
 		return errx.ErrorInvalidEmployeeRole.Raise(err)
 	}
@@ -45,16 +45,15 @@ func (s Service) Delete(ctx context.Context, initiatorID, userID, companyID uuid
 		)
 	}
 
-	err = s.db.DeleteEmployee(ctx, userID, companyID)
-	if err != nil {
+	if err = s.db.DeleteEmployee(ctx, userID, companyID); err != nil {
 		return errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to delete employee, cause: %w", err),
 		)
 	}
 
-	if err = s.eve.UpdateEmployee(ctx, userID, nil, nil); err != nil {
+	if err = s.event.PublishEmployeeDeleted(ctx, employee); err != nil {
 		return errx.ErrorInternal.Raise(
-			fmt.Errorf("failed to refuse own employee be kafka, cause: %w", err),
+			fmt.Errorf("failed to publish company deleted event, cause: %w", err),
 		)
 	}
 

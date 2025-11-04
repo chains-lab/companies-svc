@@ -6,7 +6,6 @@ import (
 
 	"github.com/chains-lab/companies-svc/internal/data/pgdb"
 	"github.com/chains-lab/companies-svc/internal/domain/models"
-	"github.com/google/uuid"
 )
 
 type Database struct {
@@ -100,21 +99,8 @@ func inviteModelToSchema(m models.Invite) pgdb.Invite {
 		Status:    m.Status,
 		Role:      m.Role,
 		CompanyID: m.CompanyID,
-		Token:     m.Token,
 		CreatedAt: m.CreatedAt,
 		ExpiresAt: m.ExpiresAt,
-	}
-	if m.UserID != nil {
-		res.UserID = uuid.NullUUID{
-			UUID:  *m.UserID,
-			Valid: true,
-		}
-	}
-	if m.AnsweredAt != nil {
-		res.AnsweredAt = sql.NullTime{
-			Time:  *m.AnsweredAt,
-			Valid: true,
-		}
 	}
 
 	return res
@@ -126,15 +112,8 @@ func inviteSchemaToModel(m pgdb.Invite) models.Invite {
 		Status:    m.Status,
 		Role:      m.Role,
 		CompanyID: m.CompanyID,
-		Token:     m.Token,
 		CreatedAt: m.CreatedAt,
 		ExpiresAt: m.ExpiresAt,
-	}
-	if m.UserID.Valid {
-		res.UserID = &m.UserID.UUID
-	}
-	if m.AnsweredAt.Valid {
-		res.AnsweredAt = &m.AnsweredAt.Time
 	}
 
 	return res

@@ -39,7 +39,7 @@ func (s Service) Crete(
 		)
 	}
 	if !activeBlock.IsNil() {
-		return models.CompanyBlock{}, errx.ErrorcompanyHaveAlreadyActiveBlock.Raise(
+		return models.CompanyBlock{}, errx.ErrorCompanyHaveAlreadyActiveBlock.Raise(
 			fmt.Errorf("company %s already has an active block", companyID),
 		)
 	}
@@ -62,6 +62,13 @@ func (s Service) Crete(
 		return nil
 	}); err != nil {
 		return models.CompanyBlock{}, err
+	}
+
+	err = s.event.PublishCompanyBlocked(ctx, block)
+	if err != nil {
+		return models.CompanyBlock{}, errx.ErrorInternal.Raise(
+			fmt.Errorf("failed to publish company blocked event, cause: %w", err),
+		)
 	}
 
 	return block, nil

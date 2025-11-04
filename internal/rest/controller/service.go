@@ -31,29 +31,24 @@ type companySvc interface {
 }
 
 type employeeSvc interface {
-	Create(ctx context.Context, params employee.CreateParams) (models.EmployeeWithUserData, error)
+	Create(ctx context.Context, params employee.CreateParams) (models.Employee, error)
 
-	Get(ctx context.Context, params employee.GetParams) (models.EmployeeWithUserData, error)
+	Get(ctx context.Context, params employee.GetParams) (models.Employee, error)
 	Filter(
 		ctx context.Context,
 		filters employee.FilterParams,
 		page, size uint64,
-	) (models.EmployeeWithUserDataCollection, error)
+	) (models.EmployeeCollection, error)
 
-	UpdateEmployeeRole(
-		ctx context.Context,
-		initiatorID uuid.UUID,
-		userID uuid.UUID,
-		newRole string,
-	) (models.EmployeeWithUserData, error)
+	UpdateEmployee(ctx context.Context, initiatorID, userID uuid.UUID, params employee.UpdateEmployeeParams) (models.Employee, error)
 
 	Delete(ctx context.Context, initiatorID, userID, companyID uuid.UUID) error
 	RefuseMe(ctx context.Context, initiatorID uuid.UUID) error
 }
 
 type inviteSvc interface {
-	Create(ctx context.Context, InitiatorID uuid.UUID, params invite.CreateParams) (models.Invite, error)
-	Accept(ctx context.Context, userID uuid.UUID, token string) (models.Invite, error)
+	Create(ctx context.Context, initiatorID uuid.UUID, params invite.CreateParams) (models.Invite, error)
+	Answer(ctx context.Context, userID, inviteID uuid.UUID, answer string) (models.Invite, error)
 }
 
 type blockSvc interface {

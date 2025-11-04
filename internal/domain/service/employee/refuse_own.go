@@ -28,7 +28,7 @@ func (s Service) RefuseMe(ctx context.Context, initiatorID uuid.UUID) error {
 		)
 	}
 
-	if err = s.eve.UpdateEmployee(ctx, initiatorID, nil, nil); err != nil {
+	if err = s.event.PublishEmployeeDeleted(ctx, own); err != nil {
 		return errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to refuse own employee be kafka, cause: %w", err),
 		)

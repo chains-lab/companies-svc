@@ -8,7 +8,7 @@ var EmployeeInvalidRole = ape.DeclareError("INVALID_EMPLOYEE_ROLE")
 
 var ErrorEmployeeNotFound = ape.DeclareError("EMPLOYEE_NOT_FOUND")
 
-var ErrorEmployeeAlreadyExists = ape.DeclareError("EMPLOYEE_ALREADY_EXISTS")
+var ErrorUserAlreadyEmployee = ape.DeclareError("USER_ALREADY_EMPLOYEE")
 
 var ErrorCannotDeleteYourself = ape.DeclareError("CANNOT_DELETE_YOURSELF")
 

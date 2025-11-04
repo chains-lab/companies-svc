@@ -12,11 +12,9 @@ import (
 	"github.com/chains-lab/companies-svc/internal/domain/service/employee"
 	"github.com/chains-lab/companies-svc/internal/domain/service/invite"
 	"github.com/chains-lab/companies-svc/internal/events/publisher"
-	"github.com/chains-lab/companies-svc/internal/jwtmanager"
 	"github.com/chains-lab/companies-svc/internal/rest"
 	"github.com/chains-lab/companies-svc/internal/rest/controller"
 	"github.com/chains-lab/companies-svc/internal/rest/middlewares"
-	"github.com/chains-lab/companies-svc/internal/usrguesser"
 	"github.com/chains-lab/logium"
 )
 
@@ -35,15 +33,13 @@ func Start(ctx context.Context, cfg internal.Config, log logium.Logger, wg *sync
 	}
 
 	database := data.NewDatabase(pg)
-	jwtInviteManager := jwtmanager.NewManager(cfg)
-	userGuesser := usrguesser.NewService(cfg.Profile.Url, nil)
 
-	eventWriter := publisher.New(cfg.Kafka.Broker)
+	eventPublisher := publisher.New(cfg.Kafka.Broker)
 
-	companiesSvc := company.NewService(database, eventWriter)
-	employeeSvc := employee.NewService(database, userGuesser, eventWriter)
-	inviteSvc := invite.NewService(database, jwtInviteManager, eventWriter)
-	blockSvc := block.NewService(database)
+	companiesSvc := company.NewService(database, eventPublisher)
+	employeeSvc := employee.NewService(database, eventPublisher)
+	inviteSvc := invite.NewService(database, eventPublisher)
+	blockSvc := block.NewService(database, eventPublisher)
 
 	ctrl := controller.New(log, companiesSvc, employeeSvc, inviteSvc, blockSvc)
 	mdlv := middlewares.New(log)

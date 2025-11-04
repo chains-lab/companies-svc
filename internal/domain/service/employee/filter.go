@@ -10,7 +10,8 @@ import (
 )
 
 type FilterParams struct {
-	CompanyID *uuid.UUID
+	UserID    []uuid.UUID
+	CompanyID []uuid.UUID
 	Roles     []string
 }
 
@@ -18,10 +19,10 @@ func (s Service) Filter(
 	ctx context.Context,
 	filters FilterParams,
 	page, size uint64,
-) (models.EmployeeWithUserDataCollection, error) {
+) (models.EmployeeCollection, error) {
 	res, err := s.db.FilterEmployees(ctx, filters, page, size)
 	if err != nil {
-		return models.EmployeeWithUserDataCollection{}, errx.ErrorInternal.Raise(
+		return models.EmployeeCollection{}, errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to list employees, cause: %w", err),
 		)
 	}
@@ -31,12 +32,5 @@ func (s Service) Filter(
 		userIDs = append(userIDs, emp.UserID)
 	}
 
-	profiles, err := s.userGuesser.Guess(ctx, userIDs...)
-	if err != nil {
-		return models.EmployeeWithUserDataCollection{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("failed to guess employees, cause: %w", err),
-		)
-	}
-
-	return res.AddProfileData(profiles), nil
+	return res, nil
 }

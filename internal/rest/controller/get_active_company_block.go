@@ -28,7 +28,7 @@ func (a Service) GetActiveCompanyBlock(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		a.log.WithError(err).Errorf("failed to get company %s active block", companyID)
 		switch {
-		case errors.Is(err, errx.ErrorcompanyBlockNotFound):
+		case errors.Is(err, errx.ErrorCompanyBlockNotFound):
 			ape.RenderErr(w, problems.NotFound("no active block for company"))
 		default:
 			ape.RenderErr(w, problems.InternalError())

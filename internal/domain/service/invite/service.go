@@ -3,7 +3,6 @@ package invite
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/chains-lab/companies-svc/internal/domain/enum"
 	"github.com/chains-lab/companies-svc/internal/domain/errx"
@@ -11,40 +10,15 @@ import (
 	"github.com/google/uuid"
 )
 
-type JwtManager interface {
-	CreateInviteToken(
-		inviteID uuid.UUID,
-		role string,
-		cityID uuid.UUID,
-		ExpiredAt time.Time,
-	) (string, error)
-
-	DecryptInviteToken(tokenStr string) (models.InviteTokenData, error)
-
-	HashInviteToken(tokenStr string) (string, error)
-	VerifyInviteToken(tokenStr, hashed string) error
-}
-
-type EventWriter interface {
-	UpdateEmployee(
-		ctx context.Context,
-		userID uuid.UUID,
-		companyID *uuid.UUID,
-		role *string,
-	) error
-}
-
 type Service struct {
-	db  database
-	jwt JwtManager
-	eve EventWriter
+	db    database
+	event EventPublisher
 }
 
-func NewService(db database, jwt JwtManager, eve EventWriter) Service {
+func NewService(db database, publisher EventPublisher) Service {
 	return Service{
-		db:  db,
-		jwt: jwt,
-		eve: eve,
+		db:    db,
+		event: publisher,
 	}
 }
 
@@ -54,29 +28,19 @@ type database interface {
 	GetCompanyByID(ctx context.Context, ID uuid.UUID) (models.Company, error)
 
 	CreateEmployee(ctx context.Context, input models.Employee) error
-
-	GetEmployeeByUserID(
-		ctx context.Context,
-		userID uuid.UUID,
-	) (models.Employee, error)
-
-	GetEmployeeByCompanyAndUser(
-		ctx context.Context,
-		companyID, userID uuid.UUID,
-	) (models.Employee, error)
-
-	GetEmployeeByCompanyAndUserAndRole(
-		ctx context.Context,
-		companyID, userID uuid.UUID,
-		role string,
-	) (models.Employee, error)
-
-	UpdateEmployeeRole(ctx context.Context, userID uuid.UUID, newRole string, updatedAt time.Time) error
-	DeleteEmployee(ctx context.Context, userID, companyID uuid.UUID) error
+	GetEmployeeByUserID(ctx context.Context, userID uuid.UUID) (models.Employee, error)
+	GetEmployeeByCompanyAndUser(ctx context.Context, companyID, userID uuid.UUID) (models.Employee, error)
 
 	CreateInvite(ctx context.Context, input models.Invite) error
 	GetInvite(ctx context.Context, ID uuid.UUID) (models.Invite, error)
-	UpdateInviteStatus(ctx context.Context, ID, UserID uuid.UUID, status string, acceptedAt time.Time) error
+	UpdateInviteStatus(ctx context.Context, ID uuid.UUID, answer string) error
+
+	EmployeeExist(ctx context.Context, userID uuid.UUID) (bool, error)
+}
+
+type EventPublisher interface {
+	PublishEmployeeCreated(ctx context.Context, employee models.Employee) error
+	PublishInviteCreated(ctx context.Context, invite models.Invite) error
 }
 
 func (s Service) companyIsActive(ctx context.Context, companyID uuid.UUID) error {
@@ -87,12 +51,12 @@ func (s Service) companyIsActive(ctx context.Context, companyID uuid.UUID) error
 		)
 	}
 	if dis.IsNil() {
-		return errx.ErrorcompanyNotFound.Raise(
+		return errx.ErrorCompanyNotFound.Raise(
 			fmt.Errorf("company with ID %s not found", companyID),
 		)
 	}
 	if dis.Status != enum.CompanyStatusActive {
-		return errx.ErrorcompanyIsNotActive.Raise(
+		return errx.ErrorCompanyIsNotActive.Raise(
 			fmt.Errorf("company with ID %s is not active", companyID),
 		)
 	}

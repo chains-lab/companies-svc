@@ -17,16 +17,16 @@ type CreateParams struct {
 	Role      string
 }
 
-func (s Service) Create(ctx context.Context, params CreateParams) (models.EmployeeWithUserData, error) {
+func (s Service) Create(ctx context.Context, params CreateParams) (models.Employee, error) {
 	emp, err := s.db.GetEmployeeByUserID(ctx, params.UserID)
 	if err != nil {
-		return models.EmployeeWithUserData{}, errx.ErrorInternal.Raise(
+		return models.Employee{}, errx.ErrorInternal.Raise(
 			fmt.Errorf("falied to check existing employee, cause: %w", err),
 		)
 	}
 
 	if !emp.IsNil() {
-		return models.EmployeeWithUserData{}, errx.ErrorEmployeeAlreadyExists.Raise(
+		return models.Employee{}, errx.ErrorUserAlreadyEmployee.Raise(
 			fmt.Errorf("employee with user ID %s already exists", params.UserID),
 		)
 	}
@@ -34,7 +34,7 @@ func (s Service) Create(ctx context.Context, params CreateParams) (models.Employ
 	now := time.Now().UTC()
 	err = enum.CheckEmployeeRole(params.Role)
 	if err != nil {
-		return models.EmployeeWithUserData{}, errx.ErrorInvalidEmployeeRole.Raise(
+		return models.Employee{}, errx.ErrorInvalidEmployeeRole.Raise(
 			fmt.Errorf("failed to check employee role, cause: %w", err),
 		)
 	}
@@ -49,17 +49,17 @@ func (s Service) Create(ctx context.Context, params CreateParams) (models.Employ
 
 	err = s.db.CreateEmployee(ctx, emp)
 	if err != nil {
-		return models.EmployeeWithUserData{}, errx.ErrorInternal.Raise(
+		return models.Employee{}, errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to create employee, cause: %w", err),
 		)
 	}
 
-	profiles, err := s.userGuesser.Guess(ctx, params.UserID)
+	err = s.event.PublishEmployeeCreated(ctx, emp)
 	if err != nil {
-		return models.EmployeeWithUserData{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("failed to guess employee, cause: %w", err),
+		return models.Employee{}, errx.ErrorInternal.Raise(
+			fmt.Errorf("failed to publish employee created event, cause: %w", err),
 		)
 	}
 
-	return emp.AddProfileData(profiles[params.UserID]), nil
+	return emp, nil
 }

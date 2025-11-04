@@ -37,9 +37,9 @@ func (a Service) UpdateCompany(w http.ResponseWriter, r *http.Request) {
 			ape.RenderErr(w, problems.Forbidden("initiator is not an employee"))
 		case errors.Is(err, errx.ErrorInitiatorHaveNotEnoughRights):
 			ape.RenderErr(w, problems.Forbidden("initiator employee has not enough rights"))
-		case errors.Is(err, errx.ErrorcompanyNotFound):
+		case errors.Is(err, errx.ErrorCompanyNotFound):
 			ape.RenderErr(w, problems.NotFound("company not found"))
-		case errors.Is(err, errx.ErrorcompanyIsBlocked):
+		case errors.Is(err, errx.ErrorCompanyIsBlocked):
 			ape.RenderErr(w, problems.Conflict("company is blocked"))
 		default:
 			ape.RenderErr(w, problems.InternalError())

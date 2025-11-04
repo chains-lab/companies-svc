@@ -1,25 +1,26 @@
 type: object
 required:
+  - company_id
+  - user_id
   - status
   - role
-  - company_id
-  - token
   - expires_at
   - created_at
 properties:
+  company_id:
+    type: string
+    format: uuid
+    description: "company id"
+  user_id:
+    type: string
+    format: uuid
+    description: "user id"
   status:
     type: string
     description: "status of the invite"
   role:
     type: string
     description: "role of the user in this city"
-  company_id:
-    type: string
-    format: uuid
-    description: "company id"
-  token:
-    type: string
-    description: "unique token for the invite"
   expires_at:
     type: string
     format: date-time

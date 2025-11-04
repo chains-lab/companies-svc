@@ -28,7 +28,7 @@ func (a Service) GetBlock(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		a.log.WithError(err).Errorf("failed to get block, ID: %s", blockID)
 		switch {
-		case errors.Is(err, errx.ErrorcompanyBlockNotFound):
+		case errors.Is(err, errx.ErrorCompanyBlockNotFound):
 			ape.RenderErr(w, problems.NotFound("Crete not found"))
 		default:
 			ape.RenderErr(w, problems.InternalError())

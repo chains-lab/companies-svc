@@ -18,7 +18,7 @@ func (s Service) Get(ctx context.Context, ID uuid.UUID) (models.Company, error) 
 	}
 
 	if company.IsNil() {
-		return models.Company{}, errx.ErrorcompanyNotFound.Raise(
+		return models.Company{}, errx.ErrorCompanyNotFound.Raise(
 			fmt.Errorf("company with ID %s not found", ID),
 		)
 	}

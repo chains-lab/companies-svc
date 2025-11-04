@@ -99,7 +99,10 @@ func (d *Database) FilterEmployees(
 	query := d.sql.employees.New()
 
 	if filter.CompanyID != nil {
-		query = query.FilterCompanyID(*filter.CompanyID)
+		query = query.FilterCompanyID(filter.CompanyID...)
+	}
+	if filter.UserID != nil {
+		query = query.FilterUserID(filter.UserID...)
 	}
 	if filter.Roles != nil && len(filter.Roles) > 0 {
 		query = query.FilterRole(filter.Roles...)
@@ -128,20 +131,49 @@ func (d *Database) FilterEmployees(
 	}, nil
 }
 
-func (d *Database) UpdateEmployeeRole(
+func (d *Database) UpdateEmployee(
 	ctx context.Context,
 	userID uuid.UUID,
-	newRole string,
+	params employee.UpdateEmployeeParams,
 	updatedAt time.Time,
 ) error {
-	err := d.sql.employees.New().FilterUserID(userID).UpdateRole(newRole).Update(ctx, updatedAt)
-	if err != nil {
-		return err
+	q := d.sql.employees.New().FilterUserID(userID)
+	empty := true
+
+	if params.Role != nil {
+		q = q.UpdateRole(*params.Role)
+		empty = false
 	}
 
-	return nil
+	if params.Position != nil {
+		if *params.Position == "" {
+			q = q.UpdatePosition(nil)
+		} else {
+			q = q.UpdatePosition(params.Position)
+		}
+		empty = false
+	}
+
+	if params.Label != nil {
+		if *params.Label == "" {
+			q = q.UpdateLabel(nil)
+		} else {
+			q = q.UpdateLabel(params.Label)
+		}
+		empty = false
+	}
+
+	if empty {
+		return nil
+	}
+
+	return q.Update(ctx, updatedAt)
 }
 
 func (d *Database) DeleteEmployee(ctx context.Context, userID, companyID uuid.UUID) error {
 	return d.sql.employees.New().FilterUserID(userID).FilterCompanyID(companyID).Delete(ctx)
+}
+
+func (d *Database) EmployeeExist(ctx context.Context, userID uuid.UUID) (bool, error) {
+	return d.sql.employees.New().FilterUserID(userID).Exist(ctx)
 }

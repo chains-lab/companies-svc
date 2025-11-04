@@ -16,7 +16,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func CreateCompany(t *testing.T, s Setup) (models.Company, models.EmployeeWithUserData) {
+func CreateCompany(t *testing.T, s Setup) (models.Company, models.Employee) {
 	ownerID := uuid.New()
 	ctx := context.Background()
 
@@ -36,7 +36,7 @@ func CreateCompany(t *testing.T, s Setup) (models.Company, models.EmployeeWithUs
 	return comp, owner
 }
 
-func CreateEmployee(t *testing.T, s Setup, initiatorID, companyID uuid.UUID, role string) models.EmployeeWithUserData {
+func CreateEmployee(t *testing.T, s Setup, initiatorID, companyID uuid.UUID, role string) models.Employee {
 	ctx := context.Background()
 
 	userID := uuid.New()
@@ -125,8 +125,8 @@ func TestCreateCompanyByEmployee(t *testing.T) {
 		Name: "companyID 2",
 		Icon: "icon 2",
 	})
-	if !errors.Is(err, errx.ErrorCurrentEmployeeCannotCreatecompany) {
-		t.Fatalf("expected error %v, got %v", errx.ErrorCurrentEmployeeCannotCreatecompany, err)
+	if !errors.Is(err, errx.ErrorCurrentEmployeeCannotCreateCompany) {
+		t.Fatalf("expected error %v, got %v", errx.ErrorCurrentEmployeeCannotCreateCompany, err)
 	}
 }
 
@@ -206,8 +206,8 @@ func TestInactiveCompany(t *testing.T) {
 
 	compID := comp.ID
 	comp, err = s.domain.company.UpdateStatus(ctx, compID, enum.CompanyStatusBlocked)
-	if !errors.Is(err, errx.ErrorCannotSetcompaniestatusBlocked) {
-		t.Fatalf("expected error %v, got %v", errx.ErrorCannotSetcompaniestatusBlocked, err)
+	if !errors.Is(err, errx.ErrorCannotSetCompanyStatusBlocked) {
+		t.Fatalf("expected error %v, got %v", errx.ErrorCannotSetCompanyStatusBlocked, err)
 	}
 
 	err = s.domain.employee.Delete(ctx, admin.UserID, admin.UserID, compID)

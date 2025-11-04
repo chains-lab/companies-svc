@@ -16,28 +16,22 @@ CREATE TABLE "employees" (
 CREATE Type invite_status AS ENUM (
     'sent',
     'accepted',
-    'rejected'
+    'declined'
 );
 
-CREATE TABLE employee_invites (
+CREATE TABLE invites (
     id          UUID           PRIMARY KEY,
+    company_id  UUID           NOT NULL REFERENCES companies("id") ON DELETE CASCADE,
+    user_id     UUID           NOT NULL,
     status      invite_status  NOT NULL DEFAULT 'sent',
     role        employee_roles NOT NULL,
-    company_id  UUID           NOT NULL REFERENCES companies("id") ON DELETE CASCADE,
-    token       VARCHAR        NOT NULL UNIQUE,
-    user_id     UUID,
-    answered_at TIMESTAMP,
+
     expires_at  TIMESTAMP      NOT NULL,
     created_at  TIMESTAMP      NOT NULL DEFAULT (now() AT TIME ZONE 'UTC'),
-
-    CONSTRAINT invite_status_answered_ck CHECK (
-        (status = 'sent' AND answered_at IS NULL)
-        OR (status IN ('accepted','rejected') AND answered_at IS NOT NULL)
-    )
 );
 
 -- +migrate Down
-DROP TABLE IF EXISTS employee_invites CASCADE;
+DROP TABLE IF EXISTS invites CASCADE;
 DROP TYPE IF EXISTS invite_status CASCADE;
 
 DROP TABLE IF EXISTS employees CASCADE;

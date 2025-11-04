@@ -23,14 +23,14 @@ var _ MappedNullable = &InviteAttributes{}
 
 // InviteAttributes struct for InviteAttributes
 type InviteAttributes struct {
+	// company id
+	CompanyId uuid.UUID `json:"company_id"`
+	// user id
+	UserId uuid.UUID `json:"user_id"`
 	// status of the invite
 	Status string `json:"status"`
 	// role of the user in this city
 	Role string `json:"role"`
-	// company id
-	CompanyId uuid.UUID `json:"company_id"`
-	// unique token for the invite
-	Token string `json:"token"`
 	// timestamp when the invite will expire
 	ExpiresAt time.Time `json:"expires_at"`
 	// timestamp when the invite was created
@@ -43,12 +43,12 @@ type _InviteAttributes InviteAttributes
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewInviteAttributes(status string, role string, companyId uuid.UUID, token string, expiresAt time.Time, createdAt time.Time) *InviteAttributes {
+func NewInviteAttributes(companyId uuid.UUID, userId uuid.UUID, status string, role string, expiresAt time.Time, createdAt time.Time) *InviteAttributes {
 	this := InviteAttributes{}
+	this.CompanyId = companyId
+	this.UserId = userId
 	this.Status = status
 	this.Role = role
-	this.CompanyId = companyId
-	this.Token = token
 	this.ExpiresAt = expiresAt
 	this.CreatedAt = createdAt
 	return &this
@@ -60,6 +60,54 @@ func NewInviteAttributes(status string, role string, companyId uuid.UUID, token 
 func NewInviteAttributesWithDefaults() *InviteAttributes {
 	this := InviteAttributes{}
 	return &this
+}
+
+// GetCompanyId returns the CompanyId field value
+func (o *InviteAttributes) GetCompanyId() uuid.UUID {
+	if o == nil {
+		var ret uuid.UUID
+		return ret
+	}
+
+	return o.CompanyId
+}
+
+// GetCompanyIdOk returns a tuple with the CompanyId field value
+// and a boolean to check if the value has been set.
+func (o *InviteAttributes) GetCompanyIdOk() (*uuid.UUID, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.CompanyId, true
+}
+
+// SetCompanyId sets field value
+func (o *InviteAttributes) SetCompanyId(v uuid.UUID) {
+	o.CompanyId = v
+}
+
+// GetUserId returns the UserId field value
+func (o *InviteAttributes) GetUserId() uuid.UUID {
+	if o == nil {
+		var ret uuid.UUID
+		return ret
+	}
+
+	return o.UserId
+}
+
+// GetUserIdOk returns a tuple with the UserId field value
+// and a boolean to check if the value has been set.
+func (o *InviteAttributes) GetUserIdOk() (*uuid.UUID, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.UserId, true
+}
+
+// SetUserId sets field value
+func (o *InviteAttributes) SetUserId(v uuid.UUID) {
+	o.UserId = v
 }
 
 // GetStatus returns the Status field value
@@ -108,54 +156,6 @@ func (o *InviteAttributes) GetRoleOk() (*string, bool) {
 // SetRole sets field value
 func (o *InviteAttributes) SetRole(v string) {
 	o.Role = v
-}
-
-// GetCompanyId returns the CompanyId field value
-func (o *InviteAttributes) GetCompanyId() uuid.UUID {
-	if o == nil {
-		var ret uuid.UUID
-		return ret
-	}
-
-	return o.CompanyId
-}
-
-// GetCompanyIdOk returns a tuple with the CompanyId field value
-// and a boolean to check if the value has been set.
-func (o *InviteAttributes) GetCompanyIdOk() (*uuid.UUID, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.CompanyId, true
-}
-
-// SetCompanyId sets field value
-func (o *InviteAttributes) SetCompanyId(v uuid.UUID) {
-	o.CompanyId = v
-}
-
-// GetToken returns the Token field value
-func (o *InviteAttributes) GetToken() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Token
-}
-
-// GetTokenOk returns a tuple with the Token field value
-// and a boolean to check if the value has been set.
-func (o *InviteAttributes) GetTokenOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Token, true
-}
-
-// SetToken sets field value
-func (o *InviteAttributes) SetToken(v string) {
-	o.Token = v
 }
 
 // GetExpiresAt returns the ExpiresAt field value
@@ -216,10 +216,10 @@ func (o InviteAttributes) MarshalJSON() ([]byte, error) {
 
 func (o InviteAttributes) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	toSerialize["company_id"] = o.CompanyId
+	toSerialize["user_id"] = o.UserId
 	toSerialize["status"] = o.Status
 	toSerialize["role"] = o.Role
-	toSerialize["company_id"] = o.CompanyId
-	toSerialize["token"] = o.Token
 	toSerialize["expires_at"] = o.ExpiresAt
 	toSerialize["created_at"] = o.CreatedAt
 	return toSerialize, nil
@@ -230,10 +230,10 @@ func (o *InviteAttributes) UnmarshalJSON(data []byte) (err error) {
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
+		"company_id",
+		"user_id",
 		"status",
 		"role",
-		"company_id",
-		"token",
 		"expires_at",
 		"created_at",
 	}

@@ -28,7 +28,7 @@ components:
             type:
               type: string
               enum:
-                - create_company
+                - company
             attributes:
               type: object
               required:
@@ -70,42 +70,6 @@ components:
                 reason:
                   type: string
                   description: The reason for blocking the company.
-    CreateEmployeeInvite:
-      type: object
-      required:
-        - data
-      properties:
-        data:
-          type: object
-          required:
-            - type
-            - attributes
-          properties:
-            type:
-              type: string
-              enum:
-                - send_employee_invite
-            attributes:
-              type: object
-              required:
-                - company_id
-                - user_id
-                - role
-              properties:
-                company_id:
-                  type: string
-                  format: uuid
-                  description: The UUID of the company to which the user is being invited.
-                user_id:
-                  type: string
-                  format: uuid
-                  description: The UUID of the user being invited.
-                role:
-                  type: string
-                  description: The role assigned to the invited user within the company.
-                  enum:
-                    - admin
-                    - member
     UpdateCompany:
       type: object
       required:
@@ -155,7 +119,7 @@ components:
             type:
               type: string
               enum:
-                - update_company_status
+                - company
             attributes:
               type: object
               required:
@@ -250,20 +214,11 @@ components:
     EmployeeAttributes:
       type: object
       required:
-        - username
-        - avatar
         - company_id
         - role
         - created_at
         - updated_at
       properties:
-        username:
-          type: string
-          description: The username of the employee within the company's system.
-        avatar:
-          type: string
-          format: uri
-          description: A URL pointing to the employee's avatar image.
         company_id:
           type: string
           format: uuid
@@ -318,26 +273,27 @@ components:
     InviteAttributes:
       type: object
       required:
+        - company_id
+        - user_id
         - status
         - role
-        - company_id
-        - token
         - expires_at
         - created_at
       properties:
+        company_id:
+          type: string
+          format: uuid
+          description: company id
+        user_id:
+          type: string
+          format: uuid
+          description: user id
         status:
           type: string
           description: status of the invite
         role:
           type: string
           description: role of the user in this city
-        company_id:
-          type: string
-          format: uuid
-          description: company id
-        token:
-          type: string
-          description: unique token for the invite
         expires_at:
           type: string
           format: date-time
@@ -346,7 +302,7 @@ components:
           type: string
           format: date-time
           description: timestamp when the invite was created
-    SentInvite:
+    AnswerInvite:
       type: object
       required:
         - data
@@ -369,9 +325,40 @@ components:
             attributes:
               type: object
               required:
+                - answer
+              properties:
+                answer:
+                  type: string
+                  enum:
+                    - accept
+                    - decline
+                  description: 'The answer to the invite, either ''accept'' or ''decline'''
+    CreateInvite:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: object
+          required:
+            - type
+            - attributes
+          properties:
+            type:
+              type: string
+              enum:
+                - company_invite
+            attributes:
+              type: object
+              required:
+                - user_id
                 - company_id
                 - role
               properties:
+                user_id:
+                  type: string
+                  format: uuid
+                  description: ID of the user being invited
                 company_id:
                   type: string
                   format: uuid

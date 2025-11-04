@@ -48,7 +48,7 @@ func (a Service) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
 		switch {
 		case errors.Is(err, errx.ErrorInitiatorHaveNotEnoughRights):
 			ape.RenderErr(w, problems.Forbidden("initiator employee have not enough rights"))
-		case errors.Is(err, errx.ErrorcompanyNotFound):
+		case errors.Is(err, errx.ErrorCompanyNotFound):
 			ape.RenderErr(w, problems.NotFound("company not found"))
 		case errors.Is(err, errx.ErrorEmployeeNotFound):
 			ape.RenderErr(w, problems.NotFound("employee not found"))

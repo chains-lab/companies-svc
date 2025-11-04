@@ -33,9 +33,9 @@ func (a Service) CreateCompanyBlock(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		a.log.WithError(err).Errorf("failed to block company")
 		switch {
-		case errors.Is(err, errx.ErrorcompanyHaveAlreadyActiveBlock):
+		case errors.Is(err, errx.ErrorCompanyHaveAlreadyActiveBlock):
 			ape.RenderErr(w, problems.Conflict("company already have active block"))
-		case errors.Is(err, errx.ErrorcompanyNotFound):
+		case errors.Is(err, errx.ErrorCompanyNotFound):
 			ape.RenderErr(w, problems.NotFound("company not found"))
 		default:
 			ape.RenderErr(w, problems.InternalError())

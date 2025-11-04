@@ -109,3 +109,12 @@ func (d *Database) UpdateCompaniesStatus(
 
 	return nil
 }
+
+func (d *Database) DeleteCompany(ctx context.Context, ID uuid.UUID) error {
+	err := d.sql.companies.New().FilterID(ID).Delete(ctx)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

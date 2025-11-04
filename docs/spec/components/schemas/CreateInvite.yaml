@@ -1,0 +1,31 @@
+type: object
+required:
+  - data
+properties:
+  data:
+    type: object
+    required:
+      - type
+      - attributes
+    properties:
+      type:
+        type: string
+        enum: [ company_invite ]
+      attributes:
+        type: object
+        required:
+          - user_id
+          - company_id
+          - role
+        properties:
+          user_id:
+            type: string
+            format: uuid
+            description: "ID of the user being invited"
+          company_id:
+            type: string
+            format: uuid
+            description: "ID of the company the invite is for"
+          role:
+            type: string
+            description: "Role assigned to the invited user"

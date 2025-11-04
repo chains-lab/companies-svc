@@ -12,13 +12,6 @@ import (
 )
 
 func (a Service) UpdateCompaniesStatus(w http.ResponseWriter, r *http.Request) {
-	//initiator, err := meta.User(r.Context())
-	//if err != nil {
-	//	a.log.WithError(err).Error("failed to get user from context")
-	//	ape.RenderErr(w, problems.Unauthorized("user not found in context"))
-	//	return
-	//}
-
 	req, err := requests.UpdateCompanyStatus(r)
 	if err != nil {
 		a.log.WithError(err).Error("failed to parse update company status request")
@@ -35,9 +28,9 @@ func (a Service) UpdateCompaniesStatus(w http.ResponseWriter, r *http.Request) {
 			ape.RenderErr(w, problems.Forbidden("initiator is not an employee"))
 		case errors.Is(err, errx.ErrorInitiatorHaveNotEnoughRights):
 			ape.RenderErr(w, problems.Forbidden("initiator employee has not enough rights"))
-		case errors.Is(err, errx.ErrorcompanyNotFound):
+		case errors.Is(err, errx.ErrorCompanyNotFound):
 			ape.RenderErr(w, problems.NotFound("company not found"))
-		case errors.Is(err, errx.ErrorcompanyIsBlocked):
+		case errors.Is(err, errx.ErrorCompanyIsBlocked):
 			ape.RenderErr(w, problems.Conflict("company is blocked"))
 		default:
 			ape.RenderErr(w, problems.InternalError())

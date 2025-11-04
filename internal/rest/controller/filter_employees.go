@@ -2,33 +2,51 @@ package controller
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/chains-lab/ape"
 	"github.com/chains-lab/ape/problems"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/google/uuid"
 
 	"github.com/chains-lab/companies-svc/internal/domain/service/employee"
 	"github.com/chains-lab/companies-svc/internal/rest/responses"
 	"github.com/chains-lab/restkit/pagi"
-	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/google/uuid"
 )
 
 func (a Service) ListEmployees(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	filters := employee.FilterParams{}
 
-	if v := strings.TrimSpace(q.Get("company_id")); v != "" {
-		id, err := uuid.Parse(v)
-		if err != nil {
-			a.log.WithError(err).Errorf("invalid company ID format")
-			ape.RenderErr(w, problems.BadRequest(validation.Errors{
-				"company_id": err,
-			})...)
+	if comps := q["company_id"]; len(comps) > 0 {
+		filters.CompanyID = make([]uuid.UUID, 0, len(comps))
+		for _, raw := range comps {
+			id, err := uuid.Parse(raw)
+			if err != nil {
+				a.log.WithError(err).Errorf("invalid company ID format")
+				ape.RenderErr(w, problems.BadRequest(validation.Errors{
+					"company_id": err,
+				})...)
+				return
+			}
 
-			return
+			filters.CompanyID = append(filters.CompanyID, id)
 		}
-		filters.CompanyID = &id
+	}
+
+	if users := q["user_id"]; len(users) > 0 {
+		filters.UserID = make([]uuid.UUID, 0, len(users))
+		for _, raw := range users {
+			id, err := uuid.Parse(raw)
+			if err != nil {
+				a.log.WithError(err).Errorf("invalid user ID format")
+				ape.RenderErr(w, problems.BadRequest(validation.Errors{
+					"user_id": err,
+				})...)
+				return
+			}
+
+			filters.UserID = append(filters.UserID, id)
+		}
 	}
 
 	if roles := q["role"]; len(roles) > 0 {

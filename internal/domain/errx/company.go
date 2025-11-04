@@ -4,12 +4,14 @@ import (
 	"github.com/chains-lab/ape"
 )
 
-var ErrorcompanyNotFound = ape.DeclareError("company_NOT_FOUND")
+var ErrorCompanyNotFound = ape.DeclareError("COMPANY_NOT_FOUND")
 
-var ErrorcompanyIsBlocked = ape.DeclareError("company_STATUS_BLOCKED")
+var ErrorCompanyIsBlocked = ape.DeclareError("COMPANY_STATUS_BLOCKED")
 
-var ErrorcompanyIsNotActive = ape.DeclareError("company_IS_NOT_ACTIVE")
+var ErrorCompanyIsNotActive = ape.DeclareError("COMPANY_IS_NOT_ACTIVE")
 
-var ErrorCannotSetcompaniestatusBlocked = ape.DeclareError("CANNOT_SET_company_STATUS_BLOCKED")
+var ErrorCannotSetCompanyStatusBlocked = ape.DeclareError("COMPANY_STATUS_BLOCKED")
 
-var ErrorCurrentEmployeeCannotCreatecompany = ape.DeclareError("CURRENT_EMPLOYEE_CANNOT_CREATE_company")
+var ErrorCurrentEmployeeCannotCreateCompany = ape.DeclareError("CURRENT_EMPLOYEE_CANNOT_CREATE_COMPANY")
+
+var ErrorOnlyInactiveCompanyCanBeDeleted = ape.DeclareError("COMPANY_CAN_BE_DELETED")

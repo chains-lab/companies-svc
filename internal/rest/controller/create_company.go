@@ -38,7 +38,7 @@ func (a Service) CreateCompany(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		a.log.WithError(err).Errorf("failed to create company")
 		switch {
-		case errors.Is(err, errx.ErrorCurrentEmployeeCannotCreatecompany):
+		case errors.Is(err, errx.ErrorCurrentEmployeeCannotCreateCompany):
 			ape.RenderErr(w, problems.Conflict(
 				fmt.Sprintf("current employee %s cannot create company", initiator.ID),
 			))

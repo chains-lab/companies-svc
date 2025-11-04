@@ -38,21 +38,21 @@ type companySvc interface {
 }
 
 type employeeSvc interface {
-	Create(ctx context.Context, params employee.CreateParams) (models.EmployeeWithUserData, error)
+	Create(ctx context.Context, params employee.CreateParams) (models.Employee, error)
 
-	Get(ctx context.Context, params employee.GetParams) (models.EmployeeWithUserData, error)
+	Get(ctx context.Context, params employee.GetParams) (models.Employee, error)
 	Filter(
 		ctx context.Context,
 		filters employee.FilterParams,
 		page, size uint64,
-	) (models.EmployeeWithUserDataCollection, error)
+	) (models.EmployeeCollection, error)
 
 	UpdateEmployeeRole(
 		ctx context.Context,
 		initiatorID uuid.UUID,
 		userID uuid.UUID,
 		newRole string,
-	) (models.EmployeeWithUserData, error)
+	) (models.Employee, error)
 
 	Delete(ctx context.Context, initiatorID, userID, companyID uuid.UUID) error
 	RefuseMe(ctx context.Context, initiatorID uuid.UUID) error

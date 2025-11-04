@@ -4,10 +4,10 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**CompanyId** | [**uuid.UUID**](uuid.UUID.md) | company id | 
+**UserId** | [**uuid.UUID**](uuid.UUID.md) | user id | 
 **Status** | **string** | status of the invite | 
 **Role** | **string** | role of the user in this city | 
-**CompanyId** | [**uuid.UUID**](uuid.UUID.md) | company id | 
-**Token** | **string** | unique token for the invite | 
 **ExpiresAt** | **time.Time** | timestamp when the invite will expire | 
 **CreatedAt** | **time.Time** | timestamp when the invite was created | 
 
@@ -15,7 +15,7 @@ Name | Type | Description | Notes
 
 ### NewInviteAttributes
 
-`func NewInviteAttributes(status string, role string, companyId uuid.UUID, token string, expiresAt time.Time, createdAt time.Time, ) *InviteAttributes`
+`func NewInviteAttributes(companyId uuid.UUID, userId uuid.UUID, status string, role string, expiresAt time.Time, createdAt time.Time, ) *InviteAttributes`
 
 NewInviteAttributes instantiates a new InviteAttributes object
 This constructor will assign default values to properties that have it defined,
@@ -29,6 +29,46 @@ will change when the set of required properties is changed
 NewInviteAttributesWithDefaults instantiates a new InviteAttributes object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
+
+### GetCompanyId
+
+`func (o *InviteAttributes) GetCompanyId() uuid.UUID`
+
+GetCompanyId returns the CompanyId field if non-nil, zero value otherwise.
+
+### GetCompanyIdOk
+
+`func (o *InviteAttributes) GetCompanyIdOk() (*uuid.UUID, bool)`
+
+GetCompanyIdOk returns a tuple with the CompanyId field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetCompanyId
+
+`func (o *InviteAttributes) SetCompanyId(v uuid.UUID)`
+
+SetCompanyId sets CompanyId field to given value.
+
+
+### GetUserId
+
+`func (o *InviteAttributes) GetUserId() uuid.UUID`
+
+GetUserId returns the UserId field if non-nil, zero value otherwise.
+
+### GetUserIdOk
+
+`func (o *InviteAttributes) GetUserIdOk() (*uuid.UUID, bool)`
+
+GetUserIdOk returns a tuple with the UserId field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetUserId
+
+`func (o *InviteAttributes) SetUserId(v uuid.UUID)`
+
+SetUserId sets UserId field to given value.
+
 
 ### GetStatus
 
@@ -68,46 +108,6 @@ and a boolean to check if the value has been set.
 `func (o *InviteAttributes) SetRole(v string)`
 
 SetRole sets Role field to given value.
-
-
-### GetCompanyId
-
-`func (o *InviteAttributes) GetCompanyId() uuid.UUID`
-
-GetCompanyId returns the CompanyId field if non-nil, zero value otherwise.
-
-### GetCompanyIdOk
-
-`func (o *InviteAttributes) GetCompanyIdOk() (*uuid.UUID, bool)`
-
-GetCompanyIdOk returns a tuple with the CompanyId field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetCompanyId
-
-`func (o *InviteAttributes) SetCompanyId(v uuid.UUID)`
-
-SetCompanyId sets CompanyId field to given value.
-
-
-### GetToken
-
-`func (o *InviteAttributes) GetToken() string`
-
-GetToken returns the Token field if non-nil, zero value otherwise.
-
-### GetTokenOk
-
-`func (o *InviteAttributes) GetTokenOk() (*string, bool)`
-
-GetTokenOk returns a tuple with the Token field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetToken
-
-`func (o *InviteAttributes) SetToken(v string)`
-
-SetToken sets Token field to given value.
 
 
 ### GetExpiresAt

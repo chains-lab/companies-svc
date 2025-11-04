@@ -19,35 +19,28 @@ components:
     CreateCompany:
       properties:
         data:
-          $ref: '#/components/schemas/CreateCompany_data'
+          $ref: "#/components/schemas/CreateCompany_data"
       required:
       - data
       type: object
     CreateCompanyBlock:
       properties:
         data:
-          $ref: '#/components/schemas/CreateCompanyBlock_data'
-      required:
-      - data
-      type: object
-    CreateEmployeeInvite:
-      properties:
-        data:
-          $ref: '#/components/schemas/CreateEmployeeInvite_data'
+          $ref: "#/components/schemas/CreateCompanyBlock_data"
       required:
       - data
       type: object
     UpdateCompany:
       properties:
         data:
-          $ref: '#/components/schemas/UpdateCompany_data'
+          $ref: "#/components/schemas/UpdateCompany_data"
       required:
       - data
       type: object
     UpdateCompanyStatus:
       properties:
         data:
-          $ref: '#/components/schemas/UpdateCompanyStatus_data'
+          $ref: "#/components/schemas/UpdateCompanyStatus_data"
       required:
       - data
       type: object
@@ -79,7 +72,7 @@ components:
         errors:
           description: Non empty array of errors occurred during request processing
           items:
-            $ref: '#/components/schemas/Errors_errors_inner'
+            $ref: "#/components/schemas/Errors_errors_inner"
           type: array
       required:
       - errors
@@ -87,7 +80,7 @@ components:
     Employee:
       properties:
         data:
-          $ref: '#/components/schemas/EmployeeData'
+          $ref: "#/components/schemas/EmployeeData"
       required:
       - data
       type: object
@@ -102,7 +95,7 @@ components:
           - employee
           type: string
         attributes:
-          $ref: '#/components/schemas/EmployeeAttributes'
+          $ref: "#/components/schemas/EmployeeAttributes"
       required:
       - attributes
       - id
@@ -110,13 +103,6 @@ components:
       type: object
     EmployeeAttributes:
       properties:
-        username:
-          description: The username of the employee within the company's system.
-          type: string
-        avatar:
-          description: A URL pointing to the employee's avatar image.
-          format: uri
-          type: string
         company_id:
           description: The unique identifier for the company associated with the employee.
           format: uuid
@@ -134,21 +120,19 @@ components:
           format: date-time
           type: string
       required:
-      - avatar
       - company_id
       - created_at
       - role
       - updated_at
-      - username
       type: object
     EmployeesCollection:
       properties:
         data:
           items:
-            $ref: '#/components/schemas/EmployeeData'
+            $ref: "#/components/schemas/EmployeeData"
           type: array
         links:
-          $ref: '#/components/schemas/PaginationData'
+          $ref: "#/components/schemas/PaginationData"
       required:
       - data
       - links
@@ -156,7 +140,7 @@ components:
     Invite:
       properties:
         data:
-          $ref: '#/components/schemas/InviteData'
+          $ref: "#/components/schemas/InviteData"
       required:
       - data
       type: object
@@ -171,7 +155,7 @@ components:
           - company_invite
           type: string
         attributes:
-          $ref: '#/components/schemas/InviteAttributes'
+          $ref: "#/components/schemas/InviteAttributes"
       required:
       - attributes
       - id
@@ -179,18 +163,19 @@ components:
       type: object
     InviteAttributes:
       properties:
+        company_id:
+          description: company id
+          format: uuid
+          type: string
+        user_id:
+          description: user id
+          format: uuid
+          type: string
         status:
           description: status of the invite
           type: string
         role:
           description: role of the user in this city
-          type: string
-        company_id:
-          description: company id
-          format: uuid
-          type: string
-        token:
-          description: unique token for the invite
           type: string
         expires_at:
           description: timestamp when the invite will expire
@@ -206,19 +191,26 @@ components:
       - expires_at
       - role
       - status
-      - token
+      - user_id
       type: object
-    SentInvite:
+    AnswerInvite:
       properties:
         data:
-          $ref: '#/components/schemas/SentInvite_data'
+          $ref: "#/components/schemas/AnswerInvite_data"
+      required:
+      - data
+      type: object
+    CreateInvite:
+      properties:
+        data:
+          $ref: "#/components/schemas/CreateInvite_data"
       required:
       - data
       type: object
     Company:
       properties:
         data:
-          $ref: '#/components/schemas/CompanyData'
+          $ref: "#/components/schemas/CompanyData"
       required:
       - data
       type: object
@@ -233,7 +225,7 @@ components:
           - company
           type: string
         attributes:
-          $ref: '#/components/schemas/CompanyAttributes'
+          $ref: "#/components/schemas/CompanyAttributes"
       required:
       - attributes
       - id
@@ -269,10 +261,10 @@ components:
       properties:
         data:
           items:
-            $ref: '#/components/schemas/CompanyData'
+            $ref: "#/components/schemas/CompanyData"
           type: array
         links:
-          $ref: '#/components/schemas/PaginationData'
+          $ref: "#/components/schemas/PaginationData"
       required:
       - data
       - links
@@ -280,7 +272,7 @@ components:
     CompanyBlock:
       properties:
         data:
-          $ref: '#/components/schemas/CompanyBlockData'
+          $ref: "#/components/schemas/CompanyBlockData"
       required:
       - data
       type: object
@@ -295,7 +287,7 @@ components:
           - company_block
           type: string
         attributes:
-          $ref: '#/components/schemas/CompanyBlockAttributes'
+          $ref: "#/components/schemas/CompanyBlockAttributes"
       required:
       - attributes
       - id
@@ -342,10 +334,10 @@ components:
       properties:
         data:
           items:
-            $ref: '#/components/schemas/CompanyBlockData'
+            $ref: "#/components/schemas/CompanyBlockData"
           type: array
         links:
-          $ref: '#/components/schemas/PaginationData'
+          $ref: "#/components/schemas/PaginationData"
       required:
       - data
       - links
@@ -367,10 +359,10 @@ components:
       properties:
         type:
           enum:
-          - create_company
+          - company
           type: string
         attributes:
-          $ref: '#/components/schemas/CreateCompany_data_attributes'
+          $ref: "#/components/schemas/CreateCompany_data_attributes"
       required:
       - attributes
       - type
@@ -395,40 +387,7 @@ components:
           - block_company
           type: string
         attributes:
-          $ref: '#/components/schemas/CreateCompanyBlock_data_attributes'
-      required:
-      - attributes
-      - type
-      type: object
-    CreateEmployeeInvite_data_attributes:
-      properties:
-        company_id:
-          description: The UUID of the company to which the user is being invited.
-          format: uuid
-          type: string
-        user_id:
-          description: The UUID of the user being invited.
-          format: uuid
-          type: string
-        role:
-          description: The role assigned to the invited user within the company.
-          enum:
-          - admin
-          - member
-          type: string
-      required:
-      - company_id
-      - role
-      - user_id
-      type: object
-    CreateEmployeeInvite_data:
-      properties:
-        type:
-          enum:
-          - send_employee_invite
-          type: string
-        attributes:
-          $ref: '#/components/schemas/CreateEmployeeInvite_data_attributes'
+          $ref: "#/components/schemas/CreateCompanyBlock_data_attributes"
       required:
       - attributes
       - type
@@ -454,7 +413,7 @@ components:
           - update_company
           type: string
         attributes:
-          $ref: '#/components/schemas/UpdateCompany_data_attributes'
+          $ref: "#/components/schemas/UpdateCompany_data_attributes"
       required:
       - attributes
       - id
@@ -479,10 +438,10 @@ components:
           type: string
         type:
           enum:
-          - update_company_status
+          - company
           type: string
         attributes:
-          $ref: '#/components/schemas/UpdateCompanyStatus_data_attributes'
+          $ref: "#/components/schemas/UpdateCompanyStatus_data_attributes"
       required:
       - attributes
       - id
@@ -514,20 +473,18 @@ components:
       - status
       - title
       type: object
-    SentInvite_data_attributes:
+    AnswerInvite_data_attributes:
       properties:
-        company_id:
-          description: ID of the company the invite is for
-          format: uuid
-          type: string
-        role:
-          description: Role assigned to the invited user
+        answer:
+          description: "The answer to the invite, either 'accept' or 'decline'"
+          enum:
+          - accept
+          - decline
           type: string
       required:
-      - company_id
-      - role
+      - answer
       type: object
-    SentInvite_data:
+    AnswerInvite_data:
       properties:
         id:
           description: invite id
@@ -538,9 +495,39 @@ components:
           - company_invite
           type: string
         attributes:
-          $ref: '#/components/schemas/SentInvite_data_attributes'
+          $ref: "#/components/schemas/AnswerInvite_data_attributes"
       required:
       - attributes
       - id
+      - type
+      type: object
+    CreateInvite_data_attributes:
+      properties:
+        user_id:
+          description: ID of the user being invited
+          format: uuid
+          type: string
+        company_id:
+          description: ID of the company the invite is for
+          format: uuid
+          type: string
+        role:
+          description: Role assigned to the invited user
+          type: string
+      required:
+      - company_id
+      - role
+      - user_id
+      type: object
+    CreateInvite_data:
+      properties:
+        type:
+          enum:
+          - company_invite
+          type: string
+        attributes:
+          $ref: "#/components/schemas/CreateInvite_data_attributes"
+      required:
+      - attributes
       - type
       type: object

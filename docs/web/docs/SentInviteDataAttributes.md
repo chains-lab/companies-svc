@@ -4,6 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**UserId** | [**uuid.UUID**](uuid.UUID.md) | ID of the user being invited | 
 **CompanyId** | [**uuid.UUID**](uuid.UUID.md) | ID of the company the invite is for | 
 **Role** | **string** | Role assigned to the invited user | 
 
@@ -11,7 +12,7 @@ Name | Type | Description | Notes
 
 ### NewSentInviteDataAttributes
 
-`func NewSentInviteDataAttributes(companyId uuid.UUID, role string, ) *SentInviteDataAttributes`
+`func NewSentInviteDataAttributes(userId uuid.UUID, companyId uuid.UUID, role string, ) *SentInviteDataAttributes`
 
 NewSentInviteDataAttributes instantiates a new SentInviteDataAttributes object
 This constructor will assign default values to properties that have it defined,
@@ -25,6 +26,26 @@ will change when the set of required properties is changed
 NewSentInviteDataAttributesWithDefaults instantiates a new SentInviteDataAttributes object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
+
+### GetUserId
+
+`func (o *SentInviteDataAttributes) GetUserId() uuid.UUID`
+
+GetUserId returns the UserId field if non-nil, zero value otherwise.
+
+### GetUserIdOk
+
+`func (o *SentInviteDataAttributes) GetUserIdOk() (*uuid.UUID, bool)`
+
+GetUserIdOk returns a tuple with the UserId field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetUserId
+
+`func (o *SentInviteDataAttributes) SetUserId(v uuid.UUID)`
+
+SetUserId sets UserId field to given value.
+
 
 ### GetCompanyId
 

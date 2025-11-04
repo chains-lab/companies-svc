@@ -8,14 +8,14 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
-func CreateEmployeeInvite(r *http.Request) (req resources.CreateEmployeeInvite, err error) {
+func CreateInvite(r *http.Request) (req resources.CreateInvite, err error) {
 	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
 		err = newDecodeError("body", err)
 		return
 	}
 
 	errs := validation.Errors{
-		"data/type":       validation.Validate(req.Data.Type, validation.Required, validation.In(resources.CreateEmployeeInviteType)),
+		"data/type":       validation.Validate(req.Data.Type, validation.Required, validation.In(resources.EmployeeType)),
 		"data/attributes": validation.Validate(req.Data.Attributes, validation.Required),
 	}
 	return req, errs.Filter()

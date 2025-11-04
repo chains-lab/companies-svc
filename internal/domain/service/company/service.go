@@ -8,24 +8,15 @@ import (
 	"github.com/google/uuid"
 )
 
-type EventWriter interface {
-	UpdateEmployee(
-		ctx context.Context,
-		userID uuid.UUID,
-		companyID *uuid.UUID,
-		role *string,
-	) error
-}
-
 type Service struct {
-	eve EventWriter
-	db  database
+	event EventPublisher
+	db    database
 }
 
-func NewService(db database, eve EventWriter) Service {
+func NewService(db database, publisher EventPublisher) Service {
 	return Service{
-		eve: eve,
-		db:  db,
+		event: publisher,
+		db:    db,
 	}
 }
 
@@ -34,32 +25,25 @@ type database interface {
 
 	CreateEmployee(ctx context.Context, input models.Employee) error
 
-	GetEmployeeByUserID(
-		ctx context.Context,
-		userID uuid.UUID,
-	) (models.Employee, error)
-
-	GetEmployeeByCompanyAndUser(
-		ctx context.Context,
-		companyID, userID uuid.UUID,
-	) (models.Employee, error)
-
-	GetEmployeeByCompanyAndUserAndRole(
-		ctx context.Context,
-		companyID, userID uuid.UUID,
-		role string,
-	) (models.Employee, error)
+	GetEmployeeByUserID(ctx context.Context, userID uuid.UUID) (models.Employee, error)
+	GetEmployeeByCompanyAndUser(ctx context.Context, companyID, userID uuid.UUID) (models.Employee, error)
+	GetEmployeeByCompanyAndUserAndRole(ctx context.Context, companyID, userID uuid.UUID, role string) (models.Employee, error)
 
 	CreateCompany(ctx context.Context, input models.Company) (models.Company, error)
-
 	GetCompanyByID(ctx context.Context, ID uuid.UUID) (models.Company, error)
-
-	FilterCompanies(
-		ctx context.Context,
-		filters FiltersParams,
-		page, size uint64,
-	) (models.CompanyCollection, error)
+	FilterCompanies(ctx context.Context, filters FiltersParams, page, size uint64) (models.CompanyCollection, error)
 
 	UpdateCompany(ctx context.Context, ID uuid.UUID, params UpdateParams, updatedAt time.Time) error
 	UpdateCompaniesStatus(ctx context.Context, ID uuid.UUID, status string, updatedAt time.Time) error
+	DeleteCompany(ctx context.Context, ID uuid.UUID) error
+}
+
+type EventPublisher interface {
+	PublishCompanyCreated(ctx context.Context, company models.Company) error
+	PublishCompanyDeleted(ctx context.Context, company models.Company) error
+
+	PublishCompanyDeactivated(ctx context.Context, company models.Company) error
+	PublishCompanyActivated(ctx context.Context, company models.Company) error
+
+	PublishEmployeeCreated(ctx context.Context, employee models.Employee) error
 }

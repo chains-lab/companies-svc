@@ -22,7 +22,7 @@ func CreateCompany(r *http.Request) (req resources.CreateCompany, err error) {
 	}
 
 	errs := validation.Errors{
-		"data/type":       validation.Validate(req.Data.Type, validation.Required, validation.In(resources.CreatecompanyType)),
+		"data/type":       validation.Validate(req.Data.Type, validation.Required, validation.In(resources.CompanyType)),
 		"data/attributes": validation.Validate(req.Data.Attributes, validation.Required),
 	}
 	return req, errs.Filter()
