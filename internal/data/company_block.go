@@ -45,7 +45,7 @@ func (d *Database) FilterCompanyBlocks(
 	ctx context.Context,
 	filters block.FilterParams,
 	page, size uint64,
-) (models.CompanyBlockCollection, error) {
+) (models.CompanyBlocksCollection, error) {
 	limit, offset := pagi.PagConvert(page, size)
 
 	query := d.sql.blockages.New()
@@ -62,12 +62,12 @@ func (d *Database) FilterCompanyBlocks(
 
 	total, err := query.Count(ctx)
 	if err != nil {
-		return models.CompanyBlockCollection{}, err
+		return models.CompanyBlocksCollection{}, err
 	}
 
 	rows, err := query.Page(limit, offset).Select(ctx)
 	if err != nil {
-		return models.CompanyBlockCollection{}, err
+		return models.CompanyBlocksCollection{}, err
 	}
 
 	collection := make([]models.CompanyBlock, 0, len(rows))
@@ -75,7 +75,7 @@ func (d *Database) FilterCompanyBlocks(
 		collection = append(collection, companyBlockSchemaToModel(row))
 	}
 
-	return models.CompanyBlockCollection{
+	return models.CompanyBlocksCollection{
 		Data:  collection,
 		Page:  page,
 		Size:  size,

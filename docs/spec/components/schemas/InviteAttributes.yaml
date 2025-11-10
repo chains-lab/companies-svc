@@ -2,6 +2,7 @@ type: object
 required:
   - company_id
   - user_id
+  - initiator_id
   - status
   - role
   - expires_at
@@ -15,6 +16,10 @@ properties:
     type: string
     format: uuid
     description: "user id"
+  initiator_id:
+    type: string
+    format: uuid
+    description: "id of the user who sent the invite"
   status:
     type: string
     description: "status of the invite"

@@ -2,22 +2,21 @@ package publisher
 
 import (
 	"context"
-	"time"
 
 	"github.com/chains-lab/companies-svc/internal/domain/models"
 	"github.com/chains-lab/companies-svc/internal/events/contracts"
 	"github.com/google/uuid"
 )
 
-const EmployeeCreatedEvent = "employee.create"
+const EmployeeUpdatedRoleEvent = "employee.updated.role"
 
-type EmployeeCreatedPayload struct {
+type EmployeeUpdatedRolePayload struct {
 	Company    models.Company    `json:"company"`
 	Employee   models.Employee   `json:"employee"`
 	Recipients PayloadRecipients `json:"recipients"`
 }
 
-func (s Service) PublishEmployeeCreated(
+func (s Service) PublishEmployeeUpdatedRole(
 	ctx context.Context,
 	company models.Company,
 	employee models.Employee,
@@ -25,15 +24,15 @@ func (s Service) PublishEmployeeCreated(
 ) error {
 	return s.publish(
 		ctx,
-		contracts.TopicCompaniesV1,
+		contracts.TopicCompaniesEmployeeV1,
 		employee.CompanyID.String()+":"+employee.UserID.String(),
-		contracts.Envelope[EmployeeCreatedPayload]{
-			Event:     EmployeeCreatedEvent,
+		contracts.Envelope[EmployeeUpdatedRolePayload]{
+			Event:     EmployeeUpdatedRoleEvent,
 			Version:   "1",
-			Timestamp: time.Now().UTC(),
-			Data: EmployeeCreatedPayload{
-				Employee: employee,
+			Timestamp: employee.UpdatedAt,
+			Data: EmployeeUpdatedRolePayload{
 				Company:  company,
+				Employee: employee,
 				Recipients: PayloadRecipients{
 					Users: recipients,
 				},

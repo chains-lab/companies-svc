@@ -5,6 +5,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/segmentio/kafka-go"
 )
 
@@ -84,4 +85,8 @@ func (s Service) publish(
 	}
 
 	return lastErr
+}
+
+type PayloadRecipients struct {
+	Users []uuid.UUID `json:"users"`
 }

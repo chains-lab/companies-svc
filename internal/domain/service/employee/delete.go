@@ -45,13 +45,32 @@ func (s Service) Delete(ctx context.Context, initiatorID, userID, companyID uuid
 		)
 	}
 
+	company, err := s.db.GetCompanyByID(ctx, companyID)
+	if err != nil {
+		return errx.ErrorInternal.Raise(
+			fmt.Errorf("failed to get company by ID %s, cause: %w", companyID, err),
+		)
+	}
+
+	employees, err := s.db.GetCompanyEmployees(ctx, companyID, enum.EmployeeRoleAdmin, enum.EmployeeRoleOwner)
+	if err != nil {
+		return errx.ErrorInternal.Raise(
+			fmt.Errorf("failed to get company employees, cause: %w", err),
+		)
+	}
+
+	var recipientsIDs []uuid.UUID
+	for _, emp := range employees.Data {
+		recipientsIDs = append(recipientsIDs, emp.UserID)
+	}
+
 	if err = s.db.DeleteEmployee(ctx, userID, companyID); err != nil {
 		return errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to delete employee, cause: %w", err),
 		)
 	}
 
-	if err = s.event.PublishEmployeeDeleted(ctx, employee); err != nil {
+	if err = s.event.PublishEmployeeDeleted(ctx, company, employee, recipientsIDs); err != nil {
 		return errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to publish company deleted event, cause: %w", err),
 		)

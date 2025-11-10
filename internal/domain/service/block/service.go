@@ -37,14 +37,27 @@ type database interface {
 		ctx context.Context,
 		filters FilterParams,
 		page, size uint64,
-	) (models.CompanyBlockCollection, error)
+	) (models.CompanyBlocksCollection, error)
+
+	GetCompanyEmployees(ctx context.Context, companyID uuid.UUID, roles ...string) (models.EmployeesCollection, error)
 
 	CancelActiveCompanyBlock(ctx context.Context, companyID uuid.UUID, canceledAt time.Time) error
 }
 
 type EventPublisher interface {
-	PublishCompanyBlocked(ctx context.Context, block models.CompanyBlock) error
-	PublishCompanyUnblocked(ctx context.Context, block models.CompanyBlock) error
+	PublishCompanyBlocked(
+		ctx context.Context,
+		block models.CompanyBlock,
+		company models.Company,
+		recipients []uuid.UUID,
+	) error
+
+	PublishCompanyUnblocked(
+		ctx context.Context,
+		block models.CompanyBlock,
+		company models.Company,
+		recipients []uuid.UUID,
+	) error
 }
 
 func (s Service) getCompany(ctx context.Context, ID uuid.UUID) (models.Company, error) {

@@ -9,30 +9,32 @@ import (
 	"github.com/google/uuid"
 )
 
-const CompanyDeletedEvent = "company.deleted"
+const InviteDeclinedEvent = "invite.declined"
 
-type CompanyDeletedPayload struct {
+type InviteDeclinedPayload struct {
+	Invite     models.Invite     `json:"invite"`
 	Company    models.Company    `json:"company"`
 	Recipients PayloadRecipients `json:"recipients"`
 }
 
-func (s Service) PublishCompanyDeleted(
+func (s Service) PublishInviteDeclined(
 	ctx context.Context,
+	invite models.Invite,
 	company models.Company,
-	recipients []uuid.UUID,
 ) error {
 	return s.publish(
 		ctx,
-		contracts.TopicCompaniesV1,
-		company.ID.String(),
-		contracts.Envelope[CompanyDeletedPayload]{
-			Event:     CompanyDeletedEvent,
+		contracts.TopicCompaniesInviteV1,
+		invite.ID.String(),
+		contracts.Envelope[InviteDeclinedPayload]{
+			Event:     InviteDeclinedEvent,
 			Version:   "1",
 			Timestamp: time.Now().UTC(),
-			Data: CompanyDeletedPayload{
+			Data: InviteDeclinedPayload{
+				Invite:  invite,
 				Company: company,
 				Recipients: PayloadRecipients{
-					Users: recipients,
+					Users: []uuid.UUID{invite.InitiatorID},
 				},
 			},
 		},

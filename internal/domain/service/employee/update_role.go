@@ -11,16 +11,11 @@ import (
 	"github.com/google/uuid"
 )
 
-type UpdateEmployeeParams struct {
-	Position *string
-	Label    *string
-}
-
-func (s Service) UpdateEmployee(
+func (s Service) UpdateRole(
 	ctx context.Context,
 	initiatorID uuid.UUID,
 	userID uuid.UUID,
-	params UpdateEmployeeParams,
+	role string,
 ) (models.Employee, error) {
 	initiator, err := s.GetInitiator(ctx, initiatorID)
 	if err != nil {
@@ -40,27 +35,6 @@ func (s Service) UpdateEmployee(
 		)
 	}
 
-	access, err := enum.CompareEmployeeRoles(initiator.Role, employee.Role)
-	if err != nil {
-		return models.Employee{}, errx.ErrorInvalidEmployeeRole.Raise(
-			fmt.Errorf("compare employee roles: %w", err),
-		)
-	}
-	if access != 1 {
-		return models.Employee{}, errx.ErrorInitiatorHaveNotEnoughRights.Raise(
-			fmt.Errorf("initiator have not enough rights to update employee"),
-		)
-	}
-
-	if params.Position == nil {
-		employee.Position = params.Position
-	}
-	if params.Label == nil {
-		employee.Label = params.Label
-	}
-	updatedAt := time.Now().UTC()
-	employee.UpdatedAt = updatedAt
-
 	company, err := s.db.GetCompanyByID(ctx, initiator.CompanyID)
 	if err != nil {
 		return models.Employee{}, errx.ErrorInternal.Raise(
@@ -73,13 +47,58 @@ func (s Service) UpdateEmployee(
 		)
 	}
 
-	if err = s.db.UpdateEmployee(ctx, userID, params, updatedAt); err != nil {
+	access, err := enum.CompareEmployeeRoles(initiator.Role, employee.Role)
+	if err != nil {
+		return models.Employee{}, errx.ErrorInvalidEmployeeRole.Raise(
+			fmt.Errorf("compare employee roles: %w", err),
+		)
+	}
+	if access != 1 {
+		return models.Employee{}, errx.ErrorInitiatorHaveNotEnoughRights.Raise(
+			fmt.Errorf("initiator have not enough rights to update employee"),
+		)
+	}
+
+	access, err = enum.CompareEmployeeRoles(initiator.Role, role)
+	if err != nil {
+		return models.Employee{}, errx.EmployeeInvalidRole.Raise(
+			fmt.Errorf("new role is invalid: %w", err),
+		)
+	}
+	if access != 1 {
+		return models.Employee{}, errx.ErrorInitiatorHaveNotEnoughRights.Raise(
+			fmt.Errorf("initiator have not enough rights to update employee role"),
+		)
+	}
+
+	employee.Role = role
+	employee.UpdatedAt = time.Now().UTC()
+
+	if err = s.db.UpdateEmployeeRole(ctx, employee.UserID, role, employee.UpdatedAt); err != nil {
 		return models.Employee{}, errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to update employee role, cause: %w", err),
 		)
 	}
 
-	if err = s.event.PublishEmployeeUpdated(ctx, company, employee, []uuid.UUID{initiatorID}); err != nil {
+	employees, err := s.db.GetCompanyEmployees(
+		ctx,
+		company.ID,
+		enum.EmployeeRoleOwner,
+		enum.EmployeeRoleAdmin,
+	)
+	if err != nil {
+		return models.Employee{}, errx.ErrorInternal.Raise(
+			fmt.Errorf("failed to get company employees by role %s, cause: %w", employee.Role, err),
+		)
+	}
+
+	var recipientIDs []uuid.UUID
+	for _, emp := range employees.Data {
+		recipientIDs = append(recipientIDs, emp.UserID)
+	}
+	recipientIDs = append(recipientIDs, initiatorID)
+
+	if err = s.event.PublishEmployeeUpdated(ctx, company, initiator, recipientIDs); err != nil {
 		return models.Employee{}, errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to refuse own employee be kafka, cause: %w", err),
 		)

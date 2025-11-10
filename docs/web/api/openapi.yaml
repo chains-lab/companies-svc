@@ -111,6 +111,12 @@ components:
           description: "The role of the employee within the company's organization\
             \ (e.g., manager, staff)."
           type: string
+        position:
+          description: The job position or title of the employee.
+          type: string
+        label:
+          description: A human-readable label or name for the employee.
+          type: string
         created_at:
           description: The timestamp when the employee record was created.
           format: date-time
@@ -171,6 +177,10 @@ components:
           description: user id
           format: uuid
           type: string
+        initiator_id:
+          description: id of the user who sent the invite
+          format: uuid
+          type: string
         status:
           description: status of the invite
           type: string
@@ -189,6 +199,7 @@ components:
       - company_id
       - created_at
       - expires_at
+      - initiator_id
       - role
       - status
       - user_id
@@ -503,12 +514,12 @@ components:
       type: object
     CreateInvite_data_attributes:
       properties:
-        user_id:
-          description: ID of the user being invited
-          format: uuid
-          type: string
         company_id:
           description: ID of the company the invite is for
+          format: uuid
+          type: string
+        user_id:
+          description: ID of the user being invited
           format: uuid
           type: string
         role:

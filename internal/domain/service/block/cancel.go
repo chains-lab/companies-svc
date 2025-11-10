@@ -44,15 +44,26 @@ func (s Service) Cancel(ctx context.Context, companyID uuid.UUID) (models.Compan
 		return models.Company{}, err
 	}
 
-	err = s.event.PublishCompanyUnblocked(ctx, block)
+	employees, err := s.db.GetCompanyEmployees(ctx, companyID)
 	if err != nil {
 		return models.Company{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("failed to publish company unblocked event, cause: %w", err),
+			fmt.Errorf("failed to get company employees for event recipients, cause: %w", err),
 		)
 	}
 
 	company.Status = enum.CompanyStatusInactive
 	company.UpdatedAt = now
+
+	var recipients []uuid.UUID
+	for _, emp := range employees.Data {
+		recipients = append(recipients, emp.UserID)
+	}
+
+	if err = s.event.PublishCompanyUnblocked(ctx, block, company, recipients); err != nil {
+		return models.Company{}, errx.ErrorInternal.Raise(
+			fmt.Errorf("failed to publish company unblocked event, cause: %w", err),
+		)
+	}
 
 	return company, nil
 }

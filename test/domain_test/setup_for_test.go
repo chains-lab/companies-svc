@@ -27,7 +27,7 @@ type companySvc interface {
 		ctx context.Context,
 		filters company.FiltersParams,
 		page, size uint64,
-	) (models.CompanyCollection, error)
+	) (models.CompaniesCollection, error)
 
 	Update(ctx context.Context, companyID uuid.UUID, params company.UpdateParams) (models.Company, error)
 	UpdateStatus(
@@ -45,7 +45,7 @@ type employeeSvc interface {
 		ctx context.Context,
 		filters employee.FilterParams,
 		page, size uint64,
-	) (models.EmployeeCollection, error)
+	) (models.EmployeesCollection, error)
 
 	UpdateEmployeeRole(
 		ctx context.Context,
@@ -77,7 +77,7 @@ type blockSvc interface {
 		ctx context.Context,
 		filters block.FilterParams,
 		page, size uint64,
-	) (models.CompanyBlockCollection, error)
+	) (models.CompanyBlocksCollection, error)
 
 	Get(ctx context.Context, blockID uuid.UUID) (models.CompanyBlock, error)
 	GetActiveCompanyBlock(ctx context.Context, companyID uuid.UUID) (models.CompanyBlock, error)

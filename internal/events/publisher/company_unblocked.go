@@ -12,35 +12,31 @@ import (
 const CompanyUnblockedEvent = "company.unblocked"
 
 type CompanyUnblockedPayload struct {
-	ID          uuid.UUID  `json:"id"`
-	CompanyID   uuid.UUID  `json:"company_id"`
-	InitiatorID uuid.UUID  `json:"initiator_id"`
-	Reason      string     `json:"reason"`
-	Status      string     `json:"status"`
-	BlockedAt   time.Time  `json:"blocked_at"`
-	CanceledAt  *time.Time `json:"canceled_at"`
+	Block      models.CompanyBlock `json:"block"`
+	Company    models.Company      `json:"company"`
+	Recipients PayloadRecipients   `json:"recipients"`
 }
 
 func (s Service) PublishCompanyUnblocked(
 	ctx context.Context,
 	block models.CompanyBlock,
+	company models.Company,
+	recipients []uuid.UUID,
 ) error {
 	return s.publish(
 		ctx,
-		contracts.TopicCompaniesCompanyBlockV1,
-		block.ID.String(),
+		contracts.TopicCompaniesV1,
+		company.ID.String(),
 		contracts.Envelope[CompanyUnblockedPayload]{
 			Event:     CompanyUnblockedEvent,
 			Version:   "1",
 			Timestamp: time.Now().UTC(),
 			Data: CompanyUnblockedPayload{
-				ID:          block.ID,
-				CompanyID:   block.CompanyID,
-				InitiatorID: block.InitiatorID,
-				Reason:      block.Reason,
-				Status:      block.Status,
-				BlockedAt:   block.BlockedAt,
-				CanceledAt:  block.CanceledAt,
+				Company: company,
+				Block:   block,
+				Recipients: PayloadRecipients{
+					Users: recipients,
+				},
 			},
 		},
 	)

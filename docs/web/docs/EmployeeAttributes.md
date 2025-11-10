@@ -6,6 +6,8 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **CompanyId** | [**uuid.UUID**](uuid.UUID.md) | The unique identifier for the company associated with the employee. | 
 **Role** | **string** | The role of the employee within the company&#39;s organization (e.g., manager, staff). | 
+**Position** | Pointer to **string** | The job position or title of the employee. | [optional] 
+**Label** | Pointer to **string** | A human-readable label or name for the employee. | [optional] 
 **CreatedAt** | **time.Time** | The timestamp when the employee record was created. | 
 **UpdatedAt** | **time.Time** | The timestamp when the employee record was last updated. | 
 
@@ -67,6 +69,56 @@ and a boolean to check if the value has been set.
 
 SetRole sets Role field to given value.
 
+
+### GetPosition
+
+`func (o *EmployeeAttributes) GetPosition() string`
+
+GetPosition returns the Position field if non-nil, zero value otherwise.
+
+### GetPositionOk
+
+`func (o *EmployeeAttributes) GetPositionOk() (*string, bool)`
+
+GetPositionOk returns a tuple with the Position field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetPosition
+
+`func (o *EmployeeAttributes) SetPosition(v string)`
+
+SetPosition sets Position field to given value.
+
+### HasPosition
+
+`func (o *EmployeeAttributes) HasPosition() bool`
+
+HasPosition returns a boolean if a field has been set.
+
+### GetLabel
+
+`func (o *EmployeeAttributes) GetLabel() string`
+
+GetLabel returns the Label field if non-nil, zero value otherwise.
+
+### GetLabelOk
+
+`func (o *EmployeeAttributes) GetLabelOk() (*string, bool)`
+
+GetLabelOk returns a tuple with the Label field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetLabel
+
+`func (o *EmployeeAttributes) SetLabel(v string)`
+
+SetLabel sets Label field to given value.
+
+### HasLabel
+
+`func (o *EmployeeAttributes) HasLabel() bool`
+
+HasLabel returns a boolean if a field has been set.
 
 ### GetCreatedAt
 

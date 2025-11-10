@@ -23,7 +23,7 @@ func Company(m models.Company) resources.Company {
 	return resp
 }
 
-func CompanyCollection(ms models.CompanyCollection) resources.CompaniesCollection {
+func CompanyCollection(ms models.CompaniesCollection) resources.CompaniesCollection {
 	items := make([]resources.CompanyData, 0, len(ms.Data))
 	for _, m := range ms.Data {
 		items = append(items, Company(m).Data)

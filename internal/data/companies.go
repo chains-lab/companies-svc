@@ -39,7 +39,7 @@ func (d *Database) FilterCompanies(
 	ctx context.Context,
 	filters company.FiltersParams,
 	page, size uint64,
-) (models.CompanyCollection, error) {
+) (models.CompaniesCollection, error) {
 	limit, offset := pagi.PagConvert(page, size)
 
 	query := d.sql.companies.New()
@@ -53,12 +53,12 @@ func (d *Database) FilterCompanies(
 
 	total, err := query.Count(ctx)
 	if err != nil {
-		return models.CompanyCollection{}, err
+		return models.CompaniesCollection{}, err
 	}
 
 	rows, err := query.Page(limit, offset).Select(ctx)
 	if err != nil {
-		return models.CompanyCollection{}, err
+		return models.CompaniesCollection{}, err
 	}
 
 	collection := make([]models.Company, 0, len(rows))
@@ -66,7 +66,7 @@ func (d *Database) FilterCompanies(
 		collection = append(collection, companiesSchemaToModel(r))
 	}
 
-	return models.CompanyCollection{
+	return models.CompaniesCollection{
 		Data:  collection,
 		Page:  page,
 		Size:  size,

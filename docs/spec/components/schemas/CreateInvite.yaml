@@ -14,18 +14,18 @@ properties:
       attributes:
         type: object
         required:
-          - user_id
           - company_id
+          - user_id
           - role
         properties:
-          user_id:
-            type: string
-            format: uuid
-            description: "ID of the user being invited"
           company_id:
             type: string
             format: uuid
             description: "ID of the company the invite is for"
+          user_id:
+            type: string
+            format: uuid
+            description: "ID of the user being invited"
           role:
             type: string
             description: "Role assigned to the invited user"

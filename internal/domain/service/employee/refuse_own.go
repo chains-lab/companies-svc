@@ -21,14 +21,33 @@ func (s Service) RefuseMe(ctx context.Context, initiatorID uuid.UUID) error {
 		)
 	}
 
-	err = s.db.DeleteEmployee(ctx, own.UserID, own.CompanyID)
+	company, err := s.db.GetCompanyByID(ctx, own.CompanyID)
 	if err != nil {
 		return errx.ErrorInternal.Raise(
-			fmt.Errorf("failed to refuse own employee, cause: %w", err),
+			fmt.Errorf("failed to get company by ID %s, cause: %w", own.CompanyID, err),
 		)
 	}
 
-	if err = s.event.PublishEmployeeDeleted(ctx, own); err != nil {
+	employees, err := s.db.GetCompanyEmployees(ctx, own.CompanyID, enum.EmployeeRoleAdmin, enum.EmployeeRoleOwner)
+	if err != nil {
+		return errx.ErrorInternal.Raise(
+			fmt.Errorf("failed to get company employees, cause: %w", err),
+		)
+	}
+
+	var recipientsIDs []uuid.UUID
+	for _, emp := range employees.Data {
+		recipientsIDs = append(recipientsIDs, emp.UserID)
+	}
+
+	err = s.db.DeleteEmployee(ctx, own.UserID, own.CompanyID)
+	if err != nil {
+		return errx.ErrorInternal.Raise(
+			fmt.Errorf("failed to refuse own employee in transaction, cause: %w", err),
+		)
+	}
+
+	if err = s.event.PublishEmployeeDeleted(ctx, company, own, recipientsIDs); err != nil {
 		return errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to refuse own employee be kafka, cause: %w", err),
 		)

@@ -2,10 +2,7 @@ package invite
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/chains-lab/companies-svc/internal/domain/enum"
-	"github.com/chains-lab/companies-svc/internal/domain/errx"
 	"github.com/chains-lab/companies-svc/internal/domain/models"
 	"github.com/google/uuid"
 )
@@ -34,32 +31,36 @@ type database interface {
 	CreateInvite(ctx context.Context, input models.Invite) error
 	GetInvite(ctx context.Context, ID uuid.UUID) (models.Invite, error)
 	UpdateInviteStatus(ctx context.Context, ID uuid.UUID, answer string) error
+	GetCompanyEmployees(ctx context.Context, companyID uuid.UUID, roles ...string) (models.EmployeesCollection, error)
 
 	EmployeeExist(ctx context.Context, userID uuid.UUID) (bool, error)
 }
 
 type EventPublisher interface {
-	PublishEmployeeCreated(ctx context.Context, employee models.Employee) error
-	PublishInviteCreated(ctx context.Context, invite models.Invite) error
-}
+	PublishInviteAccepted(
+		ctx context.Context,
+		invite models.Invite,
+		company models.Company,
+		recipients []uuid.UUID,
+	) error
 
-func (s Service) companyIsActive(ctx context.Context, companyID uuid.UUID) error {
-	dis, err := s.db.GetCompanyByID(ctx, companyID)
-	if err != nil {
-		return errx.ErrorInternal.Raise(
-			fmt.Errorf("failed to get company by ID, cause: %w", err),
-		)
-	}
-	if dis.IsNil() {
-		return errx.ErrorCompanyNotFound.Raise(
-			fmt.Errorf("company with ID %s not found", companyID),
-		)
-	}
-	if dis.Status != enum.CompanyStatusActive {
-		return errx.ErrorCompanyIsNotActive.Raise(
-			fmt.Errorf("company with ID %s is not active", companyID),
-		)
-	}
+	PublishInviteDeclined(
+		ctx context.Context,
+		invite models.Invite,
+		company models.Company,
+	) error
 
-	return nil
+	PublishInviteCreated(
+		ctx context.Context,
+		invite models.Invite,
+		company models.Company,
+		recipients []uuid.UUID,
+	) error
+
+	PublishEmployeeCreated(
+		ctx context.Context,
+		company models.Company,
+		employee models.Employee,
+		recipients []uuid.UUID,
+	) error
 }

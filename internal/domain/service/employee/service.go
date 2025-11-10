@@ -31,14 +31,34 @@ type database interface {
 	GetEmployeeByUserID(ctx context.Context, userID uuid.UUID) (models.Employee, error)
 	GetEmployeeByCompanyAndUser(ctx context.Context, companyID, userID uuid.UUID) (models.Employee, error)
 	GetEmployeeByCompanyAndUserAndRole(ctx context.Context, companyID, userID uuid.UUID, role string) (models.Employee, error)
-	FilterEmployees(ctx context.Context, filters FilterParams, page, size uint64) (models.EmployeeCollection, error)
+	FilterEmployees(ctx context.Context, filters FilterParams, page, size uint64) (models.EmployeesCollection, error)
+
+	GetCompanyEmployees(ctx context.Context, companyID uuid.UUID, roles ...string) (models.EmployeesCollection, error)
 
 	UpdateEmployee(ctx context.Context, userID uuid.UUID, params UpdateEmployeeParams, updatedAt time.Time) error
+	UpdateEmployeeRole(ctx context.Context, userID uuid.UUID, role string, updatedAt time.Time) error
 	DeleteEmployee(ctx context.Context, userID, companyID uuid.UUID) error
 }
 
 type EventPublisher interface {
-	PublishEmployeeCreated(ctx context.Context, employee models.Employee) error
-	PublishEmployeeUpdated(ctx context.Context, employee models.Employee) error
-	PublishEmployeeDeleted(ctx context.Context, employee models.Employee) error
+	PublishEmployeeCreated(
+		ctx context.Context,
+		company models.Company,
+		employee models.Employee,
+		recipients []uuid.UUID,
+	) error
+
+	PublishEmployeeUpdated(
+		ctx context.Context,
+		company models.Company,
+		employee models.Employee,
+		recipients []uuid.UUID,
+	) error
+
+	PublishEmployeeDeleted(
+		ctx context.Context,
+		company models.Company,
+		employee models.Employee,
+		Recipients []uuid.UUID,
+	) error
 }

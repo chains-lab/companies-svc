@@ -80,30 +80,45 @@ func (s Service) UpdateStatus(
 		)
 	}
 
-	now := time.Now().UTC()
-	err = s.db.UpdateCompaniesStatus(ctx, companyID, status, now)
+	employees, err := s.db.GetCompanyEmployees(ctx, companyID)
 	if err != nil {
 		return models.Company{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("failed to update company status, cause: %w", err),
+			fmt.Errorf("failed to get company employees, cause: %w", err),
 		)
 	}
 
-	switch status {
-	case enum.CompanyStatusActive:
-		err = s.event.PublishCompanyActivated(ctx, company)
-		if err != nil {
-			return models.Company{}, errx.ErrorInternal.Raise(
-				fmt.Errorf("failed to publish company unblocked event, cause: %w", err),
+	var recipientIDs []uuid.UUID
+	for _, emp := range employees.Data {
+		recipientIDs = append(recipientIDs, emp.UserID)
+	}
+
+	now := time.Now().UTC()
+	if err = s.db.Transaction(ctx, func(ctx context.Context) error {
+		if err = s.db.UpdateCompaniesStatus(ctx, companyID, status, now); err != nil {
+			return errx.ErrorInternal.Raise(
+				fmt.Errorf("failed to update company status, cause: %w", err),
 			)
 		}
 
-	case enum.CompanyStatusInactive:
-		err = s.event.PublishCompanyDeactivated(ctx, company)
-		if err != nil {
-			return models.Company{}, errx.ErrorInternal.Raise(
-				fmt.Errorf("failed to publish company blocked event, cause: %w", err),
-			)
+		switch status {
+		case enum.CompanyStatusActive:
+			if err = s.event.PublishCompanyActivated(ctx, company, recipientIDs); err != nil {
+				return errx.ErrorInternal.Raise(
+					fmt.Errorf("failed to publish company unblocked event, cause: %w", err),
+				)
+			}
+
+		case enum.CompanyStatusInactive:
+			if err = s.event.PublishCompanyDeactivated(ctx, company, recipientIDs); err != nil {
+				return errx.ErrorInternal.Raise(
+					fmt.Errorf("failed to publish company blocked event, cause: %w", err),
+				)
+			}
 		}
+
+		return nil
+	}); err != nil {
+		return models.Company{}, err
 	}
 
 	return models.Company{

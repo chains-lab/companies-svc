@@ -13,13 +13,14 @@ import (
 const invitesTable = "invites"
 
 type Invite struct {
-	ID        uuid.UUID `db:"id"`
-	Status    string    `db:"status"` // enum invite_status: sent | accepted | declined
-	Role      string    `db:"role"`   // enum employee_roles
-	CompanyID uuid.UUID `db:"company_id"`
-	UserID    uuid.UUID `db:"user_id"`
-	ExpiresAt time.Time `db:"expires_at"`
-	CreatedAt time.Time `db:"created_at"`
+	ID          uuid.UUID `db:"id"`
+	CompanyID   uuid.UUID `db:"company_id"`
+	UserID      uuid.UUID `db:"user_id"`
+	InitiatorID uuid.UUID `db:"initiator_id"`
+	Status      string    `db:"status"` // enum invite_status: sent | accepted | declined
+	Role        string    `db:"role"`   // enum employee_roles
+	ExpiresAt   time.Time `db:"expires_at"`
+	CreatedAt   time.Time `db:"created_at"`
 }
 
 type InvitesQ struct {
@@ -48,12 +49,13 @@ func (q InvitesQ) New() InvitesQ { return NewInvitesQ(q.db) }
 
 func (q InvitesQ) Insert(ctx context.Context, input Invite) error {
 	values := map[string]interface{}{
-		"id":         input.ID,
-		"company_id": input.CompanyID,
-		"user_id":    input.UserID,
-		"status":     input.Status,
-		"role":       input.Role,
-		"expires_at": input.ExpiresAt,
+		"id":           input.ID,
+		"company_id":   input.CompanyID,
+		"user_id":      input.UserID,
+		"initiator_id": input.InitiatorID,
+		"status":       input.Status,
+		"role":         input.Role,
+		"expires_at":   input.ExpiresAt,
 	}
 	if !input.CreatedAt.IsZero() {
 		values["created_at"] = input.CreatedAt
@@ -90,6 +92,7 @@ func (q InvitesQ) Get(ctx context.Context) (Invite, error) {
 		&m.ID,
 		&m.CompanyID,
 		&m.UserID,
+		&m.InitiatorID,
 		&m.Status,
 		&m.Role,
 		&m.ExpiresAt,
@@ -124,6 +127,7 @@ func (q InvitesQ) Select(ctx context.Context) ([]Invite, error) {
 			&m.ID,
 			&m.CompanyID,
 			&m.UserID,
+			&m.InitiatorID,
 			&m.Status,
 			&m.Role,
 			&m.ExpiresAt,
@@ -209,6 +213,14 @@ func (q InvitesQ) FilterUserID(userID ...uuid.UUID) InvitesQ {
 	q.updater = q.updater.Where(sq.Eq{"user_id": userID})
 	q.deleter = q.deleter.Where(sq.Eq{"user_id": userID})
 	q.counter = q.counter.Where(sq.Eq{"user_id": userID})
+	return q
+}
+
+func (q InvitesQ) FilterInitiatorID(initiatorID ...uuid.UUID) InvitesQ {
+	q.selector = q.selector.Where(sq.Eq{"initiator_id": initiatorID})
+	q.updater = q.updater.Where(sq.Eq{"initiator_id": initiatorID})
+	q.deleter = q.deleter.Where(sq.Eq{"initiator_id": initiatorID})
+	q.counter = q.counter.Where(sq.Eq{"initiator_id": initiatorID})
 	return q
 }
 

@@ -93,7 +93,7 @@ func (d *Database) FilterEmployees(
 	ctx context.Context,
 	filter employee.FilterParams,
 	page, size uint64,
-) (models.EmployeeCollection, error) {
+) (models.EmployeesCollection, error) {
 	limit, offset := pagi.PagConvert(page, size)
 
 	query := d.sql.employees.New()
@@ -110,12 +110,12 @@ func (d *Database) FilterEmployees(
 
 	total, err := query.Count(ctx)
 	if err != nil {
-		return models.EmployeeCollection{}, err
+		return models.EmployeesCollection{}, err
 	}
 
 	rows, err := query.Page(limit, offset).Select(ctx)
 	if err != nil {
-		return models.EmployeeCollection{}, err
+		return models.EmployeesCollection{}, err
 	}
 
 	collection := make([]models.Employee, 0, len(rows))
@@ -123,7 +123,7 @@ func (d *Database) FilterEmployees(
 		collection = append(collection, employeeSchemaToModel(row))
 	}
 
-	return models.EmployeeCollection{
+	return models.EmployeesCollection{
 		Data:  collection,
 		Page:  page,
 		Size:  size,
@@ -139,11 +139,6 @@ func (d *Database) UpdateEmployee(
 ) error {
 	q := d.sql.employees.New().FilterUserID(userID)
 	empty := true
-
-	if params.Role != nil {
-		q = q.UpdateRole(*params.Role)
-		empty = false
-	}
 
 	if params.Position != nil {
 		if *params.Position == "" {
@@ -170,10 +165,43 @@ func (d *Database) UpdateEmployee(
 	return q.Update(ctx, updatedAt)
 }
 
+func (d *Database) UpdateEmployeeRole(
+	ctx context.Context,
+	userID uuid.UUID,
+	role string,
+	updatedAt time.Time,
+) error {
+	return d.sql.employees.New().FilterUserID(userID).UpdateRole(role).Update(ctx, updatedAt)
+}
+
 func (d *Database) DeleteEmployee(ctx context.Context, userID, companyID uuid.UUID) error {
 	return d.sql.employees.New().FilterUserID(userID).FilterCompanyID(companyID).Delete(ctx)
 }
 
 func (d *Database) EmployeeExist(ctx context.Context, userID uuid.UUID) (bool, error) {
 	return d.sql.employees.New().FilterUserID(userID).Exist(ctx)
+}
+
+func (d *Database) GetCompanyEmployees(ctx context.Context, companyID uuid.UUID, roles ...string) (models.EmployeesCollection, error) {
+	query := d.sql.employees.New().FilterCompanyID(companyID)
+	if len(roles) > 0 {
+		query = query.FilterRole(roles...)
+	}
+
+	rows, err := query.Select(ctx)
+	if err != nil {
+		return models.EmployeesCollection{}, err
+	}
+
+	collection := make([]models.Employee, 0, len(rows))
+	for _, row := range rows {
+		collection = append(collection, employeeSchemaToModel(row))
+	}
+
+	return models.EmployeesCollection{
+		Data:  collection,
+		Page:  1,
+		Size:  uint64(len(collection)),
+		Total: uint64(len(collection)),
+	}, nil
 }

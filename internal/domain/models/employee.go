@@ -20,7 +20,7 @@ func (e Employee) IsNil() bool {
 	return e.UserID == uuid.Nil
 }
 
-type EmployeeCollection struct {
+type EmployeesCollection struct {
 	Data  []Employee `json:"data"`
 	Page  uint64     `json:"page"`
 	Size  uint64     `json:"size"`

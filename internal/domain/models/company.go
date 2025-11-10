@@ -19,7 +19,7 @@ func (d Company) IsNil() bool {
 	return d.ID == uuid.Nil
 }
 
-type CompanyCollection struct {
+type CompaniesCollection struct {
 	Data  []Company `json:"data"`
 	Page  uint64    `json:"page"`
 	Size  uint64    `json:"size"`

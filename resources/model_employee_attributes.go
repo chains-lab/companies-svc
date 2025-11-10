@@ -27,6 +27,10 @@ type EmployeeAttributes struct {
 	CompanyId uuid.UUID `json:"company_id"`
 	// The role of the employee within the company's organization (e.g., manager, staff).
 	Role string `json:"role"`
+	// The job position or title of the employee.
+	Position *string `json:"position,omitempty"`
+	// A human-readable label or name for the employee.
+	Label *string `json:"label,omitempty"`
 	// The timestamp when the employee record was created.
 	CreatedAt time.Time `json:"created_at"`
 	// The timestamp when the employee record was last updated.
@@ -104,6 +108,70 @@ func (o *EmployeeAttributes) SetRole(v string) {
 	o.Role = v
 }
 
+// GetPosition returns the Position field value if set, zero value otherwise.
+func (o *EmployeeAttributes) GetPosition() string {
+	if o == nil || IsNil(o.Position) {
+		var ret string
+		return ret
+	}
+	return *o.Position
+}
+
+// GetPositionOk returns a tuple with the Position field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *EmployeeAttributes) GetPositionOk() (*string, bool) {
+	if o == nil || IsNil(o.Position) {
+		return nil, false
+	}
+	return o.Position, true
+}
+
+// HasPosition returns a boolean if a field has been set.
+func (o *EmployeeAttributes) HasPosition() bool {
+	if o != nil && !IsNil(o.Position) {
+		return true
+	}
+
+	return false
+}
+
+// SetPosition gets a reference to the given string and assigns it to the Position field.
+func (o *EmployeeAttributes) SetPosition(v string) {
+	o.Position = &v
+}
+
+// GetLabel returns the Label field value if set, zero value otherwise.
+func (o *EmployeeAttributes) GetLabel() string {
+	if o == nil || IsNil(o.Label) {
+		var ret string
+		return ret
+	}
+	return *o.Label
+}
+
+// GetLabelOk returns a tuple with the Label field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *EmployeeAttributes) GetLabelOk() (*string, bool) {
+	if o == nil || IsNil(o.Label) {
+		return nil, false
+	}
+	return o.Label, true
+}
+
+// HasLabel returns a boolean if a field has been set.
+func (o *EmployeeAttributes) HasLabel() bool {
+	if o != nil && !IsNil(o.Label) {
+		return true
+	}
+
+	return false
+}
+
+// SetLabel gets a reference to the given string and assigns it to the Label field.
+func (o *EmployeeAttributes) SetLabel(v string) {
+	o.Label = &v
+}
+
 // GetCreatedAt returns the CreatedAt field value
 func (o *EmployeeAttributes) GetCreatedAt() time.Time {
 	if o == nil {
@@ -164,6 +232,12 @@ func (o EmployeeAttributes) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["company_id"] = o.CompanyId
 	toSerialize["role"] = o.Role
+	if !IsNil(o.Position) {
+		toSerialize["position"] = o.Position
+	}
+	if !IsNil(o.Label) {
+		toSerialize["label"] = o.Label
+	}
 	toSerialize["created_at"] = o.CreatedAt
 	toSerialize["updated_at"] = o.UpdatedAt
 	return toSerialize, nil

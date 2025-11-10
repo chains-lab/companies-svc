@@ -12,18 +12,16 @@ import (
 const InviteCreated = "invite.created"
 
 type InviteCreatedPayload struct {
-	ID        uuid.UUID `json:"id"`
-	CompanyID uuid.UUID `json:"company_id"`
-	UserID    uuid.UUID `json:"user_id"`
-	Role      string    `json:"role"`
-	Status    string    `json:"status"`
-	ExpiresAt time.Time `json:"expires_at"`
-	CreatedAt time.Time `json:"created_at"`
+	Invite     models.Invite     `json:"invite"`
+	Company    models.Company    `json:"company"`
+	Recipients PayloadRecipients `json:"recipients"`
 }
 
 func (s Service) PublishInviteCreated(
 	ctx context.Context,
 	invite models.Invite,
+	company models.Company,
+	recipients []uuid.UUID,
 ) error {
 	return s.publish(
 		ctx,
@@ -34,13 +32,11 @@ func (s Service) PublishInviteCreated(
 			Version:   "1",
 			Timestamp: time.Now().UTC(),
 			Data: InviteCreatedPayload{
-				ID:        invite.ID,
-				CompanyID: invite.CompanyID,
-				UserID:    invite.UserID,
-				Role:      invite.Role,
-				Status:    invite.Status,
-				ExpiresAt: invite.ExpiresAt,
-				CreatedAt: invite.CreatedAt,
+				Invite:  invite,
+				Company: company,
+				Recipients: PayloadRecipients{
+					Users: recipients,
+				},
 			},
 		},
 	)

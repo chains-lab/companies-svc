@@ -21,23 +21,23 @@ func (s Service) Answer(ctx context.Context, userID, inviteID uuid.UUID, answer 
 
 	now := time.Now().UTC()
 
-	inv, err := s.GetInvite(ctx, inviteID)
+	invite, err := s.GetInvite(ctx, inviteID)
 	if err != nil {
 		return models.Invite{}, err
 	}
 
-	if inv.Status != enum.InviteStatusSent {
+	if invite.Status != enum.InviteStatusSent {
 		return models.Invite{}, errx.ErrorInviteAlreadyAnswered.Raise(
-			fmt.Errorf("invite already answered with status=%s", inv.Status),
+			fmt.Errorf("invite already answered with status=%s", invite.Status),
 		)
 	}
-	if now.After(inv.ExpiresAt) {
+	if now.After(invite.ExpiresAt) {
 		return models.Invite{}, errx.ErrorInviteExpired.Raise(
 			fmt.Errorf("invite expired"),
 		)
 	}
 
-	if inv.UserID != userID {
+	if invite.UserID != userID {
 		return models.Invite{}, errx.ErrorInviteNotForUser.Raise(
 			fmt.Errorf("invite not for user %s", userID),
 		)
@@ -55,44 +55,80 @@ func (s Service) Answer(ctx context.Context, userID, inviteID uuid.UUID, answer 
 		)
 	}
 
-	err = s.companyIsActive(ctx, inv.CompanyID)
+	company, err := s.db.GetCompanyByID(ctx, invite.CompanyID)
 	if err != nil {
-		return models.Invite{}, err
+		return models.Invite{}, errx.ErrorInternal.Raise(
+			fmt.Errorf("failed to get company by ID, cause: %w", err),
+		)
+	}
+	if company.IsNil() {
+		return models.Invite{}, errx.ErrorCompanyNotFound.Raise(
+			fmt.Errorf("company with ID %s not found", invite.CompanyID),
+		)
+	}
+	if company.Status != enum.CompanyStatusActive {
+		return models.Invite{}, errx.ErrorCompanyIsNotActive.Raise(
+			fmt.Errorf("company with ID %s is not active", invite.CompanyID),
+		)
 	}
 
 	employee := models.Employee{
 		UserID:    userID,
-		CompanyID: inv.CompanyID,
-		Role:      inv.Role,
+		CompanyID: invite.CompanyID,
+		Role:      invite.Role,
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
 
-	if err = s.db.Transaction(ctx, func(ctx context.Context) error {
-		err = s.db.CreateEmployee(ctx, employee)
-		if err != nil {
-			return err
+	switch answer {
+	case enum.InviteStatusAccepted:
+		if err = s.db.Transaction(ctx, func(ctx context.Context) error {
+			err = s.db.CreateEmployee(ctx, employee)
+			if err != nil {
+				return err
+			}
+
+			if err = s.db.UpdateInviteStatus(ctx, invite.ID, enum.InviteStatusAccepted); err != nil {
+				return errx.ErrorInternal.Raise(
+					fmt.Errorf("failed to update invite status, cause: %w", err),
+				)
+			}
+
+			return nil
+		}); err != nil {
+			return models.Invite{}, err
 		}
 
-		if err = s.db.UpdateInviteStatus(ctx, inv.ID, enum.InviteStatusAccepted); err != nil {
-			return errx.ErrorInternal.Raise(
+		err = s.event.PublishInviteAccepted(ctx, invite, models.Company{ID: invite.CompanyID}, []uuid.UUID{invite.InitiatorID})
+		if err != nil {
+			return models.Invite{}, errx.ErrorInternal.Raise(
+				fmt.Errorf("failed to publish invite accepted event, cause: %w", err),
+			)
+		}
+
+		err = s.event.PublishEmployeeCreated(ctx, company, employee, []uuid.UUID{invite.InitiatorID})
+		if err != nil {
+			return models.Invite{}, errx.ErrorInternal.Raise(
+				fmt.Errorf("failed to publish employee created event, cause: %w", err),
+			)
+		}
+
+	case enum.InviteStatusDeclined:
+		if err = s.db.UpdateInviteStatus(ctx, invite.ID, enum.InviteStatusDeclined); err != nil {
+			return models.Invite{}, errx.ErrorInternal.Raise(
 				fmt.Errorf("failed to update invite status, cause: %w", err),
 			)
 		}
 
-		return nil
-	}); err != nil {
-		return models.Invite{}, err
+		err = s.event.PublishInviteDeclined(ctx, invite, company)
+		if err != nil {
+			return models.Invite{}, errx.ErrorInternal.Raise(
+				fmt.Errorf("failed to publish invite declined event, cause: %w", err),
+			)
+		}
 	}
 
-	if err = s.event.PublishEmployeeCreated(ctx, employee); err != nil {
-		return models.Invite{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("failed to update employee with event, cause: %w", err),
-		)
-	}
+	invite.Status = answer
 
-	inv.Status = enum.InviteStatusAccepted
-	inv.UserID = userID
-
-	return inv, nil
+	return invite, nil
 }

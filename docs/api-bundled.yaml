@@ -226,6 +226,12 @@ components:
         role:
           type: string
           description: 'The role of the employee within the company''s organization (e.g., manager, staff).'
+        position:
+          type: string
+          description: The job position or title of the employee.
+        label:
+          type: string
+          description: A human-readable label or name for the employee.
         created_at:
           type: string
           format: date-time
@@ -275,6 +281,7 @@ components:
       required:
         - company_id
         - user_id
+        - initiator_id
         - status
         - role
         - expires_at
@@ -288,6 +295,10 @@ components:
           type: string
           format: uuid
           description: user id
+        initiator_id:
+          type: string
+          format: uuid
+          description: id of the user who sent the invite
         status:
           type: string
           description: status of the invite
@@ -351,18 +362,18 @@ components:
             attributes:
               type: object
               required:
-                - user_id
                 - company_id
+                - user_id
                 - role
               properties:
-                user_id:
-                  type: string
-                  format: uuid
-                  description: ID of the user being invited
                 company_id:
                   type: string
                   format: uuid
                   description: ID of the company the invite is for
+                user_id:
+                  type: string
+                  format: uuid
+                  description: ID of the user being invited
                 role:
                   type: string
                   description: Role assigned to the invited user
@@ -393,8 +404,8 @@ components:
     CompanyAttributes:
       type: object
       required:
-        - icon
         - name
+        - icon
         - status
         - created_at
         - updated_at

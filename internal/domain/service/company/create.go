@@ -23,7 +23,7 @@ func (s Service) Create(
 ) (models.Company, error) {
 	now := time.Now().UTC()
 
-	comp := models.Company{
+	company := models.Company{
 		ID:        uuid.New(),
 		Name:      params.Name,
 		Icon:      params.Icon,
@@ -46,7 +46,7 @@ func (s Service) Create(
 
 	var employee models.Employee
 	if err = s.db.Transaction(ctx, func(ctx context.Context) error {
-		_, err = s.db.CreateCompany(ctx, comp)
+		_, err = s.db.CreateCompany(ctx, company)
 		if err != nil {
 			return errx.ErrorInternal.Raise(
 				fmt.Errorf("failed to create company, cause: %w", err),
@@ -55,7 +55,7 @@ func (s Service) Create(
 
 		employee = models.Employee{
 			UserID:    initiatorID,
-			CompanyID: comp.ID,
+			CompanyID: company.ID,
 			Role:      enum.EmployeeRoleOwner,
 			CreatedAt: now,
 			UpdatedAt: now,
@@ -72,17 +72,14 @@ func (s Service) Create(
 		return models.Company{}, err
 	}
 
-	if err = s.event.PublishEmployeeCreated(ctx, employee); err != nil {
+	if err = s.event.PublishCompanyCreated(
+		ctx,
+		company,
+	); err != nil {
 		return models.Company{}, errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to update employee with kafka, cause: %w", err),
 		)
 	}
 
-	if err = s.event.PublishCompanyCreated(ctx, comp); err != nil {
-		return models.Company{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("failed to publish company created event, cause: %w", err),
-		)
-	}
-
-	return comp, err
+	return company, err
 }

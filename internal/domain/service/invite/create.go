@@ -59,8 +59,21 @@ func (s Service) Create(ctx context.Context, initiatorID uuid.UUID, params Creat
 		)
 	}
 
-	if err = s.companyIsActive(ctx, initiator.CompanyID); err != nil {
-		return models.Invite{}, err
+	company, err := s.db.GetCompanyByID(ctx, initiator.CompanyID)
+	if err != nil {
+		return models.Invite{}, errx.ErrorInternal.Raise(
+			fmt.Errorf("failed to get company by ID, cause: %w", err),
+		)
+	}
+	if company.IsNil() {
+		return models.Invite{}, errx.ErrorCompanyNotFound.Raise(
+			fmt.Errorf("company with ID %s not found", initiator.CompanyID),
+		)
+	}
+	if company.Status != enum.CompanyStatusActive {
+		return models.Invite{}, errx.ErrorCompanyIsNotActive.Raise(
+			fmt.Errorf("company with ID %s is not active", initiator.CompanyID),
+		)
 	}
 
 	inviteID := uuid.New()
@@ -84,7 +97,19 @@ func (s Service) Create(ctx context.Context, initiatorID uuid.UUID, params Creat
 		)
 	}
 
-	err = s.event.PublishInviteCreated(ctx, invite)
+	employees, err := s.db.GetCompanyEmployees(ctx, company.ID, enum.EmployeeRoleAdmin, enum.EmployeeRoleOwner)
+	if err != nil {
+		return models.Invite{}, errx.ErrorInternal.Raise(
+			fmt.Errorf("failed to get company employees by company id %s, cause: %w", company.ID, err),
+		)
+	}
+
+	var recipientIDs []uuid.UUID
+	for _, emp := range employees.Data {
+		recipientIDs = append(recipientIDs, emp.UserID)
+	}
+
+	err = s.event.PublishInviteCreated(ctx, invite, company, recipientIDs)
 	if err != nil {
 		return models.Invite{}, errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to publish invite created event, cause: %w", err),

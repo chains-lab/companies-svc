@@ -19,10 +19,10 @@ func (s Service) Filter(
 	ctx context.Context,
 	filters FilterParams,
 	page, size uint64,
-) (models.EmployeeCollection, error) {
+) (models.EmployeesCollection, error) {
 	res, err := s.db.FilterEmployees(ctx, filters, page, size)
 	if err != nil {
-		return models.EmployeeCollection{}, errx.ErrorInternal.Raise(
+		return models.EmployeesCollection{}, errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to list employees, cause: %w", err),
 		)
 	}

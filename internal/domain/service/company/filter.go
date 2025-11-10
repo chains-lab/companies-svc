@@ -17,10 +17,10 @@ func (s Service) Filter(
 	ctx context.Context,
 	filters FiltersParams,
 	page, size uint64,
-) (models.CompanyCollection, error) {
+) (models.CompaniesCollection, error) {
 	res, err := s.db.FilterCompanies(ctx, filters, page, size)
 	if err != nil {
-		return models.CompanyCollection{}, errx.ErrorInternal.Raise(
+		return models.CompaniesCollection{}, errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to filter companies, cause: %w", err),
 		)
 	}

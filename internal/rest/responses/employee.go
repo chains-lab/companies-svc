@@ -13,6 +13,8 @@ func Employee(m models.Employee) resources.Employee {
 			Attributes: resources.EmployeeAttributes{
 				CompanyId: m.CompanyID,
 				Role:      m.Role,
+				Position:  m.Position,
+				Label:     m.Label,
 				CreatedAt: m.CreatedAt,
 				UpdatedAt: m.UpdatedAt,
 			},
@@ -22,7 +24,7 @@ func Employee(m models.Employee) resources.Employee {
 	return resp
 }
 
-func EmployeeCollection(ms models.EmployeeCollection) resources.EmployeesCollection {
+func EmployeeCollection(ms models.EmployeesCollection) resources.EmployeesCollection {
 	items := make([]resources.EmployeeData, 0, len(ms.Data))
 	for _, m := range ms.Data {
 		items = append(items, Employee(m).Data)

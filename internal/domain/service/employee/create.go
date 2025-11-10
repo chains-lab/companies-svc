@@ -18,6 +18,19 @@ type CreateParams struct {
 }
 
 func (s Service) Create(ctx context.Context, params CreateParams) (models.Employee, error) {
+	comp, err := s.db.GetCompanyByID(ctx, params.CompanyID)
+	if err != nil {
+		return models.Employee{}, errx.ErrorInternal.Raise(
+			fmt.Errorf("failed to get company by ID %s, cause: %w", params.CompanyID, err),
+		)
+	}
+
+	if comp.IsNil() {
+		return models.Employee{}, errx.ErrorCompanyNotFound.Raise(
+			fmt.Errorf("company with ID %s not found", params.CompanyID),
+		)
+	}
+
 	emp, err := s.db.GetEmployeeByUserID(ctx, params.UserID)
 	if err != nil {
 		return models.Employee{}, errx.ErrorInternal.Raise(
@@ -47,14 +60,31 @@ func (s Service) Create(ctx context.Context, params CreateParams) (models.Employ
 		UpdatedAt: now,
 	}
 
-	err = s.db.CreateEmployee(ctx, emp)
-	if err != nil {
-		return models.Employee{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("failed to create employee, cause: %w", err),
-		)
+	var employee models.EmployeesCollection
+	err = s.db.Transaction(ctx, func(txCtx context.Context) error {
+		err = s.db.CreateEmployee(ctx, emp)
+		if err != nil {
+			return errx.ErrorInternal.Raise(
+				fmt.Errorf("failed to create employee, cause: %w", err),
+			)
+		}
+
+		employee, err = s.db.GetCompanyEmployees(ctx, emp.CompanyID)
+		if err != nil {
+			return errx.ErrorInternal.Raise(
+				fmt.Errorf("failed to get company employees, cause: %w", err),
+			)
+		}
+
+		return nil
+	})
+
+	var recipientIDs []uuid.UUID
+	for _, emp := range employee.Data {
+		recipientIDs = append(recipientIDs, emp.UserID)
 	}
 
-	err = s.event.PublishEmployeeCreated(ctx, emp)
+	err = s.event.PublishEmployeeCreated(ctx, comp, emp, recipientIDs)
 	if err != nil {
 		return models.Employee{}, errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to publish employee created event, cause: %w", err),

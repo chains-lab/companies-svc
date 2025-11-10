@@ -27,6 +27,8 @@ type InviteAttributes struct {
 	CompanyId uuid.UUID `json:"company_id"`
 	// user id
 	UserId uuid.UUID `json:"user_id"`
+	// id of the user who sent the invite
+	InitiatorId uuid.UUID `json:"initiator_id"`
 	// status of the invite
 	Status string `json:"status"`
 	// role of the user in this city
@@ -43,10 +45,11 @@ type _InviteAttributes InviteAttributes
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewInviteAttributes(companyId uuid.UUID, userId uuid.UUID, status string, role string, expiresAt time.Time, createdAt time.Time) *InviteAttributes {
+func NewInviteAttributes(companyId uuid.UUID, userId uuid.UUID, initiatorId uuid.UUID, status string, role string, expiresAt time.Time, createdAt time.Time) *InviteAttributes {
 	this := InviteAttributes{}
 	this.CompanyId = companyId
 	this.UserId = userId
+	this.InitiatorId = initiatorId
 	this.Status = status
 	this.Role = role
 	this.ExpiresAt = expiresAt
@@ -108,6 +111,30 @@ func (o *InviteAttributes) GetUserIdOk() (*uuid.UUID, bool) {
 // SetUserId sets field value
 func (o *InviteAttributes) SetUserId(v uuid.UUID) {
 	o.UserId = v
+}
+
+// GetInitiatorId returns the InitiatorId field value
+func (o *InviteAttributes) GetInitiatorId() uuid.UUID {
+	if o == nil {
+		var ret uuid.UUID
+		return ret
+	}
+
+	return o.InitiatorId
+}
+
+// GetInitiatorIdOk returns a tuple with the InitiatorId field value
+// and a boolean to check if the value has been set.
+func (o *InviteAttributes) GetInitiatorIdOk() (*uuid.UUID, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.InitiatorId, true
+}
+
+// SetInitiatorId sets field value
+func (o *InviteAttributes) SetInitiatorId(v uuid.UUID) {
+	o.InitiatorId = v
 }
 
 // GetStatus returns the Status field value
@@ -218,6 +245,7 @@ func (o InviteAttributes) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["company_id"] = o.CompanyId
 	toSerialize["user_id"] = o.UserId
+	toSerialize["initiator_id"] = o.InitiatorId
 	toSerialize["status"] = o.Status
 	toSerialize["role"] = o.Role
 	toSerialize["expires_at"] = o.ExpiresAt
@@ -232,6 +260,7 @@ func (o *InviteAttributes) UnmarshalJSON(data []byte) (err error) {
 	requiredProperties := []string{
 		"company_id",
 		"user_id",
+		"initiator_id",
 		"status",
 		"role",
 		"expires_at",

@@ -6,6 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **CompanyId** | [**uuid.UUID**](uuid.UUID.md) | company id | 
 **UserId** | [**uuid.UUID**](uuid.UUID.md) | user id | 
+**InitiatorId** | [**uuid.UUID**](uuid.UUID.md) | id of the user who sent the invite | 
 **Status** | **string** | status of the invite | 
 **Role** | **string** | role of the user in this city | 
 **ExpiresAt** | **time.Time** | timestamp when the invite will expire | 
@@ -15,7 +16,7 @@ Name | Type | Description | Notes
 
 ### NewInviteAttributes
 
-`func NewInviteAttributes(companyId uuid.UUID, userId uuid.UUID, status string, role string, expiresAt time.Time, createdAt time.Time, ) *InviteAttributes`
+`func NewInviteAttributes(companyId uuid.UUID, userId uuid.UUID, initiatorId uuid.UUID, status string, role string, expiresAt time.Time, createdAt time.Time, ) *InviteAttributes`
 
 NewInviteAttributes instantiates a new InviteAttributes object
 This constructor will assign default values to properties that have it defined,
@@ -68,6 +69,26 @@ and a boolean to check if the value has been set.
 `func (o *InviteAttributes) SetUserId(v uuid.UUID)`
 
 SetUserId sets UserId field to given value.
+
+
+### GetInitiatorId
+
+`func (o *InviteAttributes) GetInitiatorId() uuid.UUID`
+
+GetInitiatorId returns the InitiatorId field if non-nil, zero value otherwise.
+
+### GetInitiatorIdOk
+
+`func (o *InviteAttributes) GetInitiatorIdOk() (*uuid.UUID, bool)`
+
+GetInitiatorIdOk returns a tuple with the InitiatorId field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetInitiatorId
+
+`func (o *InviteAttributes) SetInitiatorId(v uuid.UUID)`
+
+SetInitiatorId sets InitiatorId field to given value.
 
 
 ### GetStatus

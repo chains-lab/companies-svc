@@ -27,7 +27,7 @@ func CompanyBlock(m models.CompanyBlock) resources.CompanyBlock {
 	return resp
 }
 
-func CompanyBlockCollection(ms models.CompanyBlockCollection) resources.CompanyBlocksCollection {
+func CompanyBlockCollection(ms models.CompanyBlocksCollection) resources.CompanyBlocksCollection {
 	items := make([]resources.CompanyBlockData, 0, len(ms.Data))
 	for _, m := range ms.Data {
 		items = append(items, CompanyBlock(m).Data)

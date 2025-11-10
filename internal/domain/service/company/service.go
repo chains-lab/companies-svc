@@ -31,7 +31,9 @@ type database interface {
 
 	CreateCompany(ctx context.Context, input models.Company) (models.Company, error)
 	GetCompanyByID(ctx context.Context, ID uuid.UUID) (models.Company, error)
-	FilterCompanies(ctx context.Context, filters FiltersParams, page, size uint64) (models.CompanyCollection, error)
+	FilterCompanies(ctx context.Context, filters FiltersParams, page, size uint64) (models.CompaniesCollection, error)
+
+	GetCompanyEmployees(ctx context.Context, companyID uuid.UUID, roles ...string) (models.EmployeesCollection, error)
 
 	UpdateCompany(ctx context.Context, ID uuid.UUID, params UpdateParams, updatedAt time.Time) error
 	UpdateCompaniesStatus(ctx context.Context, ID uuid.UUID, status string, updatedAt time.Time) error
@@ -39,11 +41,32 @@ type database interface {
 }
 
 type EventPublisher interface {
-	PublishCompanyCreated(ctx context.Context, company models.Company) error
-	PublishCompanyDeleted(ctx context.Context, company models.Company) error
+	PublishCompanyCreated(
+		ctx context.Context,
+		company models.Company,
+	) error
 
-	PublishCompanyDeactivated(ctx context.Context, company models.Company) error
-	PublishCompanyActivated(ctx context.Context, company models.Company) error
+	PublishCompanyDeleted(
+		ctx context.Context,
+		company models.Company,
+		recipients []uuid.UUID,
+	) error
 
-	PublishEmployeeCreated(ctx context.Context, employee models.Employee) error
+	PublishCompanyDeactivated(
+		ctx context.Context,
+		company models.Company,
+		recipients []uuid.UUID,
+	) error
+	PublishCompanyActivated(
+		ctx context.Context,
+		company models.Company,
+		recipients []uuid.UUID,
+	) error
+
+	PublishEmployeeCreated(
+		ctx context.Context,
+		company models.Company,
+		employee models.Employee,
+		recipients []uuid.UUID,
+	) error
 }

@@ -12,18 +12,16 @@ import (
 const EmployeeDeletedEvent = "employee.delete"
 
 type EmployeeDeletedPayload struct {
-	UserID    uuid.UUID `json:"user_id"`
-	CompanyID uuid.UUID `json:"company_id"`
-	Role      string    `json:"role"`
-	Position  *string   `json:"position"`
-	Label     *string   `json:"label,omitempty"`
-	UpdatedAt time.Time `json:"updated_at"`
-	CreatedAt time.Time `json:"created_at"`
+	Company    models.Company    `json:"company"`
+	Employee   models.Employee   `json:"employee"`
+	Recipients PayloadRecipients `json:"recipients"`
 }
 
 func (s Service) PublishEmployeeDeleted(
 	ctx context.Context,
+	company models.Company,
 	employee models.Employee,
+	recipients []uuid.UUID,
 ) error {
 	return s.publish(
 		ctx,
@@ -34,13 +32,11 @@ func (s Service) PublishEmployeeDeleted(
 			Version:   "1",
 			Timestamp: time.Now().UTC(),
 			Data: EmployeeDeletedPayload{
-				UserID:    employee.UserID,
-				CompanyID: employee.CompanyID,
-				Role:      employee.Role,
-				Position:  employee.Position,
-				Label:     employee.Label,
-				UpdatedAt: employee.UpdatedAt,
-				CreatedAt: employee.CreatedAt,
+				Company:  company,
+				Employee: employee,
+				Recipients: PayloadRecipients{
+					Users: recipients,
+				},
 			},
 		},
 	)
