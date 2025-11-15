@@ -7,7 +7,6 @@ import (
 	"github.com/chains-lab/ape"
 	"github.com/chains-lab/ape/problems"
 	"github.com/chains-lab/companies-svc/internal/domain/errx"
-	"github.com/chains-lab/companies-svc/internal/domain/services/employee"
 	"github.com/chains-lab/companies-svc/internal/rest/meta"
 	"github.com/chains-lab/companies-svc/internal/rest/responses"
 )
@@ -21,14 +20,12 @@ func (s Service) GetMyEmployee(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	me, err := s.domain.employee.Get(r.Context(), employee.GetParams{
-		UserID: &initiator.ID,
-	})
+	me, err := s.domain.employee.GetInitiator(r.Context(), initiator.ID)
 	if err != nil {
 		s.log.WithError(err).Errorf("failed to get employee")
 		switch {
-		case errors.Is(err, errx.ErrorOwnerCannotRefuseSelf):
-			ape.RenderErr(w, problems.Forbidden("owner cannot refuse self"))
+		case errors.Is(err, errx.ErrorInitiatorIsNotEmployee):
+			ape.RenderErr(w, problems.NotFound("initiator is not an employee"))
 		default:
 			ape.RenderErr(w, problems.InternalError())
 		}

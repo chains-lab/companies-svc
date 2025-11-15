@@ -10,6 +10,7 @@ import (
 	"github.com/chains-lab/companies-svc/internal/rest/meta"
 	"github.com/chains-lab/companies-svc/internal/rest/requests"
 	"github.com/chains-lab/companies-svc/internal/rest/responses"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
 func (s Service) UpdateCompaniesStatus(w http.ResponseWriter, r *http.Request) {
@@ -37,6 +38,14 @@ func (s Service) UpdateCompaniesStatus(w http.ResponseWriter, r *http.Request) {
 			ape.RenderErr(w, problems.Forbidden("initiator is not an employee"))
 		case errors.Is(err, errx.ErrorInitiatorHaveNotEnoughRights):
 			ape.RenderErr(w, problems.Forbidden("initiator employee has not enough rights"))
+		case errors.Is(err, errx.ErrorInvalidCompanyBlockStatus):
+			ape.RenderErr(w, problems.BadRequest(validation.Errors{
+				"data/attributes/status": err,
+			})...)
+		case errors.Is(err, errx.ErrorCannotSetCompanyStatusBlocked):
+			ape.RenderErr(w, problems.BadRequest(validation.Errors{
+				"data/attributes/status": err,
+			})...)
 		case errors.Is(err, errx.ErrorCompanyNotFound):
 			ape.RenderErr(w, problems.NotFound("company not found"))
 		case errors.Is(err, errx.ErrorCompanyIsBlocked):

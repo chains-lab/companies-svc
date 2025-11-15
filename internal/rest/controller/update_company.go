@@ -30,12 +30,9 @@ func (s Service) UpdateCompany(w http.ResponseWriter, r *http.Request) {
 		ape.RenderErr(w, problems.BadRequest(err)...)
 	}
 
-	input := company.UpdateParams{}
-	if req.Data.Attributes.Name != nil {
-		input.Name = req.Data.Attributes.Name
-	}
-	if req.Data.Attributes.Icon != nil {
-		input.Icon = req.Data.Attributes.Icon
+	input := company.UpdateParams{
+		Name: req.Data.Attributes.Name,
+		Icon: req.Data.Attributes.Icon,
 	}
 
 	res, err := s.domain.company.UpdateByInitiator(r.Context(), initiator.ID, req.Data.Id, input)
@@ -48,8 +45,8 @@ func (s Service) UpdateCompany(w http.ResponseWriter, r *http.Request) {
 			ape.RenderErr(w, problems.Forbidden("initiator employee has not enough rights"))
 		case errors.Is(err, errx.ErrorCompanyNotFound):
 			ape.RenderErr(w, problems.NotFound("company not found"))
-		case errors.Is(err, errx.ErrorCompanyIsBlocked):
-			ape.RenderErr(w, problems.Conflict("company is blocked"))
+		case errors.Is(err, errx.ErrorCompanyIsNotActive):
+			ape.RenderErr(w, problems.Forbidden("company is not active"))
 		default:
 			ape.RenderErr(w, problems.InternalError())
 		}

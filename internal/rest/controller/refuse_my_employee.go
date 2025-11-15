@@ -23,8 +23,12 @@ func (s Service) RefuseMyEmployee(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		s.log.WithError(err).Errorf("failed to get employee")
 		switch {
-		case errors.Is(err, errx.ErrorEmployeeNotFound):
-			ape.RenderErr(w, problems.Unauthorized("employee not found"))
+		case errors.Is(err, errx.ErrorOwnerCannotRefuseSelf):
+			ape.RenderErr(w, problems.Forbidden("owner cannot refuse himself"))
+		case errors.Is(err, errx.ErrorInitiatorIsNotEmployee):
+			ape.RenderErr(w, problems.NotFound("employee not found"))
+		case errors.Is(err, errx.ErrorCompanyNotFound):
+			ape.RenderErr(w, problems.NotFound("company not found"))
 		default:
 			ape.RenderErr(w, problems.InternalError())
 		}

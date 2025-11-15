@@ -10,6 +10,7 @@ import (
 	"github.com/chains-lab/companies-svc/internal/rest/meta"
 	"github.com/chains-lab/companies-svc/internal/rest/requests"
 	"github.com/chains-lab/companies-svc/internal/rest/responses"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
 func (s Service) AnswerInvite(w http.ResponseWriter, r *http.Request) {
@@ -33,15 +34,21 @@ func (s Service) AnswerInvite(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		s.log.WithError(err).Error("failed to answer to invite")
 		switch {
-		case errors.Is(err, errx.ErrorInviteNotForUser):
-			ape.RenderErr(w, problems.Unauthorized("invite not for user"))
-		case errors.Is(err, errx.ErrorInviteAlreadyAnswered):
-			ape.RenderErr(w, problems.Conflict("invite already answered"))
+		case errors.Is(err, errx.ErrorInvalidInviteStatus):
+			ape.RenderErr(w, problems.BadRequest(validation.Errors{
+				"data/attributes/answer": err,
+			})...)
+
 		case errors.Is(err, errx.ErrorInviteNotFound):
 			ape.RenderErr(w, problems.NotFound("invite not found"))
 		case errors.Is(err, errx.ErrorInviteExpired):
 			ape.RenderErr(w, problems.Conflict("invite expired"))
-		case errors.Is(err, errx.ErrorInvalidInviteStatus):
+		case errors.Is(err, errx.ErrorInviteAlreadyAnswered):
+			ape.RenderErr(w, problems.Conflict("invite already answered"))
+		case errors.Is(err, errx.ErrorInviteNotForUser):
+			ape.RenderErr(w, problems.Unauthorized("invite not for user"))
+		case errors.Is(err, errx.ErrorCompanyIsNotActive):
+			ape.RenderErr(w, problems.Forbidden("company is not active"))
 		default:
 			ape.RenderErr(w, problems.InternalError())
 		}

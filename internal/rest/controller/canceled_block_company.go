@@ -39,6 +39,9 @@ func (s Service) CanceledCompanyBlock(w http.ResponseWriter, r *http.Request) {
 		switch {
 		case errors.Is(err, errx.ErrorCompanyNotFound):
 			ape.RenderErr(w, problems.NotFound("company not found"))
+		case errors.Is(err, errx.ErrorCompanyBlockNotFound):
+			ape.RenderErr(w, problems.NotFound("active company block not found"))
+
 		default:
 			ape.RenderErr(w, problems.InternalError())
 		}

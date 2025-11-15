@@ -16,7 +16,6 @@ func (s Service) Get(ctx context.Context, blockID uuid.UUID) (models.CompanyBloc
 			fmt.Errorf("failed to getting block with ID %s, cause: %w", blockID, err),
 		)
 	}
-
 	if block.IsNil() {
 		return models.CompanyBlock{}, errx.ErrorCompanyBlockNotFound.Raise(
 			fmt.Errorf("block with ID %s not found", blockID),
@@ -33,7 +32,6 @@ func (s Service) GetActiveCompanyBlock(ctx context.Context, companyID uuid.UUID)
 			fmt.Errorf("failed to getting active block for company with ID %s, cause: %w", companyID, err),
 		)
 	}
-
 	if block.IsNil() {
 		return models.CompanyBlock{}, errx.ErrorCompanyBlockNotFound.Raise(
 			fmt.Errorf("active block for company with ID %s not found", companyID),

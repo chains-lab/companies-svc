@@ -38,9 +38,9 @@ func (s Service) update(ctx context.Context,
 		return models.Company{}, err
 	}
 
-	if company.Status == enum.CompanyStatusBlocked {
-		return models.Company{}, errx.ErrorCompanyIsBlocked.Raise(
-			fmt.Errorf("company with ID %s is blocked", companyID),
+	if company.Status == enum.CompanyStatusActive {
+		return models.Company{}, errx.ErrorCompanyIsNotActive.Raise(
+			fmt.Errorf("company with ID %s is not active", companyID),
 		)
 	}
 
