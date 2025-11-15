@@ -21,7 +21,7 @@ func (s Service) PublishCompanyBlocked(
 	ctx context.Context,
 	block models.CompanyBlock,
 	company models.Company,
-	recipients []uuid.UUID,
+	recipients ...uuid.UUID,
 ) error {
 	return s.publish(
 		ctx,

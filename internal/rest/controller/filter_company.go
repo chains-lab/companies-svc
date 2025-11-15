@@ -6,12 +6,12 @@ import (
 
 	"github.com/chains-lab/ape"
 	"github.com/chains-lab/ape/problems"
-	"github.com/chains-lab/companies-svc/internal/domain/service/company"
+	"github.com/chains-lab/companies-svc/internal/domain/services/company"
 	"github.com/chains-lab/companies-svc/internal/rest/responses"
 	"github.com/chains-lab/restkit/pagi"
 )
 
-func (a Service) FilterCompanies(w http.ResponseWriter, r *http.Request) {
+func (s Service) FilterCompanies(w http.ResponseWriter, r *http.Request) {
 	filters := company.FiltersParams{}
 	q := r.URL.Query()
 
@@ -28,9 +28,9 @@ func (a Service) FilterCompanies(w http.ResponseWriter, r *http.Request) {
 
 	pagReq, sort := pagi.GetPagination(r)
 
-	companies, err := a.domain.company.Filter(r.Context(), filters, pagReq, sort)
+	companies, err := s.domain.company.Filter(r.Context(), filters, pagReq, sort)
 	if err != nil {
-		a.log.WithError(err).Error("failed to select companies")
+		s.log.WithError(err).Error("failed to select companies")
 		switch {
 		default:
 			ape.RenderErr(w, problems.InternalError())

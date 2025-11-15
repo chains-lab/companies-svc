@@ -51,7 +51,7 @@ type JWTConfig struct {
 	} `mapstructure:"user"`
 	Service struct {
 		SecretKey string `mapstructure:"secret_key"`
-	} `mapstructure:"service"`
+	} `mapstructure:"services"`
 	Invites struct {
 		SecretKey string `mapstructure:"secret_key"`
 	} `mapstructure:"employee-invite"`
@@ -64,7 +64,7 @@ type SwaggerConfig struct {
 }
 
 type Config struct {
-	Service  ServiceConfig  `mapstructure:"service"`
+	Service  ServiceConfig  `mapstructure:"services"`
 	Profile  ProfileConfig  `mapstructure:"profile"`
 	Log      LogConfig      `mapstructure:"log"`
 	Rest     RestConfig     `mapstructure:"rest"`

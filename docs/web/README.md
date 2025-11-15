@@ -119,6 +119,12 @@ Class | Method | HTTP request | Description
  - [UpdateCompanyStatus](docs/UpdateCompanyStatus.md)
  - [UpdateCompanyStatusData](docs/UpdateCompanyStatusData.md)
  - [UpdateCompanyStatusDataAttributes](docs/UpdateCompanyStatusDataAttributes.md)
+ - [UpdateEmployee](docs/UpdateEmployee.md)
+ - [UpdateEmployeeData](docs/UpdateEmployeeData.md)
+ - [UpdateEmployeeDataAttributes](docs/UpdateEmployeeDataAttributes.md)
+ - [UpdateMyEmployee](docs/UpdateMyEmployee.md)
+ - [UpdateMyEmployeeData](docs/UpdateMyEmployeeData.md)
+ - [UpdateMyEmployeeDataAttributes](docs/UpdateMyEmployeeDataAttributes.md)
 
 
 ## Documentation For Authorization

@@ -7,20 +7,20 @@ import (
 	"testing"
 
 	"github.com/chains-lab/companies-svc/internal"
-	"github.com/chains-lab/companies-svc/internal/data"
 	"github.com/chains-lab/companies-svc/internal/domain/models"
-	"github.com/chains-lab/companies-svc/internal/domain/service/block"
-	"github.com/chains-lab/companies-svc/internal/domain/service/company"
-	"github.com/chains-lab/companies-svc/internal/domain/service/employee"
-	"github.com/chains-lab/companies-svc/internal/domain/service/invite"
+	"github.com/chains-lab/companies-svc/internal/domain/services/block"
+	"github.com/chains-lab/companies-svc/internal/domain/services/company"
+	"github.com/chains-lab/companies-svc/internal/domain/services/employee"
+	"github.com/chains-lab/companies-svc/internal/domain/services/invite"
 	"github.com/chains-lab/companies-svc/internal/jwtmanager"
+	"github.com/chains-lab/companies-svc/internal/repo"
 	"github.com/chains-lab/companies-svc/internal/usrguesser"
 	"github.com/chains-lab/companies-svc/test"
 	"github.com/google/uuid"
 )
 
 type companySvc interface {
-	Create(ctx context.Context, initiatorID uuid.UUID, params company.CreateParams) (models.Company, error)
+	create(ctx context.Context, initiatorID uuid.UUID, params company.CreateParams) (models.Company, error)
 
 	Get(ctx context.Context, ID uuid.UUID) (models.Company, error)
 	Filter(
@@ -119,7 +119,7 @@ func newSetup(t *testing.T) (Setup, error) {
 		log.Fatal("failed to connect to database", "error", err)
 	}
 
-	database := data.NewDatabase(pg)
+	database := repo.NewDatabase(pg)
 	jwtInviteManager := jwtmanager.NewManager(cfg)
 	userGuesser := usrguesser.NewService(cfg.Profile.Url, nil)
 

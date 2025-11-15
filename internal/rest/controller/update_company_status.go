@@ -7,22 +7,31 @@ import (
 	"github.com/chains-lab/ape"
 	"github.com/chains-lab/ape/problems"
 	"github.com/chains-lab/companies-svc/internal/domain/errx"
+	"github.com/chains-lab/companies-svc/internal/rest/meta"
 	"github.com/chains-lab/companies-svc/internal/rest/requests"
 	"github.com/chains-lab/companies-svc/internal/rest/responses"
 )
 
-func (a Service) UpdateCompaniesStatus(w http.ResponseWriter, r *http.Request) {
-	req, err := requests.UpdateCompanyStatus(r)
+func (s Service) UpdateCompaniesStatus(w http.ResponseWriter, r *http.Request) {
+	initiator, err := meta.User(r.Context())
 	if err != nil {
-		a.log.WithError(err).Error("failed to parse update company status request")
+		s.log.WithError(err).Error("failed to get user from context")
 		ape.RenderErr(w, problems.BadRequest(err)...)
 
 		return
 	}
 
-	res, err := a.domain.company.UpdateStatus(r.Context(), req.Data.Id, req.Data.Attributes.Status)
+	req, err := requests.UpdateCompanyStatus(r)
 	if err != nil {
-		a.log.WithError(err).Errorf("failed to set company %s status to active", req.Data.Id)
+		s.log.WithError(err).Error("failed to parse update company status request")
+		ape.RenderErr(w, problems.BadRequest(err)...)
+
+		return
+	}
+
+	res, err := s.domain.company.UpdateStatusByInitiator(r.Context(), initiator.ID, req.Data.Id, req.Data.Attributes.Status)
+	if err != nil {
+		s.log.WithError(err).Errorf("failed to set company %s status to active", req.Data.Id)
 		switch {
 		case errors.Is(err, errx.ErrorInitiatorIsNotEmployee):
 			ape.RenderErr(w, problems.Forbidden("initiator is not an employee"))
@@ -39,7 +48,7 @@ func (a Service) UpdateCompaniesStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	a.log.Infof("company %s status set to active successfully", res.ID)
+	s.log.Infof("company %s status set to active successfully", res.ID)
 
 	ape.Render(w, http.StatusOK, responses.Company(res))
 }

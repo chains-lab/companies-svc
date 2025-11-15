@@ -13,10 +13,10 @@ import (
 	"github.com/google/uuid"
 )
 
-func (a Service) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
+func (s Service) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
 	initiator, err := meta.User(r.Context())
 	if err != nil {
-		a.log.WithError(err).Error("failed to get user from context")
+		s.log.WithError(err).Error("failed to get user from context")
 		ape.RenderErr(w, problems.BadRequest(err)...)
 
 		return
@@ -24,7 +24,7 @@ func (a Service) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
 
 	userID, err := uuid.Parse(chi.URLParam(r, "user_id"))
 	if err != nil {
-		a.log.WithError(err).Errorf("invalid user ID format")
+		s.log.WithError(err).Errorf("invalid user ID format")
 		ape.RenderErr(w, problems.BadRequest(validation.Errors{
 			"user_id": err,
 		})...)
@@ -34,7 +34,7 @@ func (a Service) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
 
 	companyID, err := uuid.Parse(chi.URLParam(r, "company_id"))
 	if err != nil {
-		a.log.WithError(err).Errorf("invalid company ID format")
+		s.log.WithError(err).Errorf("invalid company ID format")
 		ape.RenderErr(w, problems.BadRequest(validation.Errors{
 			"company_id": err,
 		})...)
@@ -42,9 +42,9 @@ func (a Service) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = a.domain.employee.Delete(r.Context(), initiator.ID, userID, companyID)
+	err = s.domain.employee.DeleteByInitiatorID(r.Context(), initiator.ID, userID, companyID)
 	if err != nil {
-		a.log.WithError(err).Errorf("failed to delete employee with user_id: %s", userID)
+		s.log.WithError(err).Errorf("failed to delete employee with user_id: %s", userID)
 		switch {
 		case errors.Is(err, errx.ErrorInitiatorHaveNotEnoughRights):
 			ape.RenderErr(w, problems.Forbidden("initiator employee have not enough rights"))
@@ -59,7 +59,7 @@ func (a Service) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	a.log.Infof("employee %s deleted successfully", userID)
+	s.log.Infof("employee %s deleted successfully", userID)
 
 	w.WriteHeader(http.StatusNoContent)
 	return

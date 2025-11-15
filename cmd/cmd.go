@@ -6,12 +6,12 @@ import (
 	"sync"
 
 	"github.com/chains-lab/companies-svc/internal"
-	"github.com/chains-lab/companies-svc/internal/data"
-	"github.com/chains-lab/companies-svc/internal/domain/service/block"
-	"github.com/chains-lab/companies-svc/internal/domain/service/company"
-	"github.com/chains-lab/companies-svc/internal/domain/service/employee"
-	"github.com/chains-lab/companies-svc/internal/domain/service/invite"
+	"github.com/chains-lab/companies-svc/internal/domain/services/block"
+	"github.com/chains-lab/companies-svc/internal/domain/services/company"
+	"github.com/chains-lab/companies-svc/internal/domain/services/employee"
+	"github.com/chains-lab/companies-svc/internal/domain/services/invite"
 	"github.com/chains-lab/companies-svc/internal/events/publisher"
+	"github.com/chains-lab/companies-svc/internal/repo"
 	"github.com/chains-lab/companies-svc/internal/rest"
 	"github.com/chains-lab/companies-svc/internal/rest/controller"
 	"github.com/chains-lab/companies-svc/internal/rest/middlewares"
@@ -32,7 +32,7 @@ func Start(ctx context.Context, cfg internal.Config, log logium.Logger, wg *sync
 		log.Fatal("failed to connect to database", "error", err)
 	}
 
-	database := data.NewDatabase(pg)
+	database := repo.NewDatabase(pg)
 
 	eventPublisher := publisher.New(cfg.Kafka.Broker)
 

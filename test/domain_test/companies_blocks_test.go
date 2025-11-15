@@ -7,8 +7,8 @@ import (
 
 	"github.com/chains-lab/companies-svc/internal/domain/enum"
 	"github.com/chains-lab/companies-svc/internal/domain/errx"
-	"github.com/chains-lab/companies-svc/internal/domain/service/company"
-	"github.com/chains-lab/companies-svc/internal/domain/service/employee"
+	"github.com/chains-lab/companies-svc/internal/domain/services/company"
+	"github.com/chains-lab/companies-svc/internal/domain/services/employee"
 	"github.com/chains-lab/companies-svc/test"
 	"github.com/google/uuid"
 )

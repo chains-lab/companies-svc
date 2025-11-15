@@ -8,9 +8,9 @@ import (
 	"github.com/chains-lab/companies-svc/internal/domain/enum"
 	"github.com/chains-lab/companies-svc/internal/domain/errx"
 	"github.com/chains-lab/companies-svc/internal/domain/models"
-	"github.com/chains-lab/companies-svc/internal/domain/service/company"
-	"github.com/chains-lab/companies-svc/internal/domain/service/employee"
-	"github.com/chains-lab/companies-svc/internal/domain/service/invite"
+	"github.com/chains-lab/companies-svc/internal/domain/services/company"
+	"github.com/chains-lab/companies-svc/internal/domain/services/employee"
+	"github.com/chains-lab/companies-svc/internal/domain/services/invite"
 	"github.com/chains-lab/companies-svc/test"
 
 	"github.com/google/uuid"
@@ -20,7 +20,7 @@ func CreateCompany(t *testing.T, s Setup) (models.Company, models.Employee) {
 	ownerID := uuid.New()
 	ctx := context.Background()
 
-	comp, err := s.domain.company.Create(ctx, ownerID, company.CreateParams{
+	comp, err := s.domain.company.create(ctx, ownerID, company.CreateParams{
 		Name: "companyID 1",
 		Icon: "icon",
 	})
@@ -46,7 +46,7 @@ func CreateEmployee(t *testing.T, s Setup, initiatorID, companyID uuid.UUID, rol
 		Role:      role,
 	})
 	if err != nil {
-		t.Fatalf("Create: %v", err)
+		t.Fatalf("create: %v", err)
 	}
 
 	inv, err = s.domain.invite.Accept(ctx, userID, inv.Token)
@@ -73,7 +73,7 @@ func TestCreateCompany(t *testing.T) {
 	ctx := context.Background()
 
 	ownerID := uuid.New()
-	comp, err := s.domain.company.Create(ctx, ownerID, company.CreateParams{
+	comp, err := s.domain.company.create(ctx, ownerID, company.CreateParams{
 		Name: "companyID 1",
 		Icon: "icon",
 	})
@@ -121,7 +121,7 @@ func TestCreateCompanyByEmployee(t *testing.T) {
 
 	_, owner := CreateCompany(t, s)
 
-	_, err = s.domain.company.Create(ctx, owner.UserID, company.CreateParams{
+	_, err = s.domain.company.create(ctx, owner.UserID, company.CreateParams{
 		Name: "companyID 2",
 		Icon: "icon 2",
 	})

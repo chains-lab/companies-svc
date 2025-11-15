@@ -7,8 +7,8 @@ import (
 
 	"github.com/chains-lab/companies-svc/internal/domain/enum"
 	"github.com/chains-lab/companies-svc/internal/domain/errx"
-	"github.com/chains-lab/companies-svc/internal/domain/service/employee"
-	"github.com/chains-lab/companies-svc/internal/domain/service/invite"
+	"github.com/chains-lab/companies-svc/internal/domain/services/employee"
+	"github.com/chains-lab/companies-svc/internal/domain/services/invite"
 	"github.com/chains-lab/companies-svc/test"
 	"github.com/google/uuid"
 )
@@ -45,7 +45,7 @@ func TestCreateEmployee(t *testing.T) {
 		Role:      enum.EmployeeRoleAdmin,
 	})
 	if err != nil {
-		t.Fatalf("Create: %v", err)
+		t.Fatalf("create: %v", err)
 	}
 
 	if emp.Role != enum.EmployeeRoleAdmin {
@@ -144,7 +144,7 @@ func TestCreateInvite(t *testing.T) {
 		Role:      enum.EmployeeRoleAdmin,
 	})
 	if err != nil {
-		t.Fatalf("Create: %v", err)
+		t.Fatalf("create: %v", err)
 	}
 	if inv.Status != enum.InviteStatusSent {
 		t.Errorf("expected invite status '%s', got '%s'", enum.InviteStatusSent, inv.Status)

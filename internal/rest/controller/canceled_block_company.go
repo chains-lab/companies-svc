@@ -14,10 +14,10 @@ import (
 	"github.com/google/uuid"
 )
 
-func (a Service) CanceledCompanyBlock(w http.ResponseWriter, r *http.Request) {
+func (s Service) CanceledCompanyBlock(w http.ResponseWriter, r *http.Request) {
 	initiator, err := meta.User(r.Context())
 	if err != nil {
-		a.log.WithError(err).Error("failed to get user from context")
+		s.log.WithError(err).Error("failed to get user from context")
 		ape.RenderErr(w, problems.Unauthorized("failed to get user from context"))
 
 		return
@@ -25,7 +25,7 @@ func (a Service) CanceledCompanyBlock(w http.ResponseWriter, r *http.Request) {
 
 	companyID, err := uuid.Parse(chi.URLParam(r, "company_id"))
 	if err != nil {
-		a.log.WithError(err).Error("invalid company_id")
+		s.log.WithError(err).Error("invalid company_id")
 		ape.RenderErr(w, problems.BadRequest(validation.Errors{
 			"company_id": err,
 		})...)
@@ -33,9 +33,9 @@ func (a Service) CanceledCompanyBlock(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	comp, err := a.domain.block.Cancel(r.Context(), companyID)
+	comp, err := s.domain.block.Cancel(r.Context(), companyID)
 	if err != nil {
-		a.log.WithError(err).Errorf("failed to canceled block company")
+		s.log.WithError(err).Errorf("failed to canceled block company")
 		switch {
 		case errors.Is(err, errx.ErrorCompanyNotFound):
 			ape.RenderErr(w, problems.NotFound("company not found"))
@@ -46,7 +46,7 @@ func (a Service) CanceledCompanyBlock(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	a.log.Infof("company block %s canceled successfully by user %s", companyID, initiator.ID)
+	s.log.Infof("company block %s canceled successfully by user %s", companyID, initiator.ID)
 
 	ape.Render(w, http.StatusOK, responses.Company(comp))
 }

@@ -131,6 +131,62 @@ components:
                     - active
                     - inactive
                   description: The new status of the company.
+    UpdateEmployee:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: object
+          required:
+            - id
+            - type
+            - attributes
+          properties:
+            id:
+              type: string
+              format: uuid
+              description: The UUID of the employee to be updated.
+            type:
+              type: string
+              enum:
+                - employee
+            attributes:
+              type: object
+              properties:
+                role:
+                  type: string
+                  description: The role or position of the employee within the company.
+                position:
+                  type: string
+                  description: The job title of the employee.
+                label:
+                  type: string
+                  description: A label or tag associated with the employee.
+    UpdateMyEmployee:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: object
+          required:
+            - type
+            - attributes
+          properties:
+            type:
+              type: string
+              enum:
+                - employee
+            attributes:
+              type: object
+              properties:
+                position:
+                  type: string
+                  description: The job title of the employee.
+                label:
+                  type: string
+                  description: A label or tag associated with the employee.
     PaginationData:
       type: object
       required:
@@ -485,7 +541,7 @@ components:
         reason:
           type: string
           description: Reason for blocking the company
-          example: Violation of terms of service
+          example: Violation of terms of services
         status:
           type: string
           description: Current status of the block

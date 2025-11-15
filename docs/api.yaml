@@ -25,6 +25,10 @@ components:
       $ref: './spec/components/schemas/UpdateCompany.yaml'
     UpdateCompanyStatus:
       $ref: './spec/components/schemas/UpdateCompanyStatus.yaml'
+    UpdateEmployee:
+      $ref: './spec/components/schemas/UpdateEmployee.yaml'
+    UpdateMyEmployee:
+      $ref: './spec/components/schemas/UpdateMyEmployee.yaml'
 
 
     #responses

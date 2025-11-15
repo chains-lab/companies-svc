@@ -19,7 +19,7 @@ properties:
     reason:
         type: string
         description: "Reason for blocking the company"
-        example: "Violation of terms of service"
+        example: "Violation of terms of services"
     status:
         type: string
         description: "Current status of the block"

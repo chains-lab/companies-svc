@@ -12,10 +12,10 @@ import (
 	"github.com/google/uuid"
 )
 
-func (a Service) GetCompany(w http.ResponseWriter, r *http.Request) {
+func (s Service) GetCompany(w http.ResponseWriter, r *http.Request) {
 	companyID, err := uuid.Parse(chi.URLParam(r, "company_id"))
 	if err != nil {
-		a.log.WithError(err).Errorf("invalid company ID format")
+		s.log.WithError(err).Errorf("invalid company ID format")
 		ape.RenderErr(w, problems.BadRequest(validation.Errors{
 			"company_id": err,
 		})...)
@@ -23,9 +23,9 @@ func (a Service) GetCompany(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	company, err := a.domain.company.Get(r.Context(), companyID)
+	company, err := s.domain.company.Get(r.Context(), companyID)
 	if err != nil {
-		a.log.WithError(err).Error("failed to get company")
+		s.log.WithError(err).Error("failed to get company")
 		switch {
 		case errors.Is(err, errx.ErrorCompanyNotFound):
 			ape.RenderErr(w, problems.NotFound("companyID not found"))

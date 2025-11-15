@@ -19,7 +19,7 @@ type CompanyDeactivatedPayload struct {
 func (s Service) PublishCompanyDeactivated(
 	ctx context.Context,
 	company models.Company,
-	recipients []uuid.UUID,
+	recipients ...uuid.UUID,
 ) error {
 	return s.publish(
 		ctx,

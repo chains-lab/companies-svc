@@ -13,10 +13,10 @@ import (
 	"github.com/google/uuid"
 )
 
-func (a Service) GetBlock(w http.ResponseWriter, r *http.Request) {
+func (s Service) GetBlock(w http.ResponseWriter, r *http.Request) {
 	blockID, err := uuid.Parse(chi.URLParam(r, "block_id"))
 	if err != nil {
-		a.log.WithError(err).Errorf("invalid block ID format")
+		s.log.WithError(err).Errorf("invalid block ID format")
 		ape.RenderErr(w, problems.BadRequest(validation.Errors{
 			"block_id": err,
 		})...)
@@ -24,9 +24,9 @@ func (a Service) GetBlock(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	block, err := a.domain.block.Get(r.Context(), blockID)
+	block, err := s.domain.block.Get(r.Context(), blockID)
 	if err != nil {
-		a.log.WithError(err).Errorf("failed to get block, ID: %s", blockID)
+		s.log.WithError(err).Errorf("failed to get block, ID: %s", blockID)
 		switch {
 		case errors.Is(err, errx.ErrorCompanyBlockNotFound):
 			ape.RenderErr(w, problems.NotFound("Crete not found"))

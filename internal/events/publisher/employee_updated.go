@@ -21,7 +21,7 @@ func (s Service) PublishEmployeeUpdated(
 	ctx context.Context,
 	company models.Company,
 	employee models.Employee,
-	recipients []uuid.UUID,
+	recipients ...uuid.UUID,
 ) error {
 	return s.publish(
 		ctx,

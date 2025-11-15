@@ -12,10 +12,10 @@ import (
 	"github.com/chains-lab/companies-svc/internal/rest/responses"
 )
 
-func (a Service) CreateCompanyBlock(w http.ResponseWriter, r *http.Request) {
+func (s Service) CreateCompanyBlock(w http.ResponseWriter, r *http.Request) {
 	initiator, err := meta.User(r.Context())
 	if err != nil {
-		a.log.WithError(err).Error("failed to get user from context")
+		s.log.WithError(err).Error("failed to get user from context")
 		ape.RenderErr(w, problems.Unauthorized("failed to get user from context"))
 
 		return
@@ -23,15 +23,15 @@ func (a Service) CreateCompanyBlock(w http.ResponseWriter, r *http.Request) {
 
 	req, err := requests.CreateCompanyBlock(r)
 	if err != nil {
-		a.log.WithError(err).Error("failed to decode block company request")
+		s.log.WithError(err).Error("failed to decode block company request")
 		ape.RenderErr(w, problems.BadRequest(err)...)
 
 		return
 	}
 
-	block, err := a.domain.block.Crete(r.Context(), initiator.ID, req.Data.Attributes.CompanyId, req.Data.Attributes.Reason)
+	block, err := s.domain.block.Crete(r.Context(), initiator.ID, req.Data.Attributes.CompanyId, req.Data.Attributes.Reason)
 	if err != nil {
-		a.log.WithError(err).Errorf("failed to block company")
+		s.log.WithError(err).Errorf("failed to block company")
 		switch {
 		case errors.Is(err, errx.ErrorCompanyHaveAlreadyActiveBlock):
 			ape.RenderErr(w, problems.Conflict("company already have active block"))
@@ -44,7 +44,7 @@ func (a Service) CreateCompanyBlock(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	a.log.Infof("company %s blocked successfully by user %s", req.Data.Attributes.CompanyId, initiator.ID)
+	s.log.Infof("company %s blocked successfully by user %s", req.Data.Attributes.CompanyId, initiator.ID)
 
 	responses.CompanyBlock(block)
 }

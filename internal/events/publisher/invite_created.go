@@ -21,7 +21,7 @@ func (s Service) PublishInviteCreated(
 	ctx context.Context,
 	invite models.Invite,
 	company models.Company,
-	recipients []uuid.UUID,
+	recipients ...uuid.UUID,
 ) error {
 	return s.publish(
 		ctx,

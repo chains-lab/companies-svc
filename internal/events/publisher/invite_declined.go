@@ -6,15 +6,13 @@ import (
 
 	"github.com/chains-lab/companies-svc/internal/domain/models"
 	"github.com/chains-lab/companies-svc/internal/events/contracts"
-	"github.com/google/uuid"
 )
 
 const InviteDeclinedEvent = "invite.declined"
 
 type InviteDeclinedPayload struct {
-	Invite     models.Invite     `json:"invite"`
-	Company    models.Company    `json:"company"`
-	Recipients PayloadRecipients `json:"recipients"`
+	Invite  models.Invite  `json:"invite"`
+	Company models.Company `json:"company"`
 }
 
 func (s Service) PublishInviteDeclined(
@@ -33,9 +31,6 @@ func (s Service) PublishInviteDeclined(
 			Data: InviteDeclinedPayload{
 				Invite:  invite,
 				Company: company,
-				Recipients: PayloadRecipients{
-					Users: []uuid.UUID{invite.InitiatorID},
-				},
 			},
 		},
 	)

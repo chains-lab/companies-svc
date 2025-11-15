@@ -13,10 +13,10 @@ import (
 	"github.com/google/uuid"
 )
 
-func (a Service) GetActiveCompanyBlock(w http.ResponseWriter, r *http.Request) {
+func (s Service) GetActiveCompanyBlock(w http.ResponseWriter, r *http.Request) {
 	companyID, err := uuid.Parse(chi.URLParam(r, "company_id"))
 	if err != nil {
-		a.log.WithError(err).Errorf("invalid company ID format")
+		s.log.WithError(err).Errorf("invalid company ID format")
 		ape.RenderErr(w, problems.BadRequest(validation.Errors{
 			"company_id": err,
 		})...)
@@ -24,9 +24,9 @@ func (a Service) GetActiveCompanyBlock(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	block, err := a.domain.block.GetActiveCompanyBlock(r.Context(), companyID)
+	block, err := s.domain.block.GetActiveCompanyBlock(r.Context(), companyID)
 	if err != nil {
-		a.log.WithError(err).Errorf("failed to get company %s active block", companyID)
+		s.log.WithError(err).Errorf("failed to get company %s active block", companyID)
 		switch {
 		case errors.Is(err, errx.ErrorCompanyBlockNotFound):
 			ape.RenderErr(w, problems.NotFound("no active block for company"))

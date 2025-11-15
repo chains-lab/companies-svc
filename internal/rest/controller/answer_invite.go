@@ -12,10 +12,10 @@ import (
 	"github.com/chains-lab/companies-svc/internal/rest/responses"
 )
 
-func (a Service) AnswerInvite(w http.ResponseWriter, r *http.Request) {
+func (s Service) AnswerInvite(w http.ResponseWriter, r *http.Request) {
 	initiator, err := meta.User(r.Context())
 	if err != nil {
-		a.log.WithError(err).Error("failed to get user from context")
+		s.log.WithError(err).Error("failed to get user from context")
 		ape.RenderErr(w, problems.Unauthorized("failed to get user from context"))
 
 		return
@@ -23,15 +23,15 @@ func (a Service) AnswerInvite(w http.ResponseWriter, r *http.Request) {
 
 	req, err := requests.AnswerInvite(r)
 	if err != nil {
-		a.log.WithError(err).Error("invalid answer invite request")
+		s.log.WithError(err).Error("invalid answer invite request")
 		ape.RenderErr(w, problems.BadRequest(err)...)
 
 		return
 	}
 
-	invite, err := a.domain.invite.Answer(r.Context(), initiator.ID, req.Data.Id, req.Data.Attributes.Answer)
+	invite, err := s.domain.invite.Answer(r.Context(), initiator.ID, req.Data.Id, req.Data.Attributes.Answer)
 	if err != nil {
-		a.log.WithError(err).Error("failed to answer to invite")
+		s.log.WithError(err).Error("failed to answer to invite")
 		switch {
 		case errors.Is(err, errx.ErrorInviteNotForUser):
 			ape.RenderErr(w, problems.Unauthorized("invite not for user"))
