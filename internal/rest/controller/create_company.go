@@ -31,7 +31,7 @@ func (s Service) CreateCompany(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := s.domain.company.CreateByInitiator(r.Context(), initiator.ID, company.CreateParams{
+	res, err := s.domain.company.CreateByEmployee(r.Context(), initiator.ID, company.CreateParams{
 		Name: req.Data.Attributes.Name,
 		Icon: req.Data.Attributes.Icon,
 	})

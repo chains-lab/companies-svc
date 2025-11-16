@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s Service) DeleteByInitiatorID(
+func (s Service) DeleteByEmployee(
 	ctx context.Context,
 	initiatorID, userID, companyID uuid.UUID,
 ) error {
@@ -47,7 +47,7 @@ func (s Service) DeleteByInitiatorID(
 		return errx.ErrorInvalidEmployeeRole.Raise(err)
 	}
 	if allowed != 1 {
-		return errx.ErrorInitiatorHaveNotEnoughRights.Raise(
+		return errx.ErrorNotEnoughRight.Raise(
 			fmt.Errorf("initiator have not enough rights to delete employee"),
 		)
 	}
@@ -74,6 +74,7 @@ func (s Service) DeleteMe(
 	if err != nil {
 		return err
 	}
+
 	//if company.Status != enum.CompanyStatusActive {
 	//	return errx.ErrorCompanyIsNotActive.Raise(
 	//		fmt.Errorf("cannot refuse employee from inactive company with ID %s", own.CompanyID),

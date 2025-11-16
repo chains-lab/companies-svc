@@ -10,13 +10,11 @@ import (
 )
 
 type Service struct {
-	addr   string
 	writer *kafka.Writer
 }
 
 func New(addr string) *Service {
 	return &Service{
-		addr: addr,
 		writer: &kafka.Writer{
 			Addr:         kafka.TCP(addr),
 			Balancer:     &kafka.Hash{},

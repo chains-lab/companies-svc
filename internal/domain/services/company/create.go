@@ -16,7 +16,7 @@ type CreateParams struct {
 	Icon string
 }
 
-func (s Service) CreateByInitiator(
+func (s Service) CreateByEmployee(
 	ctx context.Context,
 	initiatorID uuid.UUID,
 	params CreateParams,
@@ -83,7 +83,7 @@ func (s Service) create(
 	if err = s.event.PublishCompanyCreated(
 		ctx,
 		company,
-		employee.UserID,
+		employee,
 	); err != nil {
 		return models.Company{}, errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to update employee with kafka, cause: %w", err),

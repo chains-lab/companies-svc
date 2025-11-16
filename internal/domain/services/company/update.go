@@ -16,7 +16,7 @@ type UpdateParams struct {
 	Icon *string
 }
 
-func (s Service) UpdateByInitiator(
+func (s Service) UpdateByEmployee(
 	ctx context.Context,
 	initiatorID, companyID uuid.UUID,
 	params UpdateParams,
@@ -44,27 +44,40 @@ func (s Service) update(ctx context.Context,
 		)
 	}
 
-	mow := time.Now().UTC()
+	now := time.Now().UTC()
 
 	if params.Name != nil {
 		company.Name = *params.Name
 	}
-
 	if params.Icon != nil {
 		company.Icon = *params.Icon
 	}
 
-	err = s.db.UpdateCompany(ctx, companyID, params, mow)
+	err = s.db.UpdateCompany(ctx, companyID, params, now)
 	if err != nil {
 		return models.Company{}, errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to update company status, cause: %w", err),
 		)
 	}
 
+	employees, err := s.db.GetCompanyEmployees(ctx, companyID, enum.EmployeeRoleAdmin, enum.EmployeeRoleOwner)
+	if err != nil {
+		return models.Company{}, errx.ErrorInternal.Raise(
+			fmt.Errorf("failed to update company employees, cause: %w", err),
+		)
+	}
+
+	err = s.event.PublishCompanyUpdated(ctx, company, employees.GetUserIDs()...)
+	if err != nil {
+		return models.Company{}, errx.ErrorInternal.Raise(
+			fmt.Errorf("failed to update company event, cause: %w", err),
+		)
+	}
+
 	return company, nil
 }
 
-func (s Service) UpdateStatusByInitiator(
+func (s Service) UpdateStatusByEmployee(
 	ctx context.Context,
 	initiatorID, companyID uuid.UUID,
 	status string,

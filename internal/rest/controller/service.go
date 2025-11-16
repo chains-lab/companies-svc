@@ -13,7 +13,7 @@ import (
 )
 
 type companySvc interface {
-	CreateByInitiator(
+	CreateByEmployee(
 		ctx context.Context,
 		initiatorID uuid.UUID,
 		params company.CreateParams,
@@ -26,12 +26,12 @@ type companySvc interface {
 		page, size uint64,
 	) (models.CompaniesCollection, error)
 
-	UpdateByInitiator(
+	UpdateByEmployee(
 		ctx context.Context,
 		initiatorID, companyID uuid.UUID,
 		params company.UpdateParams,
 	) (models.Company, error)
-	UpdateStatusByInitiator(
+	UpdateStatusByEmployee(
 		ctx context.Context,
 		initiatorID, companyID uuid.UUID,
 		status string,
@@ -48,7 +48,7 @@ type employeeSvc interface {
 		page, size uint64,
 	) (models.EmployeesCollection, error)
 
-	UpdateByInitiator(
+	UpdateByEmployee(
 		ctx context.Context,
 		userID uuid.UUID,
 		initiatorID uuid.UUID,
@@ -60,7 +60,7 @@ type employeeSvc interface {
 		params employee.UpdateMyParams,
 	) (models.Employee, error)
 
-	DeleteByInitiatorID(
+	DeleteByEmployee(
 		ctx context.Context,
 		initiatorID, userID, companyID uuid.UUID,
 	) error

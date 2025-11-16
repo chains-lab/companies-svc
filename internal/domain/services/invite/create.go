@@ -30,7 +30,7 @@ func (s Service) Create(ctx context.Context, initiatorID uuid.UUID, params Creat
 		)
 	}
 	if initiator.CompanyID != params.CompanyID {
-		return models.Invite{}, errx.ErrorInitiatorIsNotEmployeeOfThisCompany.Raise(
+		return models.Invite{}, errx.ErrorInitiatorIsNotEmployeeInThisCompany.Raise(
 			fmt.Errorf("initiator company_id %s not equal to params company_id %s", initiator.CompanyID, params.CompanyID),
 		)
 	}
@@ -42,7 +42,7 @@ func (s Service) Create(ctx context.Context, initiatorID uuid.UUID, params Creat
 		)
 	}
 	if access <= 0 {
-		return models.Invite{}, errx.ErrorInitiatorHaveNotEnoughRights.Raise(
+		return models.Invite{}, errx.ErrorNotEnoughRight.Raise(
 			fmt.Errorf("initiator have not enough rights to invite role %s", params.Role),
 		)
 	}

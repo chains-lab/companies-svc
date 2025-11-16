@@ -17,7 +17,7 @@ type UpdateParams struct {
 	Role     *string
 }
 
-func (s Service) UpdateByInitiator(
+func (s Service) UpdateByEmployee(
 	ctx context.Context,
 	userID uuid.UUID,
 	initiatorID uuid.UUID,
@@ -43,7 +43,7 @@ func (s Service) UpdateByInitiator(
 		)
 	}
 	if access != 1 {
-		return models.Employee{}, errx.ErrorInitiatorHaveNotEnoughRights.Raise(
+		return models.Employee{}, errx.ErrorNotEnoughRight.Raise(
 			fmt.Errorf("initiator have not enough rights to update employee"),
 		)
 	}
@@ -62,7 +62,7 @@ func (s Service) UpdateByInitiator(
 			)
 		}
 		if access != 1 {
-			return models.Employee{}, errx.ErrorInitiatorHaveNotEnoughRights.Raise(
+			return models.Employee{}, errx.ErrorNotEnoughRight.Raise(
 				fmt.Errorf("initiator have not enough rights to update employee role"),
 			)
 		}

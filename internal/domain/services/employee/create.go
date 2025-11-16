@@ -17,8 +17,8 @@ type CreateParams struct {
 	Role      string
 }
 
-// Create deprecated creates a new employee in the specified company.
-func (s Service) Create(ctx context.Context, params CreateParams) (models.Employee, error) {
+// create deprecated creates a new employee in the specified company.
+func (s Service) create(ctx context.Context, params CreateParams) (models.Employee, error) {
 	comp, err := s.getCompany(ctx, params.CompanyID)
 	if err != nil {
 		return models.Employee{}, err

@@ -37,13 +37,13 @@ func (s Service) UpdateEmployee(w http.ResponseWriter, r *http.Request) {
 		Label:    req.Data.Attributes.Label,
 	}
 
-	res, err := s.domain.employee.UpdateByInitiator(r.Context(), req.Data.Id, initiator.ID, params)
+	res, err := s.domain.employee.UpdateByEmployee(r.Context(), req.Data.Id, initiator.ID, params)
 	if err != nil {
 		s.log.WithError(err).Errorf("failed to update employee for ID: %s", req.Data.Id)
 		switch {
 		case errors.Is(err, errx.ErrorInitiatorIsNotEmployee):
 			ape.RenderErr(w, problems.Forbidden("initiator is not an employee"))
-		case errors.Is(err, errx.ErrorInitiatorHaveNotEnoughRights):
+		case errors.Is(err, errx.ErrorNotEnoughRight):
 			ape.RenderErr(w, problems.Forbidden("initiator have not enough rights"))
 		case errors.Is(err, errx.ErrorEmployeeNotFound):
 			ape.RenderErr(w, problems.NotFound("employee not found"))

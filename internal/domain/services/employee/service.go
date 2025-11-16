@@ -83,7 +83,7 @@ func (s Service) validateInitiatorRight(
 	}
 
 	if &employee.CompanyID != nil && &employee.CompanyID != companyID {
-		return models.Employee{}, errx.ErrorInitiatorHaveNotEnoughRights.Raise(
+		return models.Employee{}, errx.ErrorNotEnoughRight.Raise(
 			fmt.Errorf("initiator is not an employee of company: %s", companyID),
 		)
 	}
@@ -97,7 +97,7 @@ func (s Service) validateInitiatorRight(
 			}
 		}
 		if !hasRole {
-			return models.Employee{}, errx.ErrorInitiatorHaveNotEnoughRights.Raise(
+			return models.Employee{}, errx.ErrorNotEnoughRight.Raise(
 				fmt.Errorf("initiator have not enough rights in company: %s", companyID),
 			)
 		}

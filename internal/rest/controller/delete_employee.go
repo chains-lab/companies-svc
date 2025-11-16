@@ -42,7 +42,7 @@ func (s Service) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = s.domain.employee.DeleteByInitiatorID(r.Context(), initiator.ID, userID, companyID)
+	err = s.domain.employee.DeleteByEmployee(r.Context(), initiator.ID, userID, companyID)
 	if err != nil {
 		s.log.WithError(err).Errorf("failed to delete employee with user_id: %s", userID)
 		switch {
@@ -52,7 +52,7 @@ func (s Service) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
 			ape.RenderErr(w, problems.Forbidden("initiator is not an employee"))
 		case errors.Is(err, errx.ErrorCannotDeleteYourself):
 			ape.RenderErr(w, problems.Forbidden("cannot delete yourself"))
-		case errors.Is(err, errx.ErrorInitiatorHaveNotEnoughRights):
+		case errors.Is(err, errx.ErrorNotEnoughRight):
 			ape.RenderErr(w, problems.Forbidden("initiator employee have not enough rights"))
 		case errors.Is(err, errx.ErrorCompanyNotFound):
 			ape.RenderErr(w, problems.NotFound("company not found"))

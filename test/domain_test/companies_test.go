@@ -216,12 +216,12 @@ func TestInactiveCompany(t *testing.T) {
 	}
 
 	err = s.domain.employee.Delete(ctx, admin.UserID, owner.UserID, compID)
-	if !errors.Is(err, errx.ErrorInitiatorHaveNotEnoughRights) {
+	if !errors.Is(err, errx.ErrorNotEnoughRight) {
 		t.Fatalf("DeleteEmployee: %v", err)
 	}
 
 	err = s.domain.employee.Delete(ctx, moder1.UserID, moder2.UserID, compID)
-	if !errors.Is(err, errx.ErrorInitiatorHaveNotEnoughRights) {
+	if !errors.Is(err, errx.ErrorNotEnoughRight) {
 		t.Fatalf("DeleteEmployee: %v", err)
 	}
 

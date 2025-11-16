@@ -46,10 +46,16 @@ type EventPublisher interface {
 	PublishCompanyCreated(
 		ctx context.Context,
 		company models.Company,
-		ownerID uuid.UUID,
+		owner models.Employee,
 	) error
 
 	PublishCompanyDeleted(
+		ctx context.Context,
+		company models.Company,
+		recipients ...uuid.UUID,
+	) error
+
+	PublishCompanyUpdated(
 		ctx context.Context,
 		company models.Company,
 		recipients ...uuid.UUID,
@@ -110,7 +116,7 @@ func (s Service) validateInitiatorRight(
 	}
 
 	if employee.CompanyID != companyID {
-		return models.Employee{}, errx.ErrorInitiatorHaveNotEnoughRights.Raise(
+		return models.Employee{}, errx.ErrorNotEnoughRight.Raise(
 			fmt.Errorf("initiator is not an employee of company: %s", companyID),
 		)
 	}
@@ -124,7 +130,7 @@ func (s Service) validateInitiatorRight(
 			}
 		}
 		if !hasRole {
-			return models.Employee{}, errx.ErrorInitiatorHaveNotEnoughRights.Raise(
+			return models.Employee{}, errx.ErrorNotEnoughRight.Raise(
 				fmt.Errorf("initiator have not enough rights in company: %s", companyID),
 			)
 		}

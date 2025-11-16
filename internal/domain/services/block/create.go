@@ -71,15 +71,10 @@ func (s Service) Crete(
 		)
 	}
 
-	var recipients []uuid.UUID
-	for _, emp := range employees.Data {
-		recipients = append(recipients, emp.UserID)
-	}
-
 	company.Status = enum.CompanyStatusBlocked
 	company.UpdatedAt = now
 
-	if err = s.event.PublishCompanyBlocked(ctx, block, company, recipients...); err != nil {
+	if err = s.event.PublishCompanyBlocked(ctx, block, company, employees.GetUserIDs()...); err != nil {
 		return models.CompanyBlock{}, errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to publish company blocked event, cause: %w", err),
 		)

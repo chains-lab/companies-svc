@@ -84,8 +84,8 @@ func TestErrorCreateEmployee(t *testing.T) {
 		CompanyID: owner.CompanyID,
 		Role:      enum.EmployeeRoleOwner,
 	})
-	if !errors.Is(err, errx.ErrorInitiatorHaveNotEnoughRights) {
-		t.Fatalf("expected error %v, got %v", errx.ErrorInitiatorHaveNotEnoughRights, err)
+	if !errors.Is(err, errx.ErrorNotEnoughRight) {
+		t.Fatalf("expected error %v, got %v", errx.ErrorNotEnoughRight, err)
 	}
 
 	_, err = s.domain.invite.Create(ctx, uuid.New(), invite.CreateParams{
@@ -100,8 +100,8 @@ func TestErrorCreateEmployee(t *testing.T) {
 		CompanyID: uuid.New(),
 		Role:      enum.EmployeeRoleAdmin,
 	})
-	if !errors.Is(err, errx.ErrorInitiatorIsNotEmployeeOfThisCompany) {
-		t.Fatalf("expected error %v, got %v", errx.ErrorInitiatorIsNotEmployeeOfThisCompany, err)
+	if !errors.Is(err, errx.ErrorInitiatorIsNotEmployeeInThisCompany) {
+		t.Fatalf("expected error %v, got %v", errx.ErrorInitiatorIsNotEmployeeInThisCompany, err)
 	}
 }
 
@@ -122,8 +122,8 @@ func TestInvalidCompanyInvite(t *testing.T) {
 		CompanyID: comp2.ID,
 		Role:      enum.EmployeeRoleAdmin,
 	})
-	if !errors.Is(err, errx.ErrorInitiatorIsNotEmployeeOfThisCompany) {
-		t.Fatalf("expected error %v, got %v", errx.ErrorInitiatorIsNotEmployeeOfThisCompany, err)
+	if !errors.Is(err, errx.ErrorInitiatorIsNotEmployeeInThisCompany) {
+		t.Fatalf("expected error %v, got %v", errx.ErrorInitiatorIsNotEmployeeInThisCompany, err)
 	}
 }
 

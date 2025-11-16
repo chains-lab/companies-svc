@@ -26,3 +26,11 @@ type EmployeesCollection struct {
 	Size  uint64     `json:"size"`
 	Total uint64     `json:"total"`
 }
+
+func (c EmployeesCollection) GetUserIDs() []uuid.UUID {
+	ids := make([]uuid.UUID, 0, len(c.Data))
+	for _, admin := range c.Data {
+		ids = append(ids, admin.UserID)
+	}
+	return ids
+}

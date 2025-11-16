@@ -10,8 +10,8 @@ var ErrorCompanyIsBlocked = ape.DeclareError("COMPANY_STATUS_BLOCKED")
 
 var ErrorCompanyIsNotActive = ape.DeclareError("COMPANY_IS_NOT_ACTIVE")
 
-var ErrorCannotSetCompanyStatusBlocked = ape.DeclareError("COMPANY_STATUS_BLOCKED")
+var ErrorOnlyInactiveCompanyCanBeDeleted = ape.DeclareError("ONLY_INACTIVE_COMPANY_CAN_BE_DELETED")
+
+var ErrorCannotSetCompanyStatusBlocked = ape.DeclareError("CANNOT_SET_COMPANY_STATUS_BLOCKED")
 
 var ErrorCurrentEmployeeCannotCreateCompany = ape.DeclareError("CURRENT_EMPLOYEE_CANNOT_CREATE_COMPANY")
-
-var ErrorOnlyInactiveCompanyCanBeDeleted = ape.DeclareError("COMPANY_CAN_BE_DELETED")
