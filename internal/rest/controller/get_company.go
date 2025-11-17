@@ -15,7 +15,7 @@ import (
 func (s Service) GetCompany(w http.ResponseWriter, r *http.Request) {
 	companyID, err := uuid.Parse(chi.URLParam(r, "company_id"))
 	if err != nil {
-		s.log.WithError(err).Errorf("invalid company ID format")
+		s.log.WithError(err).Errorf("invalid company EmployeeID format")
 		ape.RenderErr(w, problems.BadRequest(validation.Errors{
 			"company_id": err,
 		})...)

@@ -12,9 +12,9 @@ import (
 
 func (s Service) DeleteByEmployee(
 	ctx context.Context,
-	initiatorID, companyID uuid.UUID,
+	userID, companyID uuid.UUID,
 ) error {
-	_, err := s.validateInitiatorRight(ctx, initiatorID, companyID, enum.EmployeeRoleOwner)
+	_, err := s.validateInitiator(ctx, userID, companyID, enum.EmployeeRoleOwner)
 	if err != nil {
 		return err
 	}
@@ -47,7 +47,7 @@ func (s Service) delete(ctx context.Context, companyID uuid.UUID) error {
 			fmt.Errorf("failed to delete company, cause: %w", err),
 		)
 	}
-	
+
 	if err = s.event.PublishCompanyDeleted(ctx, company, employees.GetUserIDs()...); err != nil {
 		return errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to publish company deleted event, cause: %w", err),

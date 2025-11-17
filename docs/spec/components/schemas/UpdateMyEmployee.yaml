@@ -13,7 +13,13 @@ properties:
         enum: [ employee ]
       attributes:
         type: object
+        required:
+          - company_id
         properties:
+          company_id:
+            type: string
+            format: uuid
+            description: The ID of the company the employee belongs to.
           position:
             type: string
             description: The job title of the employee.

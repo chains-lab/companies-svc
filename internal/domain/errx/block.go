@@ -7,5 +7,3 @@ import (
 var ErrorCompanyBlockNotFound = ape.DeclareError("BLOCK_NOT_FOUND")
 
 var ErrorCompanyHaveAlreadyActiveBlock = ape.DeclareError("COMPANY_HAVE_ALREADY_ACTIVE_BLOCK")
-
-var ErrorInvalidCompanyBlockStatus = ape.DeclareError("INVALID_BLOCK_STATUS")

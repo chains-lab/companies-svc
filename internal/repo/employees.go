@@ -6,6 +6,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/chains-lab/companies-svc/internal/domain/enum"
 	"github.com/chains-lab/companies-svc/internal/domain/models"
 	"github.com/chains-lab/companies-svc/internal/domain/services/employee"
 	"github.com/chains-lab/restkit/pagi"
@@ -16,11 +17,11 @@ func (r *Repo) CreateEmployee(ctx context.Context, input models.Employee) error 
 	return r.sql.employees.New().Insert(ctx, employeeModelToSchema(input))
 }
 
-func (r *Repo) GetEmployeeByUserID(
+func (r *Repo) GetEmployee(
 	ctx context.Context,
-	userID uuid.UUID,
+	ID uuid.UUID,
 ) (models.Employee, error) {
-	row, err := r.sql.employees.New().FilterUserID(userID).Get(ctx)
+	row, err := r.sql.employees.New().FilterID(ID).Get(ctx)
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
 		return models.Employee{}, nil
@@ -31,9 +32,9 @@ func (r *Repo) GetEmployeeByUserID(
 	return employeeSchemaToModel(row), nil
 }
 
-func (r *Repo) GetEmployeeByCompanyAndUser(
+func (r *Repo) GetEmployeeUserInCompany(
 	ctx context.Context,
-	companyID, userID uuid.UUID,
+	userID, companyID uuid.UUID,
 ) (models.Employee, error) {
 	row, err := r.sql.employees.New().FilterCompanyID(companyID).FilterUserID(userID).Get(ctx)
 	switch {
@@ -46,39 +47,8 @@ func (r *Repo) GetEmployeeByCompanyAndUser(
 	return employeeSchemaToModel(row), nil
 }
 
-func (r *Repo) GetEmployeeByCompanyAndUserAndRole(
-	ctx context.Context,
-	companyID, userID uuid.UUID,
-	role string,
-) (models.Employee, error) {
-	row, err := r.sql.employees.New().FilterCompanyID(companyID).FilterUserID(userID).FilterRole(role).Get(ctx)
-	switch {
-	case errors.Is(err, sql.ErrNoRows):
-		return models.Employee{}, nil
-	case err != nil:
-		return models.Employee{}, err
-	}
-
-	return employeeSchemaToModel(row), nil
-}
-
-func (r *Repo) GetEmployee(
-	ctx context.Context,
-	params employee.GetParams,
-) (models.Employee, error) {
-	query := r.sql.employees.New()
-
-	if params.UserID != nil {
-		query = query.FilterUserID(*params.UserID)
-	}
-	if params.CompanyID != nil {
-		query = query.FilterCompanyID(*params.CompanyID)
-	}
-	if params.Role != nil {
-		query = query.FilterRole(*params.Role)
-	}
-
-	row, err := query.Get(ctx)
+func (r *Repo) GetCompanyOwner(ctx context.Context, companyID uuid.UUID) (models.Employee, error) {
+	row, err := r.sql.employees.New().FilterCompanyID(companyID).FilterRole(enum.EmployeeRoleOwner).Get(ctx)
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
 		return models.Employee{}, nil
@@ -107,6 +77,9 @@ func (r *Repo) FilterEmployees(
 	if filter.Roles != nil && len(filter.Roles) > 0 {
 		query = query.FilterRole(filter.Roles...)
 	}
+	if filter.EmployeeID != nil && len(filter.EmployeeID) > 0 {
+		query = query.FilterID(filter.EmployeeID...)
+	}
 
 	total, err := query.Count(ctx)
 	if err != nil {
@@ -133,11 +106,11 @@ func (r *Repo) FilterEmployees(
 
 func (r *Repo) UpdateEmployee(
 	ctx context.Context,
-	userID uuid.UUID,
+	ID uuid.UUID,
 	params employee.UpdateParams,
 	updatedAt time.Time,
 ) error {
-	q := r.sql.employees.New().FilterUserID(userID)
+	q := r.sql.employees.New().FilterID(ID)
 	empty := true
 
 	if params.Position != nil {
@@ -170,12 +143,8 @@ func (r *Repo) UpdateEmployee(
 	return q.Update(ctx, updatedAt)
 }
 
-func (r *Repo) DeleteEmployee(ctx context.Context, userID, companyID uuid.UUID) error {
-	return r.sql.employees.New().FilterUserID(userID).FilterCompanyID(companyID).Delete(ctx)
-}
-
-func (r *Repo) EmployeeExist(ctx context.Context, userID uuid.UUID) (bool, error) {
-	return r.sql.employees.New().FilterUserID(userID).Exist(ctx)
+func (r *Repo) DeleteEmployee(ctx context.Context, ID uuid.UUID) error {
+	return r.sql.employees.New().FilterID(ID).Delete(ctx)
 }
 
 func (r *Repo) GetCompanyEmployees(ctx context.Context, companyID uuid.UUID, roles ...string) (models.EmployeesCollection, error) {

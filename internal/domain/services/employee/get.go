@@ -9,14 +9,8 @@ import (
 	"github.com/google/uuid"
 )
 
-type GetParams struct {
-	UserID    *uuid.UUID
-	CompanyID *uuid.UUID
-	Role      *string
-}
-
-func (s Service) Get(ctx context.Context, params GetParams) (models.Employee, error) {
-	res, err := s.db.GetEmployee(ctx, params)
+func (s Service) Get(ctx context.Context, ID uuid.UUID) (models.Employee, error) {
+	res, err := s.db.GetEmployee(ctx, ID)
 	if err != nil {
 		return models.Employee{}, errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to get employee, cause: %w", err),
@@ -31,16 +25,16 @@ func (s Service) Get(ctx context.Context, params GetParams) (models.Employee, er
 	return res, nil
 }
 
-func (s Service) GetInitiator(ctx context.Context, initiatorID uuid.UUID) (models.Employee, error) {
-	employee, err := s.db.GetEmployeeByUserID(ctx, initiatorID)
+func (s Service) GetByUserInCompany(ctx context.Context, companyID, userID uuid.UUID) (models.Employee, error) {
+	employee, err := s.db.GetEmployeeUserInCompany(ctx, userID, companyID)
 	if err != nil {
 		return models.Employee{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("failed to get employee by user ID %s, cause: %w", initiatorID, err),
+			fmt.Errorf("failed to get employee user %s in company %s, cause: %w", userID, companyID, err),
 		)
 	}
 	if employee.IsNil() {
-		return models.Employee{}, errx.ErrorInitiatorIsNotEmployee.Raise(
-			fmt.Errorf("employee not found for user %s", initiatorID),
+		return models.Employee{}, errx.ErrorEmployeeNotFound.Raise(
+			fmt.Errorf("employee for user EmployeeID %s not found in company %s", userID, companyID),
 		)
 	}
 

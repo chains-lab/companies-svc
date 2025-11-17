@@ -13,13 +13,13 @@ func (s Service) Get(ctx context.Context, ID uuid.UUID) (models.Company, error) 
 	company, err := s.db.GetCompanyByID(ctx, ID)
 	if err != nil {
 		return models.Company{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("failed to get company by ID, cause: %w", err),
+			fmt.Errorf("failed to get company by EmployeeID, cause: %w", err),
 		)
 	}
 
 	if company.IsNil() {
 		return models.Company{}, errx.ErrorCompanyNotFound.Raise(
-			fmt.Errorf("company with ID %s not found", ID),
+			fmt.Errorf("company with EmployeeID %s not found", ID),
 		)
 	}
 

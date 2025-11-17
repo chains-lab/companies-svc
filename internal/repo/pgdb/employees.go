@@ -14,6 +14,7 @@ import (
 const employeesTable = "employees"
 
 type Employee struct {
+	ID        uuid.UUID      `db:"id"`
 	UserID    uuid.UUID      `db:"user_id"`
 	CompanyID uuid.UUID      `db:"company_id"`
 	Role      string         `db:"role"`
@@ -51,6 +52,7 @@ func (q EmployeesQ) New() EmployeesQ {
 
 func (q EmployeesQ) Insert(ctx context.Context, in Employee) error {
 	values := map[string]interface{}{
+		"id":         in.ID,
 		"user_id":    in.UserID,
 		"company_id": in.CompanyID,
 		"role":       in.Role,
@@ -94,6 +96,7 @@ func (q EmployeesQ) Get(ctx context.Context) (Employee, error) {
 
 	var emp Employee
 	err = row.Scan(
+		&emp.ID,
 		&emp.UserID,
 		&emp.CompanyID,
 		&emp.Role,
@@ -128,6 +131,7 @@ func (q EmployeesQ) Select(ctx context.Context) ([]Employee, error) {
 	for rows.Next() {
 		var emp Employee
 		if err := rows.Scan(
+			&emp.ID,
 			&emp.UserID,
 			&emp.CompanyID,
 			&emp.Role,
@@ -207,6 +211,14 @@ func (q EmployeesQ) Exist(ctx context.Context) (bool, error) {
 	}
 
 	return n > 0, nil
+}
+
+func (q EmployeesQ) FilterID(id ...uuid.UUID) EmployeesQ {
+	q.selector = q.selector.Where(sq.Eq{"id": id})
+	q.counter = q.counter.Where(sq.Eq{"id": id})
+	q.updater = q.updater.Where(sq.Eq{"id": id})
+	q.deleter = q.deleter.Where(sq.Eq{"id": id})
+	return q
 }
 
 func (q EmployeesQ) FilterUserID(userID ...uuid.UUID) EmployeesQ {

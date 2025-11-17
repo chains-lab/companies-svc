@@ -6,11 +6,14 @@ CREATE TYPE employee_roles AS ENUM (
 );
 
 CREATE TABLE employees (
-    user_id    UUID           PRIMARY KEY NOT NULL,
+    id         UUID           PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id    UUID           NOT NULL,
     company_id UUID           NOT NULL REFERENCES companies("id") ON DELETE CASCADE,
     role       employee_roles NOT NULL,
     updated_at TIMESTAMP      NOT NULL  DEFAULT (now() AT TIME ZONE 'UTC'),
-    created_at TIMESTAMP      NOT NULL  DEFAULT (now() AT TIME ZONE 'UTC')
+    created_at TIMESTAMP      NOT NULL  DEFAULT (now() AT TIME ZONE 'UTC'),
+
+    CONSTRAINT employees_company_user_unique UNIQUE (company_id, user_id)
 );
 
 CREATE Type invite_status AS ENUM (

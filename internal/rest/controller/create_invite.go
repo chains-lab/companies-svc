@@ -38,16 +38,12 @@ func (s Service) CreateInvite(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		s.log.WithError(err).Errorf("failed to create employee invite")
 		switch {
-		case errors.Is(err, errx.ErrorInitiatorIsNotEmployee):
-			ape.RenderErr(w, problems.Forbidden("initiator is not employee"))
-		case errors.Is(err, errx.ErrorInitiatorIsNotEmployeeInThisCompany):
-			ape.RenderErr(w, problems.Forbidden("initiator is not employee of this company"))
-		case errors.Is(err, errx.ErrorUserAlreadyEmployee):
-			ape.RenderErr(w, problems.Conflict("user is already employee"))
 		case errors.Is(err, errx.ErrorNotEnoughRight):
 			ape.RenderErr(w, problems.Forbidden("initiator have not enough rights"))
 		case errors.Is(err, errx.ErrorCompanyNotFound):
 			ape.RenderErr(w, problems.NotFound("company not found"))
+		case errors.Is(err, errx.ErrorUserAlreadyInThisCompany):
+			ape.RenderErr(w, problems.Conflict("user already in this company"))
 		case errors.Is(err, errx.ErrorCompanyIsNotActive):
 			ape.RenderErr(w, problems.Conflict("company is not active"))
 		default:

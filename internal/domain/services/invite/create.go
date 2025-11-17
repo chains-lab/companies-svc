@@ -17,22 +17,10 @@ type CreateParams struct {
 	Role      string
 }
 
-func (s Service) Create(ctx context.Context, initiatorID uuid.UUID, params CreateParams) (models.Invite, error) {
-	initiator, err := s.db.GetEmployeeByUserID(ctx, initiatorID)
+func (s Service) Create(ctx context.Context, initiatorUserID uuid.UUID, params CreateParams) (models.Invite, error) {
+	initiator, err := s.validateInitiator(ctx, initiatorUserID, params.CompanyID)
 	if err != nil {
-		return models.Invite{}, errx.ErrorInitiatorIsNotEmployee.Raise(
-			fmt.Errorf("failed to get initiator employee by user id %s, cause: %w", initiatorID, err),
-		)
-	}
-	if initiator.IsNil() {
-		return models.Invite{}, errx.ErrorInitiatorIsNotEmployee.Raise(
-			fmt.Errorf("initiator employee with user id %s not found", initiatorID),
-		)
-	}
-	if initiator.CompanyID != params.CompanyID {
-		return models.Invite{}, errx.ErrorInitiatorIsNotEmployeeInThisCompany.Raise(
-			fmt.Errorf("initiator company_id %s not equal to params company_id %s", initiator.CompanyID, params.CompanyID),
-		)
+		return models.Invite{}, err
 	}
 
 	access, err := enum.CompareEmployeeRoles(initiator.Role, params.Role)
@@ -47,32 +35,32 @@ func (s Service) Create(ctx context.Context, initiatorID uuid.UUID, params Creat
 		)
 	}
 
-	exist, err := s.db.EmployeeExist(ctx, params.UserID)
+	emp, err := s.db.GetEmployeeUserInCompany(ctx, params.UserID, params.CompanyID)
 	if err != nil {
 		return models.Invite{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("failed to check user existence by user id %s, cause: %w", params.UserID, err),
+			fmt.Errorf("failed to get employee by user_id %s, cause: %w", params.UserID, err),
 		)
 	}
-	if exist {
-		return models.Invite{}, errx.ErrorUserAlreadyEmployee.Raise(
-			fmt.Errorf("user with id %s not found", params.UserID),
+	if !emp.IsNil() {
+		return models.Invite{}, errx.ErrorUserAlreadyInThisCompany.Raise(
+			fmt.Errorf("employee with user_id %s already in company %s", params.UserID, params.CompanyID),
 		)
 	}
 
 	company, err := s.db.GetCompanyByID(ctx, initiator.CompanyID)
 	if err != nil {
 		return models.Invite{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("failed to get company by ID, cause: %w", err),
+			fmt.Errorf("failed to get company by EmployeeID, cause: %w", err),
 		)
 	}
 	if company.IsNil() {
 		return models.Invite{}, errx.ErrorCompanyNotFound.Raise(
-			fmt.Errorf("company with ID %s not found", initiator.CompanyID),
+			fmt.Errorf("company with EmployeeID %s not found", initiator.CompanyID),
 		)
 	}
 	if company.Status != enum.CompanyStatusActive {
 		return models.Invite{}, errx.ErrorCompanyIsNotActive.Raise(
-			fmt.Errorf("company with ID %s is not active", initiator.CompanyID),
+			fmt.Errorf("company with EmployeeID %s is not active", initiator.CompanyID),
 		)
 	}
 

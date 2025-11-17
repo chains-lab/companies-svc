@@ -40,35 +40,24 @@ func (s Service) create(
 		UpdatedAt: now,
 	}
 
-	user, err := s.db.GetEmployeeByUserID(ctx, ownerID)
-	if err != nil {
-		return models.Company{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("failed to get user employee, cause: %w", err),
-		)
-	}
-	if !user.IsNil() {
-		return models.Company{}, errx.ErrorCurrentEmployeeCannotCreateCompany.Raise(
-			fmt.Errorf("user is already an employee of company: %s", user.CompanyID),
-		)
+	owner := models.Employee{
+		ID:        uuid.New(),
+		UserID:    ownerID,
+		CompanyID: company.ID,
+		Role:      enum.EmployeeRoleOwner,
+		CreatedAt: now,
+		UpdatedAt: now,
 	}
 
-	var employee models.Employee
-	if err = s.db.Transaction(ctx, func(ctx context.Context) error {
-		_, err = s.db.CreateCompany(ctx, company)
+	if err := s.db.Transaction(ctx, func(ctx context.Context) error {
+		_, err := s.db.CreateCompany(ctx, company)
 		if err != nil {
 			return errx.ErrorInternal.Raise(
 				fmt.Errorf("failed to create company, cause: %w", err),
 			)
 		}
 
-		employee = models.Employee{
-			UserID:    ownerID,
-			CompanyID: company.ID,
-			Role:      enum.EmployeeRoleOwner,
-			CreatedAt: now,
-			UpdatedAt: now,
-		}
-		err = s.db.CreateEmployee(ctx, employee)
+		err = s.db.CreateEmployee(ctx, owner)
 		if err != nil {
 			return errx.ErrorInternal.Raise(
 				fmt.Errorf("failed to create employee for company, cause: %w", err),
@@ -80,15 +69,11 @@ func (s Service) create(
 		return models.Company{}, err
 	}
 
-	if err = s.event.PublishCompanyCreated(
-		ctx,
-		company,
-		employee,
-	); err != nil {
+	if err := s.event.PublishCompanyCreated(ctx, company, owner); err != nil {
 		return models.Company{}, errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to update employee with kafka, cause: %w", err),
 		)
 	}
 
-	return company, err
+	return company, nil
 }

@@ -4,6 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**CompanyId** | [**uuid.UUID**](uuid.UUID.md) | The ID of the company the employee belongs to. | 
 **Position** | Pointer to **string** | The job title of the employee. | [optional] 
 **Label** | Pointer to **string** | A label or tag associated with the employee. | [optional] 
 
@@ -11,7 +12,7 @@ Name | Type | Description | Notes
 
 ### NewUpdateMyEmployeeDataAttributes
 
-`func NewUpdateMyEmployeeDataAttributes() *UpdateMyEmployeeDataAttributes`
+`func NewUpdateMyEmployeeDataAttributes(companyId uuid.UUID, ) *UpdateMyEmployeeDataAttributes`
 
 NewUpdateMyEmployeeDataAttributes instantiates a new UpdateMyEmployeeDataAttributes object
 This constructor will assign default values to properties that have it defined,
@@ -25,6 +26,26 @@ will change when the set of required properties is changed
 NewUpdateMyEmployeeDataAttributesWithDefaults instantiates a new UpdateMyEmployeeDataAttributes object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
+
+### GetCompanyId
+
+`func (o *UpdateMyEmployeeDataAttributes) GetCompanyId() uuid.UUID`
+
+GetCompanyId returns the CompanyId field if non-nil, zero value otherwise.
+
+### GetCompanyIdOk
+
+`func (o *UpdateMyEmployeeDataAttributes) GetCompanyIdOk() (*uuid.UUID, bool)`
+
+GetCompanyIdOk returns a tuple with the CompanyId field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetCompanyId
+
+`func (o *UpdateMyEmployeeDataAttributes) SetCompanyId(v uuid.UUID)`
+
+SetCompanyId sets CompanyId field to given value.
+
 
 ### GetPosition
 

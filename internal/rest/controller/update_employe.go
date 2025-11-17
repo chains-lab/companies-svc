@@ -39,10 +39,8 @@ func (s Service) UpdateEmployee(w http.ResponseWriter, r *http.Request) {
 
 	res, err := s.domain.employee.UpdateByEmployee(r.Context(), req.Data.Id, initiator.ID, params)
 	if err != nil {
-		s.log.WithError(err).Errorf("failed to update employee for ID: %s", req.Data.Id)
+		s.log.WithError(err).Errorf("failed to update employee for EmployeeID: %s", req.Data.Id)
 		switch {
-		case errors.Is(err, errx.ErrorInitiatorIsNotEmployee):
-			ape.RenderErr(w, problems.Forbidden("initiator is not an employee"))
 		case errors.Is(err, errx.ErrorNotEnoughRight):
 			ape.RenderErr(w, problems.Forbidden("initiator have not enough rights"))
 		case errors.Is(err, errx.ErrorEmployeeNotFound):
@@ -59,7 +57,7 @@ func (s Service) UpdateEmployee(w http.ResponseWriter, r *http.Request) {
 			ape.RenderErr(w, problems.InternalError())
 		}
 
-		s.log.WithError(err).Errorf("internal error when updating employee for ID: %s", req.Data.Id)
+		s.log.WithError(err).Errorf("internal error when updating employee for EmployeeID: %s", req.Data.Id)
 		return
 	}
 

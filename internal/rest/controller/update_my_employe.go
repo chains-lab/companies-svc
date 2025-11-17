@@ -35,19 +35,17 @@ func (s Service) UpdateMyEmployee(w http.ResponseWriter, r *http.Request) {
 		Label:    req.Data.Attributes.Label,
 	}
 
-	res, err := s.domain.employee.UpdateMy(r.Context(), initiator.ID, params)
+	res, err := s.domain.employee.UpdateMy(r.Context(), initiator.ID, req.Data.Attributes.CompanyId, params)
 	if err != nil {
-		s.log.WithError(err).Errorf("failed to update employee for ID: %s", initiator.ID)
+		s.log.WithError(err).Errorf("failed to update employee for EmployeeID: %s", initiator.ID)
 		switch {
-		case errors.Is(err, errx.ErrorInitiatorIsNotEmployee):
-			ape.RenderErr(w, problems.Forbidden("initiator is not an employee"))
 		case errors.Is(err, errx.ErrorCompanyNotFound):
 			ape.RenderErr(w, problems.NotFound("company not found"))
 		default:
 			ape.RenderErr(w, problems.InternalError())
 		}
 
-		s.log.WithError(err).Errorf("internal error when updating employee for ID: %s", initiator.ID)
+		s.log.WithError(err).Errorf("internal error when updating employee for EmployeeID: %s", initiator.ID)
 		return
 	}
 

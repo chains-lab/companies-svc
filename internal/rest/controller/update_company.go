@@ -37,10 +37,8 @@ func (s Service) UpdateCompany(w http.ResponseWriter, r *http.Request) {
 
 	res, err := s.domain.company.UpdateByEmployee(r.Context(), initiator.ID, req.Data.Id, input)
 	if err != nil {
-		s.log.WithError(err).Errorf("failed to update company name for ID: %s", req.Data.Id)
+		s.log.WithError(err).Errorf("failed to update company name for EmployeeID: %s", req.Data.Id)
 		switch {
-		case errors.Is(err, errx.ErrorInitiatorIsNotEmployee):
-			ape.RenderErr(w, problems.Forbidden("initiator is not an employee"))
 		case errors.Is(err, errx.ErrorNotEnoughRight):
 			ape.RenderErr(w, problems.Forbidden("initiator employee has not enough rights"))
 		case errors.Is(err, errx.ErrorCompanyNotFound):

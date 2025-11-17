@@ -27,15 +27,15 @@ type database interface {
 	GetCompanyByID(ctx context.Context, ID uuid.UUID) (models.Company, error)
 
 	CreateEmployee(ctx context.Context, input models.Employee) error
-	GetEmployeeByUserID(ctx context.Context, userID uuid.UUID) (models.Employee, error)
-	GetEmployeeByCompanyAndUser(ctx context.Context, companyID, userID uuid.UUID) (models.Employee, error)
+
+	GetEmployee(ctx context.Context, ID uuid.UUID) (models.Employee, error)
+	GetEmployeeUserInCompany(ctx context.Context, userID, companyID uuid.UUID) (models.Employee, error)
+	GetCompanyOwner(ctx context.Context, companyID uuid.UUID) (models.Employee, error)
 
 	CreateInvite(ctx context.Context, input models.Invite) error
 	GetInvite(ctx context.Context, ID uuid.UUID) (models.Invite, error)
 	UpdateInviteStatus(ctx context.Context, ID uuid.UUID, answer string) error
 	GetCompanyEmployees(ctx context.Context, companyID uuid.UUID, roles ...string) (models.EmployeesCollection, error)
-
-	EmployeeExist(ctx context.Context, userID uuid.UUID) (bool, error)
 }
 
 type EventPublisher interface {
@@ -84,4 +84,46 @@ func (s Service) getCompany(
 	}
 
 	return company, nil
+}
+
+func (s Service) validateInitiator(
+	ctx context.Context,
+	userID uuid.UUID,
+	companyID uuid.UUID,
+	roles ...string,
+) (models.Employee, error) {
+	employee, err := s.db.GetEmployeeUserInCompany(ctx, userID, companyID)
+	if err != nil {
+		return models.Employee{}, errx.ErrorInternal.Raise(
+			fmt.Errorf("failed to get employee by user EmployeeID, cause: %w", err),
+		)
+	}
+	if employee.IsNil() {
+		return models.Employee{}, errx.ErrorNotEnoughRight.Raise(
+			fmt.Errorf("employee for user EmployeeID %s not found", userID),
+		)
+	}
+
+	if employee.CompanyID != companyID {
+		return models.Employee{}, errx.ErrorNotEnoughRight.Raise(
+			fmt.Errorf("initiator is not an employee of company: %s", companyID),
+		)
+	}
+
+	if len(roles) > 0 {
+		hasRole := false
+		for _, role := range roles {
+			if employee.Role == role {
+				hasRole = true
+				break
+			}
+		}
+		if !hasRole {
+			return models.Employee{}, errx.ErrorNotEnoughRight.Raise(
+				fmt.Errorf("initiator have not enough rights in company: %s", companyID),
+			)
+		}
+	}
+
+	return employee, nil
 }

@@ -117,6 +117,10 @@ components:
       type: object
     EmployeeAttributes:
       properties:
+        user_id:
+          description: The unique identifier for the user associated with the employee.
+          format: uuid
+          type: string
         company_id:
           description: The unique identifier for the company associated with the employee.
           format: uuid
@@ -144,6 +148,7 @@ components:
       - created_at
       - role
       - updated_at
+      - user_id
       type: object
     EmployeesCollection:
       properties:
@@ -503,12 +508,18 @@ components:
       type: object
     UpdateMyEmployee_data_attributes:
       properties:
+        company_id:
+          description: The ID of the company the employee belongs to.
+          format: uuid
+          type: string
         position:
           description: The job title of the employee.
           type: string
         label:
           description: A label or tag associated with the employee.
           type: string
+      required:
+      - company_id
       type: object
     UpdateMyEmployee_data:
       properties:

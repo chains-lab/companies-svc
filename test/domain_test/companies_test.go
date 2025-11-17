@@ -97,7 +97,7 @@ func TestCreateCompany(t *testing.T) {
 	}
 
 	if owner.UserID != ownerID {
-		t.Errorf("expected owner ID '%s', got '%s'", ownerID, owner.UserID)
+		t.Errorf("expected owner EmployeeID '%s', got '%s'", ownerID, owner.UserID)
 	}
 
 	if comp.Name != "companyID 1" {

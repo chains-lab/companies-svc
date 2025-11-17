@@ -1,10 +1,15 @@
 type: object
 required:
+  - user_id
   - company_id
   - role
   - created_at
   - updated_at
 properties:
+  user_id:
+    type: string
+    format: uuid
+    description: "The unique identifier for the user associated with the employee."
   company_id:
     type: string
     format: uuid

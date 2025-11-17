@@ -32,7 +32,7 @@ func TestCompanyBlocks(t *testing.T) {
 		t.Fatalf("Crete: %v", err)
 	}
 	if block.CompanyID != comp.ID {
-		t.Errorf("expected blocked company ID '%s', got '%s'", comp.ID, block.CompanyID)
+		t.Errorf("expected blocked company EmployeeID '%s', got '%s'", comp.ID, block.CompanyID)
 	}
 
 	owner, err = s.domain.employee.Get(ctx, employee.GetParams{
@@ -71,7 +71,7 @@ func TestUpdateBlockedCompany(t *testing.T) {
 	}
 
 	if block.CompanyID != comp.ID {
-		t.Errorf("expected blocked company ID '%s', got '%s'", comp.ID, block.CompanyID)
+		t.Errorf("expected blocked company EmployeeID '%s', got '%s'", comp.ID, block.CompanyID)
 	}
 
 	owner, err = s.domain.employee.Get(ctx, employee.GetParams{

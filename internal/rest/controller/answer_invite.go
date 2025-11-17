@@ -45,7 +45,7 @@ func (s Service) AnswerInvite(w http.ResponseWriter, r *http.Request) {
 			ape.RenderErr(w, problems.Conflict("invite expired"))
 		case errors.Is(err, errx.ErrorInviteAlreadyAnswered):
 			ape.RenderErr(w, problems.Conflict("invite already answered"))
-		case errors.Is(err, errx.ErrorInviteNotForUser):
+		case errors.Is(err, errx.ErrorInviteNotForThisUser):
 			ape.RenderErr(w, problems.Unauthorized("invite not for user"))
 		case errors.Is(err, errx.ErrorCompanyIsNotActive):
 			ape.RenderErr(w, problems.Forbidden("company is not active"))

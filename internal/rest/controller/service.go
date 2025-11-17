@@ -39,8 +39,8 @@ type companySvc interface {
 }
 
 type employeeSvc interface {
-	Get(ctx context.Context, params employee.GetParams) (models.Employee, error)
-	GetInitiator(ctx context.Context, initiatorID uuid.UUID) (models.Employee, error)
+	Get(ctx context.Context, ID uuid.UUID) (models.Employee, error)
+	GetByUserInCompany(ctx context.Context, companyID, userID uuid.UUID) (models.Employee, error)
 
 	Filter(
 		ctx context.Context,
@@ -50,23 +50,24 @@ type employeeSvc interface {
 
 	UpdateByEmployee(
 		ctx context.Context,
-		userID uuid.UUID,
-		initiatorID uuid.UUID,
+		employeeID uuid.UUID,
+		initiatorUserID uuid.UUID,
 		params employee.UpdateParams,
 	) (models.Employee, error)
 	UpdateMy(
 		ctx context.Context,
-		initiatorID uuid.UUID,
+		initiatorID, companyID uuid.UUID,
 		params employee.UpdateMyParams,
 	) (models.Employee, error)
 
 	DeleteByEmployee(
 		ctx context.Context,
-		initiatorID, userID, companyID uuid.UUID,
+		initiatorUserID uuid.UUID,
+		employeeID uuid.UUID,
 	) error
 	DeleteMe(
 		ctx context.Context,
-		initiatorID uuid.UUID,
+		employeeID uuid.UUID,
 	) error
 }
 

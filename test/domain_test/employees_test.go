@@ -33,7 +33,7 @@ func TestCreateEmployee(t *testing.T) {
 	}
 
 	if empOwn.UserID != owner.UserID {
-		t.Errorf("expected employee ID '%s', got '%s'", owner.UserID, empOwn.UserID)
+		t.Errorf("expected employee EmployeeID '%s', got '%s'", owner.UserID, empOwn.UserID)
 	}
 
 	if empOwn.Role != owner.Role {
@@ -73,7 +73,7 @@ func TestErrorCreateEmployee(t *testing.T) {
 	}
 
 	if empOwn.UserID != owner.UserID {
-		t.Errorf("expected employee ID '%s', got '%s'", owner.UserID, empOwn.UserID)
+		t.Errorf("expected employee EmployeeID '%s', got '%s'", owner.UserID, empOwn.UserID)
 	}
 
 	if empOwn.Role != owner.Role {

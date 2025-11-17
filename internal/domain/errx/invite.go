@@ -14,4 +14,4 @@ var ErrorInvalidEmployeeRole = ape.DeclareError("INVALID_EMPLOYEE_ROLE")
 
 var ErrorInvalidInviteStatus = ape.DeclareError("INVALID_INVITE_STATUS")
 
-var ErrorInviteNotForUser = ape.DeclareError("INVITE_NOT_FOR_USER")
+var ErrorInviteNotForThisUser = ape.DeclareError("INVITE_NOT_FOR_THIS_USER")

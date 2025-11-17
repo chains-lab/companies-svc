@@ -26,7 +26,7 @@ func (s Service) PublishEmployeeDeleted(
 	return s.publish(
 		ctx,
 		contracts.TopicCompaniesEmployeeV1,
-		employee.CompanyID.String()+":"+employee.UserID.String(),
+		employee.ID.String(),
 		contracts.Envelope[EmployeeDeletedPayload]{
 			Event:     EmployeeDeletedEvent,
 			Version:   "1",

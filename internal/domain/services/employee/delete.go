@@ -12,33 +12,35 @@ import (
 
 func (s Service) DeleteByEmployee(
 	ctx context.Context,
-	initiatorID, userID, companyID uuid.UUID,
+	initiatorUserID uuid.UUID,
+	employeeID uuid.UUID,
 ) error {
-	employee, err := s.Get(ctx, GetParams{
-		UserID:    &userID,
-		CompanyID: &companyID,
-	})
+	employee, err := s.Get(ctx, employeeID)
 	if err != nil {
 		return err
 	}
 
-	initiator, err := s.validateInitiatorRight(ctx, initiatorID, &companyID, enum.EmployeeRoleOwner, enum.EmployeeRoleAdmin)
-	if err != nil {
-		return err
-	}
-	if initiator.UserID == userID {
+	if employee.UserID == initiatorUserID {
 		return errx.ErrorCannotDeleteYourself.Raise(
-			fmt.Errorf("initiator %s is trying to delete himself", initiatorID),
+			fmt.Errorf("initiator %s is trying to delete himself", initiatorUserID),
 		)
 	}
 
-	company, err := s.getCompany(ctx, companyID)
+	initiator, err := s.validateInitiator(
+		ctx, initiatorUserID, employee.CompanyID,
+		enum.EmployeeRoleOwner, enum.EmployeeRoleAdmin,
+	)
+	if err != nil {
+		return err
+	}
+
+	company, err := s.getCompany(ctx, employee.CompanyID)
 	if err != nil {
 		return err
 	}
 	if company.Status != enum.CompanyStatusActive {
 		return errx.ErrorCompanyIsNotActive.Raise(
-			fmt.Errorf("cannot delete employee from inactive company with ID %s", companyID),
+			fmt.Errorf("cannot delete employee from inactive company with EmployeeID %s", employee.CompanyID),
 		)
 	}
 
@@ -57,9 +59,9 @@ func (s Service) DeleteByEmployee(
 
 func (s Service) DeleteMe(
 	ctx context.Context,
-	initiatorID uuid.UUID,
+	employeeID uuid.UUID,
 ) error {
-	own, err := s.GetInitiator(ctx, initiatorID)
+	own, err := s.Get(ctx, employeeID)
 	if err != nil {
 		return err
 	}
@@ -77,7 +79,7 @@ func (s Service) DeleteMe(
 
 	//if company.Status != enum.CompanyStatusActive {
 	//	return errx.ErrorCompanyIsNotActive.Raise(
-	//		fmt.Errorf("cannot refuse employee from inactive company with ID %s", own.CompanyID),
+	//		fmt.Errorf("cannot refuse employee from inactive company with EmployeeID %s", own.CompanyID),
 	//	)
 	//}
 
@@ -89,6 +91,12 @@ func (s Service) delete(
 	employee models.Employee,
 	company models.Company,
 ) error {
+	if err := s.db.DeleteEmployee(ctx, employee.ID); err != nil {
+		return errx.ErrorInternal.Raise(
+			fmt.Errorf("failed to delete employee, cause: %w", err),
+		)
+	}
+
 	employees, err := s.db.GetCompanyEmployees(ctx, company.ID, enum.EmployeeRoleAdmin, enum.EmployeeRoleOwner)
 	if err != nil {
 		return errx.ErrorInternal.Raise(
@@ -96,18 +104,7 @@ func (s Service) delete(
 		)
 	}
 
-	var recipientsIDs []uuid.UUID
-	for _, emp := range employees.Data {
-		recipientsIDs = append(recipientsIDs, emp.UserID)
-	}
-
-	if err = s.db.DeleteEmployee(ctx, employee.UserID, company.ID); err != nil {
-		return errx.ErrorInternal.Raise(
-			fmt.Errorf("failed to delete employee, cause: %w", err),
-		)
-	}
-
-	if err = s.event.PublishEmployeeDeleted(ctx, company, employee, recipientsIDs...); err != nil {
+	if err = s.event.PublishEmployeeDeleted(ctx, company, employee, employees.GetUserIDs()...); err != nil {
 		return errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to publish company deleted event, cause: %w", err),
 		)

@@ -7,7 +7,6 @@ import (
 	"github.com/chains-lab/ape"
 	"github.com/chains-lab/ape/problems"
 	"github.com/chains-lab/companies-svc/internal/domain/errx"
-	"github.com/chains-lab/companies-svc/internal/domain/services/employee"
 	"github.com/chains-lab/companies-svc/internal/rest/responses"
 	"github.com/go-chi/chi/v5"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
@@ -15,19 +14,17 @@ import (
 )
 
 func (s Service) GetEmployee(w http.ResponseWriter, r *http.Request) {
-	userID, err := uuid.Parse(chi.URLParam(r, "user_id"))
+	employeeID, err := uuid.Parse(chi.URLParam(r, "employee_id"))
 	if err != nil {
-		s.log.WithError(err).Errorf("invalid user ID format")
+		s.log.WithError(err).Errorf("invalid employee ID format")
 		ape.RenderErr(w, problems.BadRequest(validation.Errors{
-			"user_id": err,
+			"employee_id": err,
 		})...)
 
 		return
 	}
 
-	emp, err := s.domain.employee.Get(r.Context(), employee.GetParams{
-		UserID: &userID,
-	})
+	emp, err := s.domain.employee.Get(r.Context(), employeeID)
 	if err != nil {
 		s.log.WithError(err).Errorf("failed to get employee")
 		switch {

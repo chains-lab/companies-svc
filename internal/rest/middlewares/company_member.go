@@ -28,19 +28,19 @@ package middlewares
 //			}
 //
 //			if user.CompanyID == nil {
-//				s.log.Error("user has no associated company", "user_id", user.ID)
+//				s.log.Error("user has no associated company", "user_id", user.EmployeeID)
 //				ape.RenderErr(w, problems.Forbidden("User is not associated with any company"))
 //				return
 //			}
 //
 //			if companyID != *user.CompanyID {
-//				s.log.Error("user company ID does not match", "user_id", user.ID, "user_company_id", user.CompanyID, "requested_company_id", companyID)
+//				s.log.Error("user company EmployeeID does not match", "user_id", user.EmployeeID, "user_company_id", user.CompanyID, "requested_company_id", companyID)
 //				ape.RenderErr(w, problems.Forbidden("User does not belong to the requested company"))
 //				return
 //			}
 //
 //			if !(allowedCompanyRoles[user.Role]) {
-//				s.log.Error("user role not allowed", "user_id", user.ID, "user_role", user.Role)
+//				s.log.Error("user role not allowed", "user_id", user.EmployeeID, "user_role", user.Role)
 //				ape.RenderErr(w, problems.Forbidden("User does not have the required role"))
 //				return
 //			}

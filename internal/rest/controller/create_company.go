@@ -1,13 +1,10 @@
 package controller
 
 import (
-	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/chains-lab/ape"
 	"github.com/chains-lab/ape/problems"
-	"github.com/chains-lab/companies-svc/internal/domain/errx"
 	"github.com/chains-lab/companies-svc/internal/domain/services/company"
 	"github.com/chains-lab/companies-svc/internal/rest/meta"
 	"github.com/chains-lab/companies-svc/internal/rest/requests"
@@ -38,10 +35,6 @@ func (s Service) CreateCompany(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		s.log.WithError(err).Errorf("failed to create company")
 		switch {
-		case errors.Is(err, errx.ErrorCurrentEmployeeCannotCreateCompany):
-			ape.RenderErr(w, problems.Conflict(
-				fmt.Sprintf("current employee %s cannot create company", initiator.ID),
-			))
 		default:
 			ape.RenderErr(w, problems.InternalError())
 		}

@@ -21,7 +21,7 @@ func (s Service) FilterBlockages(w http.ResponseWriter, r *http.Request) {
 	if v := strings.TrimSpace(q.Get("company_id")); v != "" {
 		id, err := uuid.Parse(v)
 		if err != nil {
-			s.log.WithError(err).Errorf("invalid company ID format")
+			s.log.WithError(err).Errorf("invalid company EmployeeID format")
 			ape.RenderErr(w, problems.BadRequest(validation.Errors{
 				"company_id": err,
 			})...)
@@ -44,7 +44,7 @@ func (s Service) FilterBlockages(w http.ResponseWriter, r *http.Request) {
 	if v := strings.TrimSpace(q.Get("initiator_id")); v != "" {
 		id, err := uuid.Parse(v)
 		if err != nil {
-			s.log.WithError(err).Errorf("invalid initiator ID format")
+			s.log.WithError(err).Errorf("invalid initiator EmployeeID format")
 			ape.RenderErr(w, problems.BadRequest(validation.Errors{
 				"initiator_id": err,
 			})...)

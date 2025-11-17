@@ -24,7 +24,7 @@ func (s Service) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
 
 	userID, err := uuid.Parse(chi.URLParam(r, "user_id"))
 	if err != nil {
-		s.log.WithError(err).Errorf("invalid user ID format")
+		s.log.WithError(err).Errorf("invalid user EmployeeID format")
 		ape.RenderErr(w, problems.BadRequest(validation.Errors{
 			"user_id": err,
 		})...)
@@ -32,24 +32,12 @@ func (s Service) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	companyID, err := uuid.Parse(chi.URLParam(r, "company_id"))
-	if err != nil {
-		s.log.WithError(err).Errorf("invalid company ID format")
-		ape.RenderErr(w, problems.BadRequest(validation.Errors{
-			"company_id": err,
-		})...)
-
-		return
-	}
-
-	err = s.domain.employee.DeleteByEmployee(r.Context(), initiator.ID, userID, companyID)
+	err = s.domain.employee.DeleteByEmployee(r.Context(), initiator.ID, userID)
 	if err != nil {
 		s.log.WithError(err).Errorf("failed to delete employee with user_id: %s", userID)
 		switch {
 		case errors.Is(err, errx.ErrorEmployeeNotFound):
 			ape.RenderErr(w, problems.NotFound("employee not found"))
-		case errors.Is(err, errx.ErrorInitiatorIsNotEmployee):
-			ape.RenderErr(w, problems.Forbidden("initiator is not an employee"))
 		case errors.Is(err, errx.ErrorCannotDeleteYourself):
 			ape.RenderErr(w, problems.Forbidden("cannot delete yourself"))
 		case errors.Is(err, errx.ErrorNotEnoughRight):

@@ -10,9 +10,10 @@ import (
 )
 
 type FilterParams struct {
-	UserID    []uuid.UUID
-	CompanyID []uuid.UUID
-	Roles     []string
+	EmployeeID []uuid.UUID
+	UserID     []uuid.UUID
+	CompanyID  []uuid.UUID
+	Roles      []string
 }
 
 func (s Service) Filter(

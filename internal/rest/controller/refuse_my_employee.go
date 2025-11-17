@@ -25,8 +25,6 @@ func (s Service) RefuseMyEmployee(w http.ResponseWriter, r *http.Request) {
 		switch {
 		case errors.Is(err, errx.ErrorOwnerCannotRefuseSelf):
 			ape.RenderErr(w, problems.Forbidden("owner cannot refuse himself"))
-		case errors.Is(err, errx.ErrorInitiatorIsNotEmployee):
-			ape.RenderErr(w, problems.NotFound("employee not found"))
 		case errors.Is(err, errx.ErrorCompanyNotFound):
 			ape.RenderErr(w, problems.NotFound("company not found"))
 		default:

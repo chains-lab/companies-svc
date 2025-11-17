@@ -17,12 +17,28 @@ func (s Service) ListEmployees(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	filters := employee.FilterParams{}
 
+	if empls := q["employee_id"]; len(empls) > 0 {
+		filters.EmployeeID = make([]uuid.UUID, 0, len(empls))
+		for _, raw := range empls {
+			id, err := uuid.Parse(raw)
+			if err != nil {
+				s.log.WithError(err).Errorf("invalid employee EmployeeID format")
+				ape.RenderErr(w, problems.BadRequest(validation.Errors{
+					"employee_id": err,
+				})...)
+				return
+			}
+
+			filters.EmployeeID = append(filters.EmployeeID, id)
+		}
+	}
+
 	if comps := q["company_id"]; len(comps) > 0 {
 		filters.CompanyID = make([]uuid.UUID, 0, len(comps))
 		for _, raw := range comps {
 			id, err := uuid.Parse(raw)
 			if err != nil {
-				s.log.WithError(err).Errorf("invalid company ID format")
+				s.log.WithError(err).Errorf("invalid company EmployeeID format")
 				ape.RenderErr(w, problems.BadRequest(validation.Errors{
 					"company_id": err,
 				})...)
@@ -38,7 +54,7 @@ func (s Service) ListEmployees(w http.ResponseWriter, r *http.Request) {
 		for _, raw := range users {
 			id, err := uuid.Parse(raw)
 			if err != nil {
-				s.log.WithError(err).Errorf("invalid user ID format")
+				s.log.WithError(err).Errorf("invalid user EmployeeID format")
 				ape.RenderErr(w, problems.BadRequest(validation.Errors{
 					"user_id": err,
 				})...)

@@ -27,9 +27,9 @@ type database interface {
 
 	CreateEmployee(ctx context.Context, input models.Employee) error
 
-	GetEmployeeByUserID(ctx context.Context, userID uuid.UUID) (models.Employee, error)
-	GetEmployeeByCompanyAndUser(ctx context.Context, companyID, userID uuid.UUID) (models.Employee, error)
-	GetEmployeeByCompanyAndUserAndRole(ctx context.Context, companyID, userID uuid.UUID, role string) (models.Employee, error)
+	GetEmployee(ctx context.Context, ID uuid.UUID) (models.Employee, error)
+	GetEmployeeUserInCompany(ctx context.Context, userID, companyID uuid.UUID) (models.Employee, error)
+	GetCompanyOwner(ctx context.Context, companyID uuid.UUID) (models.Employee, error)
 
 	CreateCompany(ctx context.Context, input models.Company) (models.Company, error)
 	GetCompanyByID(ctx context.Context, ID uuid.UUID) (models.Company, error)
@@ -81,37 +81,21 @@ type EventPublisher interface {
 	) error
 }
 
-func (s Service) getEmployee(ctx context.Context, userID uuid.UUID) (models.Employee, error) {
-	empl, err := s.db.GetEmployeeByUserID(ctx, userID)
-	if err != nil {
-		return models.Employee{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("failed to get employee by user ID, cause: %w", err),
-		)
-	}
-	if empl.IsNil() {
-		return models.Employee{}, errx.ErrorEmployeeNotFound.Raise(
-			fmt.Errorf("employee for user ID %s not found", userID),
-		)
-	}
-
-	return empl, nil
-}
-
-func (s Service) validateInitiatorRight(
+func (s Service) validateInitiator(
 	ctx context.Context,
-	initiatorID uuid.UUID,
+	userID uuid.UUID,
 	companyID uuid.UUID,
 	roles ...string,
 ) (models.Employee, error) {
-	employee, err := s.db.GetEmployeeByUserID(ctx, initiatorID)
+	employee, err := s.db.GetEmployeeUserInCompany(ctx, userID, companyID)
 	if err != nil {
 		return models.Employee{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("failed to get employee by user ID, cause: %w", err),
+			fmt.Errorf("failed to get employee by user EmployeeID, cause: %w", err),
 		)
 	}
 	if employee.IsNil() {
-		return models.Employee{}, errx.ErrorInitiatorIsNotEmployee.Raise(
-			fmt.Errorf("employee for user ID %s not found", initiatorID),
+		return models.Employee{}, errx.ErrorNotEnoughRight.Raise(
+			fmt.Errorf("employee for user EmployeeID %s not found", userID),
 		)
 	}
 

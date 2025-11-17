@@ -17,27 +17,27 @@ type CreateParams struct {
 	Role      string
 }
 
-// create deprecated creates a new employee in the specified company.
-func (s Service) create(ctx context.Context, params CreateParams) (models.Employee, error) {
+// Create method whose creates a new employee in a company without any invites use this for testing or some like that
+func (s Service) Create(ctx context.Context, params CreateParams) (models.Employee, error) {
 	comp, err := s.getCompany(ctx, params.CompanyID)
 	if err != nil {
 		return models.Employee{}, err
 	}
 	if comp.Status != enum.CompanyStatusActive {
 		return models.Employee{}, errx.ErrorCompanyIsNotActive.Raise(
-			fmt.Errorf("cannot add employee to inactive company with ID %s", params.CompanyID),
+			fmt.Errorf("cannot add employee to inactive company with EmployeeID %s", params.CompanyID),
 		)
 	}
 
-	emp, err := s.db.GetEmployeeByUserID(ctx, params.UserID)
+	emp, err := s.db.GetEmployeeUserInCompany(ctx, params.UserID, params.CompanyID)
 	if err != nil {
 		return models.Employee{}, errx.ErrorInternal.Raise(
 			fmt.Errorf("falied to check existing employee, cause: %w", err),
 		)
 	}
 	if !emp.IsNil() {
-		return models.Employee{}, errx.ErrorUserAlreadyEmployee.Raise(
-			fmt.Errorf("employee with user ID %s already exists", params.UserID),
+		return models.Employee{}, errx.ErrorUserAlreadyInThisCompany.Raise(
+			fmt.Errorf("employee with user EmployeeID %s already exists in company %s", params.UserID, params.CompanyID),
 		)
 	}
 
@@ -50,6 +50,7 @@ func (s Service) create(ctx context.Context, params CreateParams) (models.Employ
 	}
 
 	emp = models.Employee{
+		ID:        uuid.New(),
 		UserID:    params.UserID,
 		CompanyID: params.CompanyID,
 		Role:      params.Role,
@@ -62,7 +63,7 @@ func (s Service) create(ctx context.Context, params CreateParams) (models.Employ
 		err = s.db.CreateEmployee(ctx, emp)
 		if err != nil {
 			return errx.ErrorInternal.Raise(
-				fmt.Errorf("failed to create employee, cause: %w", err),
+				fmt.Errorf("failed to Create employee, cause: %w", err),
 			)
 		}
 

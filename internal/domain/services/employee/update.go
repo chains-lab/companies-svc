@@ -19,19 +19,19 @@ type UpdateParams struct {
 
 func (s Service) UpdateByEmployee(
 	ctx context.Context,
-	userID uuid.UUID,
-	initiatorID uuid.UUID,
+	employeeID uuid.UUID,
+	initiatorUserID uuid.UUID,
 	params UpdateParams,
 ) (models.Employee, error) {
-	initiator, err := s.validateInitiatorRight(ctx, initiatorID, nil, enum.EmployeeRoleOwner, enum.EmployeeRoleAdmin)
+	employee, err := s.Get(ctx, employeeID)
 	if err != nil {
 		return models.Employee{}, err
 	}
 
-	employee, err := s.Get(ctx, GetParams{
-		UserID:    &userID,
-		CompanyID: &initiator.CompanyID,
-	})
+	initiator, err := s.validateInitiator(
+		ctx, initiatorUserID, employee.CompanyID,
+		enum.EmployeeRoleOwner, enum.EmployeeRoleAdmin,
+	)
 	if err != nil {
 		return models.Employee{}, err
 	}
@@ -48,12 +48,6 @@ func (s Service) UpdateByEmployee(
 		)
 	}
 
-	if params.Position == nil {
-		employee.Position = params.Position
-	}
-	if params.Label == nil {
-		employee.Label = params.Label
-	}
 	if params.Role != nil {
 		access, err = enum.CompareEmployeeRoles(initiator.Role, *params.Role)
 		if err != nil {
@@ -66,11 +60,7 @@ func (s Service) UpdateByEmployee(
 				fmt.Errorf("initiator have not enough rights to update employee role"),
 			)
 		}
-
-		employee.Role = *params.Role
 	}
-	updatedAt := time.Now().UTC()
-	employee.UpdatedAt = updatedAt
 
 	company, err := s.getCompany(ctx, initiator.CompanyID)
 	if err != nil {
@@ -82,7 +72,7 @@ func (s Service) UpdateByEmployee(
 		)
 	}
 
-	return s.update(ctx, employee, company, params, initiatorID)
+	return s.update(ctx, employee, company, params, initiatorUserID)
 }
 
 type UpdateMyParams struct {
@@ -92,10 +82,10 @@ type UpdateMyParams struct {
 
 func (s Service) UpdateMy(
 	ctx context.Context,
-	initiatorID uuid.UUID,
+	initiatorID, companyID uuid.UUID,
 	params UpdateMyParams,
 ) (models.Employee, error) {
-	initiator, err := s.GetInitiator(ctx, initiatorID)
+	initiator, err := s.validateInitiator(ctx, initiatorID, companyID)
 	if err != nil {
 		return models.Employee{}, err
 	}
@@ -122,7 +112,7 @@ func (s Service) UpdateMy(
 	return s.update(ctx, initiator, company, UpdateParams{
 		Position: params.Position,
 		Label:    params.Label,
-	}, initiatorID)
+	})
 }
 
 func (s Service) update(

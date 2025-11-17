@@ -18,10 +18,10 @@ type UpdateParams struct {
 
 func (s Service) UpdateByEmployee(
 	ctx context.Context,
-	initiatorID, companyID uuid.UUID,
+	userID, companyID uuid.UUID,
 	params UpdateParams,
 ) (models.Company, error) {
-	_, err := s.validateInitiatorRight(ctx, initiatorID, companyID, enum.EmployeeRoleOwner, enum.EmployeeRoleAdmin)
+	_, err := s.validateInitiator(ctx, userID, companyID, enum.EmployeeRoleOwner, enum.EmployeeRoleAdmin)
 	if err != nil {
 		return models.Company{}, err
 	}
@@ -40,7 +40,7 @@ func (s Service) update(ctx context.Context,
 
 	if company.Status == enum.CompanyStatusActive {
 		return models.Company{}, errx.ErrorCompanyIsNotActive.Raise(
-			fmt.Errorf("company with ID %s is not active", companyID),
+			fmt.Errorf("company with EmployeeID %s is not active", companyID),
 		)
 	}
 
@@ -79,10 +79,10 @@ func (s Service) update(ctx context.Context,
 
 func (s Service) UpdateStatusByEmployee(
 	ctx context.Context,
-	initiatorID, companyID uuid.UUID,
+	userID, companyID uuid.UUID,
 	status string,
 ) (models.Company, error) {
-	_, err := s.validateInitiatorRight(ctx, initiatorID, companyID, enum.EmployeeRoleOwner)
+	_, err := s.validateInitiator(ctx, userID, companyID, enum.EmployeeRoleOwner)
 	if err != nil {
 		return models.Company{}, err
 	}
@@ -97,7 +97,7 @@ func (s Service) updateStatus(
 ) (models.Company, error) {
 	err := enum.CheckCompanyStatus(status)
 	if err != nil {
-		return models.Company{}, errx.ErrorInvalidCompanyBlockStatus.Raise(
+		return models.Company{}, errx.ErrorInvalidCompanyStatus.Raise(
 			fmt.Errorf("failed invalid status %s, cause: %w", status, err),
 		)
 	}

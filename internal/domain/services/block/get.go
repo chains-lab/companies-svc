@@ -13,12 +13,12 @@ func (s Service) Get(ctx context.Context, blockID uuid.UUID) (models.CompanyBloc
 	block, err := s.db.GetCompanyBlockByID(ctx, blockID)
 	if err != nil {
 		return models.CompanyBlock{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("failed to getting block with ID %s, cause: %w", blockID, err),
+			fmt.Errorf("failed to getting block with EmployeeID %s, cause: %w", blockID, err),
 		)
 	}
 	if block.IsNil() {
 		return models.CompanyBlock{}, errx.ErrorCompanyBlockNotFound.Raise(
-			fmt.Errorf("block with ID %s not found", blockID),
+			fmt.Errorf("block with EmployeeID %s not found", blockID),
 		)
 	}
 
@@ -29,12 +29,12 @@ func (s Service) GetActiveCompanyBlock(ctx context.Context, companyID uuid.UUID)
 	block, err := s.db.GetActiveCompanyBlock(ctx, companyID)
 	if err != nil {
 		return models.CompanyBlock{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("failed to getting active block for company with ID %s, cause: %w", companyID, err),
+			fmt.Errorf("failed to getting active block for company with EmployeeID %s, cause: %w", companyID, err),
 		)
 	}
 	if block.IsNil() {
 		return models.CompanyBlock{}, errx.ErrorCompanyBlockNotFound.Raise(
-			fmt.Errorf("active block for company with ID %s not found", companyID),
+			fmt.Errorf("active block for company with EmployeeID %s not found", companyID),
 		)
 	}
 

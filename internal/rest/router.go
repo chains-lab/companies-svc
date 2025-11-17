@@ -32,7 +32,7 @@ type Handlers interface {
 	UpdateMyEmployee(w http.ResponseWriter, r *http.Request)
 	UpdateEmployee(w http.ResponseWriter, r *http.Request)
 
-	GetMyEmployee(w http.ResponseWriter, r *http.Request)
+	GetMyEmployees(w http.ResponseWriter, r *http.Request)
 	RefuseMyEmployee(w http.ResponseWriter, r *http.Request)
 
 	CreateInvite(w http.ResponseWriter, r *http.Request)
@@ -76,7 +76,7 @@ func Run(ctx context.Context, cfg internal.Config, log logium.Logger, m Middlewa
 			r.Route("/employees", func(r chi.Router) {
 				r.Get("/", h.ListEmployees)
 
-				r.Route("/{user_id}", func(r chi.Router) {
+				r.Route("/{employee_id}", func(r chi.Router) {
 					r.Get("/", h.GetEmployee)
 					r.With(auth).Put("/", h.UpdateEmployee)
 					r.With(auth).Delete("/", h.DeleteEmployee)
@@ -85,9 +85,12 @@ func Run(ctx context.Context, cfg internal.Config, log logium.Logger, m Middlewa
 				r.Route("/me", func(r chi.Router) {
 					r.Use(auth)
 
-					r.Get("/", h.GetMyEmployee)
-					r.Put("/", h.UpdateMyEmployee)
-					r.Delete("/", h.RefuseMyEmployee)
+					r.Get("/", h.GetMyEmployees)
+
+					r.Route("/{employee_id}", func(r chi.Router) {
+						r.Put("/", h.UpdateMyEmployee)
+						r.Delete("/", h.RefuseMyEmployee)
+					})
 				})
 			})
 

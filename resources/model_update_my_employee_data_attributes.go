@@ -12,6 +12,9 @@ package resources
 
 import (
 	"encoding/json"
+	"github.com/google/uuid"
+	"bytes"
+	"fmt"
 )
 
 // checks if the UpdateMyEmployeeDataAttributes type satisfies the MappedNullable interface at compile time
@@ -19,18 +22,23 @@ var _ MappedNullable = &UpdateMyEmployeeDataAttributes{}
 
 // UpdateMyEmployeeDataAttributes struct for UpdateMyEmployeeDataAttributes
 type UpdateMyEmployeeDataAttributes struct {
+	// The ID of the company the employee belongs to.
+	CompanyId uuid.UUID `json:"company_id"`
 	// The job title of the employee.
 	Position *string `json:"position,omitempty"`
 	// A label or tag associated with the employee.
 	Label *string `json:"label,omitempty"`
 }
 
+type _UpdateMyEmployeeDataAttributes UpdateMyEmployeeDataAttributes
+
 // NewUpdateMyEmployeeDataAttributes instantiates a new UpdateMyEmployeeDataAttributes object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewUpdateMyEmployeeDataAttributes() *UpdateMyEmployeeDataAttributes {
+func NewUpdateMyEmployeeDataAttributes(companyId uuid.UUID) *UpdateMyEmployeeDataAttributes {
 	this := UpdateMyEmployeeDataAttributes{}
+	this.CompanyId = companyId
 	return &this
 }
 
@@ -40,6 +48,30 @@ func NewUpdateMyEmployeeDataAttributes() *UpdateMyEmployeeDataAttributes {
 func NewUpdateMyEmployeeDataAttributesWithDefaults() *UpdateMyEmployeeDataAttributes {
 	this := UpdateMyEmployeeDataAttributes{}
 	return &this
+}
+
+// GetCompanyId returns the CompanyId field value
+func (o *UpdateMyEmployeeDataAttributes) GetCompanyId() uuid.UUID {
+	if o == nil {
+		var ret uuid.UUID
+		return ret
+	}
+
+	return o.CompanyId
+}
+
+// GetCompanyIdOk returns a tuple with the CompanyId field value
+// and a boolean to check if the value has been set.
+func (o *UpdateMyEmployeeDataAttributes) GetCompanyIdOk() (*uuid.UUID, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.CompanyId, true
+}
+
+// SetCompanyId sets field value
+func (o *UpdateMyEmployeeDataAttributes) SetCompanyId(v uuid.UUID) {
+	o.CompanyId = v
 }
 
 // GetPosition returns the Position field value if set, zero value otherwise.
@@ -116,6 +148,7 @@ func (o UpdateMyEmployeeDataAttributes) MarshalJSON() ([]byte, error) {
 
 func (o UpdateMyEmployeeDataAttributes) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	toSerialize["company_id"] = o.CompanyId
 	if !IsNil(o.Position) {
 		toSerialize["position"] = o.Position
 	}
@@ -123,6 +156,43 @@ func (o UpdateMyEmployeeDataAttributes) ToMap() (map[string]interface{}, error) 
 		toSerialize["label"] = o.Label
 	}
 	return toSerialize, nil
+}
+
+func (o *UpdateMyEmployeeDataAttributes) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"company_id",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varUpdateMyEmployeeDataAttributes := _UpdateMyEmployeeDataAttributes{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varUpdateMyEmployeeDataAttributes)
+
+	if err != nil {
+		return err
+	}
+
+	*o = UpdateMyEmployeeDataAttributes(varUpdateMyEmployeeDataAttributes)
+
+	return err
 }
 
 type NullableUpdateMyEmployeeDataAttributes struct {

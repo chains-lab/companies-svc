@@ -34,11 +34,9 @@ func (s Service) UpdateCompaniesStatus(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		s.log.WithError(err).Errorf("failed to set company %s status to active", req.Data.Id)
 		switch {
-		case errors.Is(err, errx.ErrorInitiatorIsNotEmployee):
-			ape.RenderErr(w, problems.Forbidden("initiator is not an employee"))
 		case errors.Is(err, errx.ErrorNotEnoughRight):
 			ape.RenderErr(w, problems.Forbidden("initiator employee has not enough rights"))
-		case errors.Is(err, errx.ErrorInvalidCompanyBlockStatus):
+		case errors.Is(err, errx.ErrorInvalidCompanyStatus):
 			ape.RenderErr(w, problems.BadRequest(validation.Errors{
 				"data/attributes/status": err,
 			})...)

@@ -41,20 +41,23 @@ func (s Service) Answer(
 		)
 	}
 	if invite.UserID != userID {
-		return models.Invite{}, errx.ErrorInviteNotForUser.Raise(
+		return models.Invite{}, errx.ErrorInviteNotForThisUser.Raise(
 			fmt.Errorf("invite not for user %s", userID),
 		)
 	}
 
-	emp, err := s.db.GetEmployeeByUserID(ctx, userID)
+	emp, err := s.db.GetEmployeeUserInCompany(ctx, userID, invite.CompanyID)
 	if err != nil {
 		return models.Invite{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("failed to get employee by user_id %s, cause: %w", userID, err),
+			fmt.Errorf(
+				"failed to get employee with user_id %s in company %s, cause: %w",
+				userID, invite.CompanyID, err,
+			),
 		)
 	}
 	if !emp.IsNil() {
-		return models.Invite{}, errx.ErrorUserAlreadyEmployee.Raise(
-			fmt.Errorf("employee with user_id %s already exists", userID),
+		return models.Invite{}, errx.ErrorUserAlreadyInThisCompany.Raise(
+			fmt.Errorf("employee with user_id %s already in company %s", userID, invite.CompanyID),
 		)
 	}
 
@@ -64,11 +67,12 @@ func (s Service) Answer(
 	}
 	if company.Status != enum.CompanyStatusActive {
 		return models.Invite{}, errx.ErrorCompanyIsNotActive.Raise(
-			fmt.Errorf("company with ID %s is not active", invite.CompanyID),
+			fmt.Errorf("company with EmployeeID %s is not active", invite.CompanyID),
 		)
 	}
 
 	employee := models.Employee{
+		ID:        uuid.New(),
 		UserID:    userID,
 		CompanyID: invite.CompanyID,
 		Role:      invite.Role,
@@ -79,14 +83,16 @@ func (s Service) Answer(
 	switch answer {
 	case enum.InviteStatusAccepted:
 		if err = s.db.Transaction(ctx, func(ctx context.Context) error {
-			err = s.db.CreateEmployee(ctx, employee)
-			if err != nil {
-				return err
-			}
-
 			if err = s.db.UpdateInviteStatus(ctx, invite.ID, enum.InviteStatusAccepted); err != nil {
 				return errx.ErrorInternal.Raise(
 					fmt.Errorf("failed to update invite status, cause: %w", err),
+				)
+			}
+
+			err = s.db.CreateEmployee(ctx, employee)
+			if err != nil {
+				return errx.ErrorInternal.Raise(
+					fmt.Errorf("failed to create employee, cause: %w", err),
 				)
 			}
 
