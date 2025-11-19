@@ -145,8 +145,9 @@ components:
           properties:
             id:
               type: string
-              format: uuid
-              description: The UUID of the employee to be updated.
+              format: string
+              description: 'user id + company id (UUID:UUID)'
+              pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
             type:
               type: string
               enum:
@@ -171,9 +172,15 @@ components:
         data:
           type: object
           required:
+            - id
             - type
             - attributes
           properties:
+            id:
+              type: string
+              format: string
+              description: 'user id + company id (UUID:UUID)'
+              pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
             type:
               type: string
               enum:
@@ -265,8 +272,9 @@ components:
       properties:
         id:
           type: string
-          format: uuid
-          description: user id
+          format: string
+          description: 'user id + company id (UUID:UUID)'
+          pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
         type:
           type: string
           enum:
@@ -276,20 +284,10 @@ components:
     EmployeeAttributes:
       type: object
       required:
-        - user_id
-        - company_id
         - role
         - created_at
         - updated_at
       properties:
-        user_id:
-          type: string
-          format: uuid
-          description: The unique identifier for the user associated with the employee.
-        company_id:
-          type: string
-          format: uuid
-          description: The unique identifier for the company associated with the employee.
         role:
           type: string
           description: 'The role of the employee within the company''s organization (e.g., manager, staff).'
@@ -380,7 +378,7 @@ components:
           type: string
           format: date-time
           description: timestamp when the invite was created
-    AnswerInvite:
+    ReplyToInvite:
       type: object
       required:
         - data
@@ -403,14 +401,14 @@ components:
             attributes:
               type: object
               required:
-                - answer
+                - reply
               properties:
-                answer:
+                reply:
                   type: string
                   enum:
                     - accept
                     - decline
-                  description: 'The answer to the invite, either ''accept'' or ''decline'''
+                  description: 'The reply to the invite, either ''accept'' or ''decline'''
     CreateInvite:
       type: object
       required:

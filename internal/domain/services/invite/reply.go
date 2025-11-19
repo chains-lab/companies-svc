@@ -11,15 +11,15 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s Service) Answer(
+func (s Service) Reply(
 	ctx context.Context,
 	userID, inviteID uuid.UUID,
-	answer string,
+	reply string,
 ) (models.Invite, error) {
-	err := enum.CheckInviteStatus(answer)
+	err := enum.CheckInviteStatus(reply)
 	if err != nil {
 		return models.Invite{}, errx.ErrorInvalidInviteStatus.Raise(
-			fmt.Errorf("invalid invite answer: %w", err),
+			fmt.Errorf("invalid invite reply: %w", err),
 		)
 	}
 
@@ -31,8 +31,8 @@ func (s Service) Answer(
 	}
 
 	if invite.Status != enum.InviteStatusSent {
-		return models.Invite{}, errx.ErrorInviteAlreadyAnswered.Raise(
-			fmt.Errorf("invite already answered with status=%s", invite.Status),
+		return models.Invite{}, errx.ErrorInviteAlreadyReplyed.Raise(
+			fmt.Errorf("invite already replyed with status=%s", invite.Status),
 		)
 	}
 	if now.After(invite.ExpiresAt) {
@@ -46,7 +46,7 @@ func (s Service) Answer(
 		)
 	}
 
-	emp, err := s.db.GetEmployeeUserInCompany(ctx, userID, invite.CompanyID)
+	emp, err := s.db.GetEmployee(ctx, userID, invite.CompanyID)
 	if err != nil {
 		return models.Invite{}, errx.ErrorInternal.Raise(
 			fmt.Errorf(
@@ -72,7 +72,6 @@ func (s Service) Answer(
 	}
 
 	employee := models.Employee{
-		ID:        uuid.New(),
 		UserID:    userID,
 		CompanyID: invite.CompanyID,
 		Role:      invite.Role,
@@ -80,7 +79,7 @@ func (s Service) Answer(
 		UpdatedAt: now,
 	}
 
-	switch answer {
+	switch reply {
 	case enum.InviteStatusAccepted:
 		if err = s.db.Transaction(ctx, func(ctx context.Context) error {
 			if err = s.db.UpdateInviteStatus(ctx, invite.ID, enum.InviteStatusAccepted); err != nil {
@@ -130,7 +129,7 @@ func (s Service) Answer(
 		}
 	}
 
-	invite.Status = answer
+	invite.Status = reply
 
 	return invite, nil
 }

@@ -101,8 +101,9 @@ components:
     EmployeeData:
       properties:
         id:
-          description: user id
-          format: uuid
+          description: user id + company id (UUID:UUID)
+          format: string
+          pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
           type: string
         type:
           enum:
@@ -117,14 +118,6 @@ components:
       type: object
     EmployeeAttributes:
       properties:
-        user_id:
-          description: The unique identifier for the user associated with the employee.
-          format: uuid
-          type: string
-        company_id:
-          description: The unique identifier for the company associated with the employee.
-          format: uuid
-          type: string
         role:
           description: "The role of the employee within the company's organization\
             \ (e.g., manager, staff)."
@@ -144,11 +137,9 @@ components:
           format: date-time
           type: string
       required:
-      - company_id
       - created_at
       - role
       - updated_at
-      - user_id
       type: object
     EmployeesCollection:
       properties:
@@ -223,10 +214,10 @@ components:
       - status
       - user_id
       type: object
-    AnswerInvite:
+    ReplyToInvite:
       properties:
         data:
-          $ref: "#/components/schemas/AnswerInvite_data"
+          $ref: "#/components/schemas/ReplyToInvite_data"
       required:
       - data
       type: object
@@ -492,8 +483,9 @@ components:
     UpdateEmployee_data:
       properties:
         id:
-          description: The UUID of the employee to be updated.
-          format: uuid
+          description: user id + company id (UUID:UUID)
+          format: string
+          pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
           type: string
         type:
           enum:
@@ -523,6 +515,11 @@ components:
       type: object
     UpdateMyEmployee_data:
       properties:
+        id:
+          description: user id + company id (UUID:UUID)
+          format: string
+          pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+          type: string
         type:
           enum:
           - employee
@@ -531,6 +528,7 @@ components:
           $ref: "#/components/schemas/UpdateMyEmployee_data_attributes"
       required:
       - attributes
+      - id
       - type
       type: object
     Errors_errors_inner:
@@ -559,18 +557,18 @@ components:
       - status
       - title
       type: object
-    AnswerInvite_data_attributes:
+    ReplyToInvite_data_attributes:
       properties:
-        answer:
-          description: "The answer to the invite, either 'accept' or 'decline'"
+        reply:
+          description: "The reply to the invite, either 'accept' or 'decline'"
           enum:
           - accept
           - decline
           type: string
       required:
-      - answer
+      - reply
       type: object
-    AnswerInvite_data:
+    ReplyToInvite_data:
       properties:
         id:
           description: invite id
@@ -581,7 +579,7 @@ components:
           - company_invite
           type: string
         attributes:
-          $ref: "#/components/schemas/AnswerInvite_data_attributes"
+          $ref: "#/components/schemas/ReplyToInvite_data_attributes"
       required:
       - attributes
       - id

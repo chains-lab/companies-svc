@@ -21,6 +21,8 @@ var _ MappedNullable = &UpdateMyEmployeeData{}
 
 // UpdateMyEmployeeData struct for UpdateMyEmployeeData
 type UpdateMyEmployeeData struct {
+	// user id + company id (UUID:UUID)
+	Id string `json:"id" validate:"regexp=^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"`
 	Type string `json:"type"`
 	Attributes UpdateMyEmployeeDataAttributes `json:"attributes"`
 }
@@ -31,8 +33,9 @@ type _UpdateMyEmployeeData UpdateMyEmployeeData
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewUpdateMyEmployeeData(type_ string, attributes UpdateMyEmployeeDataAttributes) *UpdateMyEmployeeData {
+func NewUpdateMyEmployeeData(id string, type_ string, attributes UpdateMyEmployeeDataAttributes) *UpdateMyEmployeeData {
 	this := UpdateMyEmployeeData{}
+	this.Id = id
 	this.Type = type_
 	this.Attributes = attributes
 	return &this
@@ -44,6 +47,30 @@ func NewUpdateMyEmployeeData(type_ string, attributes UpdateMyEmployeeDataAttrib
 func NewUpdateMyEmployeeDataWithDefaults() *UpdateMyEmployeeData {
 	this := UpdateMyEmployeeData{}
 	return &this
+}
+
+// GetId returns the Id field value
+func (o *UpdateMyEmployeeData) GetId() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.Id
+}
+
+// GetIdOk returns a tuple with the Id field value
+// and a boolean to check if the value has been set.
+func (o *UpdateMyEmployeeData) GetIdOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Id, true
+}
+
+// SetId sets field value
+func (o *UpdateMyEmployeeData) SetId(v string) {
+	o.Id = v
 }
 
 // GetType returns the Type field value
@@ -104,6 +131,7 @@ func (o UpdateMyEmployeeData) MarshalJSON() ([]byte, error) {
 
 func (o UpdateMyEmployeeData) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	toSerialize["id"] = o.Id
 	toSerialize["type"] = o.Type
 	toSerialize["attributes"] = o.Attributes
 	return toSerialize, nil
@@ -114,6 +142,7 @@ func (o *UpdateMyEmployeeData) UnmarshalJSON(data []byte) (err error) {
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
+		"id",
 		"type",
 		"attributes",
 	}

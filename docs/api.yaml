@@ -50,8 +50,8 @@ components:
       $ref: './spec/components/schemas/InviteData.yaml'
     InviteAttributes:
       $ref: './spec/components/schemas/InviteAttributes.yaml'
-    AnswerInvite:
-      $ref: './spec/components/schemas/AnswerInvite.yaml'
+    ReplyToInvite:
+      $ref: './spec/components/schemas/ReplyToInvite.yaml'
     CreateInvite:
       $ref: './spec/components/schemas/CreateInvite.yaml'
     Company:

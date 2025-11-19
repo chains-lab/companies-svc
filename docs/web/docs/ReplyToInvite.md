@@ -1,46 +1,46 @@
-# ReplyInvite
+# ReplyToInvite
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Data** | [**ReplyInviteData**](ReplyInviteData.md) |  | 
+**Data** | [**ReplyToInviteData**](ReplyToInviteData.md) |  | 
 
 ## Methods
 
-### NewReplyInvite
+### NewReplyToInvite
 
-`func NewReplyInvite(data ReplyInviteData, ) *ReplyInvite`
+`func NewReplyToInvite(data ReplyToInviteData, ) *ReplyToInvite`
 
-NewReplyInvite instantiates a new ReplyInvite object
+NewReplyToInvite instantiates a new ReplyToInvite object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewReplyInviteWithDefaults
+### NewReplyToInviteWithDefaults
 
-`func NewReplyInviteWithDefaults() *ReplyInvite`
+`func NewReplyToInviteWithDefaults() *ReplyToInvite`
 
-NewReplyInviteWithDefaults instantiates a new ReplyInvite object
+NewReplyToInviteWithDefaults instantiates a new ReplyToInvite object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetData
 
-`func (o *ReplyInvite) GetData() ReplyInviteData`
+`func (o *ReplyToInvite) GetData() ReplyToInviteData`
 
 GetData returns the Data field if non-nil, zero value otherwise.
 
 ### GetDataOk
 
-`func (o *ReplyInvite) GetDataOk() (*ReplyInviteData, bool)`
+`func (o *ReplyToInvite) GetDataOk() (*ReplyToInviteData, bool)`
 
 GetDataOk returns a tuple with the Data field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetData
 
-`func (o *ReplyInvite) SetData(v ReplyInviteData)`
+`func (o *ReplyToInvite) SetData(v ReplyToInviteData)`
 
 SetData sets Data field to given value.
 

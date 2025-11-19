@@ -2,7 +2,9 @@ package controller
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/chains-lab/ape"
 	"github.com/chains-lab/ape/problems"
@@ -11,7 +13,9 @@ import (
 	"github.com/chains-lab/companies-svc/internal/rest/meta"
 	"github.com/chains-lab/companies-svc/internal/rest/requests"
 	"github.com/chains-lab/companies-svc/internal/rest/responses"
+	"github.com/go-chi/chi/v5"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/google/uuid"
 )
 
 func (s Service) UpdateEmployee(w http.ResponseWriter, r *http.Request) {
@@ -31,13 +35,58 @@ func (s Service) UpdateEmployee(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	companyID, err := uuid.Parse(chi.URLParam(r, "company_id"))
+	if err != nil {
+		s.log.WithError(err).Errorf("invalid company EmployeeID format")
+		ape.RenderErr(w, problems.BadRequest(validation.Errors{
+			"company_id": err,
+		})...)
+
+		return
+	}
+	userID, err := uuid.Parse(chi.URLParam(r, "user_id"))
+	if err != nil {
+		s.log.WithError(err).Errorf("invalid user EmployeeID format")
+		ape.RenderErr(w, problems.BadRequest(validation.Errors{
+			"user_id": err,
+		})...)
+
+		return
+	}
+
+	ids := strings.Split(req.Data.Id, ":")
+	if len(ids) != 2 {
+		s.log.Error("invalid employee id format")
+		ape.RenderErr(w, problems.BadRequest(validation.Errors{
+			"id": fmt.Errorf("invalid id: %s, need format uuid:uuid look like user_id:company_id", req.Data.Id),
+		})...)
+
+		return
+	}
+	if ids[0] != userID.String() {
+		s.log.Error("employee id user_id does not match url user_id")
+		ape.RenderErr(w, problems.BadRequest(validation.Errors{
+			"id": fmt.Errorf("employee id user_id does not match url user_id"),
+		})...)
+
+		return
+	}
+	if ids[1] != companyID.String() {
+		s.log.Error("employee id company_id does not match url company_id")
+		ape.RenderErr(w, problems.BadRequest(validation.Errors{
+			"id": fmt.Errorf("employee id company_id does not match url company_id"),
+		})...)
+
+		return
+	}
+
 	params := employee.UpdateParams{
 		Role:     req.Data.Attributes.Role,
 		Position: req.Data.Attributes.Position,
 		Label:    req.Data.Attributes.Label,
 	}
 
-	res, err := s.domain.employee.UpdateByEmployee(r.Context(), req.Data.Id, initiator.ID, params)
+	res, err := s.domain.employee.UpdateByEmployee(r.Context(), initiator.ID, userID, companyID, params)
 	if err != nil {
 		s.log.WithError(err).Errorf("failed to update employee for EmployeeID: %s", req.Data.Id)
 		switch {

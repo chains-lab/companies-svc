@@ -2,6 +2,7 @@ package publisher
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/chains-lab/companies-svc/internal/domain/models"
@@ -26,7 +27,7 @@ func (s Service) PublishEmployeeDeleted(
 	return s.publish(
 		ctx,
 		contracts.TopicCompaniesEmployeeV1,
-		employee.ID.String(),
+		fmt.Sprintf("%s:%s", employee.UserID.String(), company.ID.String()),
 		contracts.Envelope[EmployeeDeletedPayload]{
 			Event:     EmployeeDeletedEvent,
 			Version:   "1",

@@ -17,8 +17,12 @@ type CreateParams struct {
 	Role      string
 }
 
-func (s Service) Create(ctx context.Context, initiatorUserID uuid.UUID, params CreateParams) (models.Invite, error) {
-	initiator, err := s.validateInitiator(ctx, initiatorUserID, params.CompanyID)
+func (s Service) Create(
+	ctx context.Context,
+	userID uuid.UUID,
+	params CreateParams,
+) (models.Invite, error) {
+	initiator, err := s.validateInitiator(ctx, userID, params.CompanyID)
 	if err != nil {
 		return models.Invite{}, err
 	}
@@ -35,7 +39,7 @@ func (s Service) Create(ctx context.Context, initiatorUserID uuid.UUID, params C
 		)
 	}
 
-	emp, err := s.db.GetEmployeeUserInCompany(ctx, params.UserID, params.CompanyID)
+	emp, err := s.db.GetEmployee(ctx, params.UserID, params.CompanyID)
 	if err != nil {
 		return models.Invite{}, errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to get employee by user_id %s, cause: %w", params.UserID, err),

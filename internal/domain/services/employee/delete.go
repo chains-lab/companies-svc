@@ -12,22 +12,23 @@ import (
 
 func (s Service) DeleteByEmployee(
 	ctx context.Context,
-	initiatorUserID uuid.UUID,
-	employeeID uuid.UUID,
+	initiatorID uuid.UUID,
+	userID uuid.UUID,
+	companyID uuid.UUID,
 ) error {
-	employee, err := s.Get(ctx, employeeID)
+	employee, err := s.Get(ctx, userID, companyID)
 	if err != nil {
 		return err
 	}
 
-	if employee.UserID == initiatorUserID {
+	if employee.UserID == initiatorID {
 		return errx.ErrorCannotDeleteYourself.Raise(
-			fmt.Errorf("initiator %s is trying to delete himself", initiatorUserID),
+			fmt.Errorf("initiator %s is trying to delete himself", initiatorID),
 		)
 	}
 
 	initiator, err := s.validateInitiator(
-		ctx, initiatorUserID, employee.CompanyID,
+		ctx, initiatorID, companyID,
 		enum.EmployeeRoleOwner, enum.EmployeeRoleAdmin,
 	)
 	if err != nil {
@@ -59,9 +60,10 @@ func (s Service) DeleteByEmployee(
 
 func (s Service) DeleteMe(
 	ctx context.Context,
-	employeeID uuid.UUID,
+	userID uuid.UUID,
+	companyID uuid.UUID,
 ) error {
-	own, err := s.Get(ctx, employeeID)
+	own, err := s.Get(ctx, userID, companyID)
 	if err != nil {
 		return err
 	}
@@ -91,7 +93,7 @@ func (s Service) delete(
 	employee models.Employee,
 	company models.Company,
 ) error {
-	if err := s.db.DeleteEmployee(ctx, employee.ID); err != nil {
+	if err := s.db.DeleteEmployee(ctx, employee.UserID, employee.CompanyID); err != nil {
 		return errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to delete employee, cause: %w", err),
 		)

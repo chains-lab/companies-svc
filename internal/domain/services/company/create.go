@@ -41,7 +41,6 @@ func (s Service) create(
 	}
 
 	owner := models.Employee{
-		ID:        uuid.New(),
 		UserID:    ownerID,
 		CompanyID: company.ID,
 		Role:      enum.EmployeeRoleOwner,

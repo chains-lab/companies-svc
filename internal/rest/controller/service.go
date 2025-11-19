@@ -39,8 +39,7 @@ type companySvc interface {
 }
 
 type employeeSvc interface {
-	Get(ctx context.Context, ID uuid.UUID) (models.Employee, error)
-	GetByUserInCompany(ctx context.Context, companyID, userID uuid.UUID) (models.Employee, error)
+	Get(ctx context.Context, companyID, userID uuid.UUID) (models.Employee, error)
 
 	Filter(
 		ctx context.Context,
@@ -50,8 +49,7 @@ type employeeSvc interface {
 
 	UpdateByEmployee(
 		ctx context.Context,
-		employeeID uuid.UUID,
-		initiatorUserID uuid.UUID,
+		initiatorID, userID, companyID uuid.UUID,
 		params employee.UpdateParams,
 	) (models.Employee, error)
 	UpdateMy(
@@ -62,18 +60,19 @@ type employeeSvc interface {
 
 	DeleteByEmployee(
 		ctx context.Context,
-		initiatorUserID uuid.UUID,
-		employeeID uuid.UUID,
+		initiatorID uuid.UUID,
+		userID, companyID uuid.UUID,
 	) error
 	DeleteMe(
 		ctx context.Context,
-		employeeID uuid.UUID,
+		userID uuid.UUID,
+		companyID uuid.UUID,
 	) error
 }
 
 type inviteSvc interface {
 	Create(ctx context.Context, initiatorID uuid.UUID, params invite.CreateParams) (models.Invite, error)
-	Answer(ctx context.Context, userID, inviteID uuid.UUID, answer string) (models.Invite, error)
+	Reply(ctx context.Context, userID, inviteID uuid.UUID, reply string) (models.Invite, error)
 }
 
 type blockSvc interface {

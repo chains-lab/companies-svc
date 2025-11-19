@@ -83,9 +83,6 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Models
 
- - [AnswerInvite](docs/AnswerInvite.md)
- - [AnswerInviteData](docs/AnswerInviteData.md)
- - [AnswerInviteDataAttributes](docs/AnswerInviteDataAttributes.md)
  - [CompaniesCollection](docs/CompaniesCollection.md)
  - [Company](docs/Company.md)
  - [CompanyAttributes](docs/CompanyAttributes.md)
@@ -113,6 +110,9 @@ Class | Method | HTTP request | Description
  - [InviteAttributes](docs/InviteAttributes.md)
  - [InviteData](docs/InviteData.md)
  - [PaginationData](docs/PaginationData.md)
+ - [ReplyToInvite](docs/ReplyToInvite.md)
+ - [ReplyToInviteData](docs/ReplyToInviteData.md)
+ - [ReplyToInviteDataAttributes](docs/ReplyToInviteDataAttributes.md)
  - [UpdateCompany](docs/UpdateCompany.md)
  - [UpdateCompanyData](docs/UpdateCompanyData.md)
  - [UpdateCompanyDataAttributes](docs/UpdateCompanyDataAttributes.md)

@@ -11,8 +11,9 @@ properties:
     properties:
       id:
         type: string
-        format: uuid
-        description: The UUID of the employee to be updated.
+        format: string
+        description: "user id + company id (UUID:UUID)"
+        pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
       type:
         type: string
         enum: [ employee ]

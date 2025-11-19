@@ -12,7 +12,6 @@ package resources
 
 import (
 	"encoding/json"
-	"github.com/google/uuid"
 	"time"
 	"bytes"
 	"fmt"
@@ -23,10 +22,6 @@ var _ MappedNullable = &EmployeeAttributes{}
 
 // EmployeeAttributes struct for EmployeeAttributes
 type EmployeeAttributes struct {
-	// The unique identifier for the user associated with the employee.
-	UserId uuid.UUID `json:"user_id"`
-	// The unique identifier for the company associated with the employee.
-	CompanyId uuid.UUID `json:"company_id"`
 	// The role of the employee within the company's organization (e.g., manager, staff).
 	Role string `json:"role"`
 	// The job position or title of the employee.
@@ -45,10 +40,8 @@ type _EmployeeAttributes EmployeeAttributes
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewEmployeeAttributes(userId uuid.UUID, companyId uuid.UUID, role string, createdAt time.Time, updatedAt time.Time) *EmployeeAttributes {
+func NewEmployeeAttributes(role string, createdAt time.Time, updatedAt time.Time) *EmployeeAttributes {
 	this := EmployeeAttributes{}
-	this.UserId = userId
-	this.CompanyId = companyId
 	this.Role = role
 	this.CreatedAt = createdAt
 	this.UpdatedAt = updatedAt
@@ -61,54 +54,6 @@ func NewEmployeeAttributes(userId uuid.UUID, companyId uuid.UUID, role string, c
 func NewEmployeeAttributesWithDefaults() *EmployeeAttributes {
 	this := EmployeeAttributes{}
 	return &this
-}
-
-// GetUserId returns the UserId field value
-func (o *EmployeeAttributes) GetUserId() uuid.UUID {
-	if o == nil {
-		var ret uuid.UUID
-		return ret
-	}
-
-	return o.UserId
-}
-
-// GetUserIdOk returns a tuple with the UserId field value
-// and a boolean to check if the value has been set.
-func (o *EmployeeAttributes) GetUserIdOk() (*uuid.UUID, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.UserId, true
-}
-
-// SetUserId sets field value
-func (o *EmployeeAttributes) SetUserId(v uuid.UUID) {
-	o.UserId = v
-}
-
-// GetCompanyId returns the CompanyId field value
-func (o *EmployeeAttributes) GetCompanyId() uuid.UUID {
-	if o == nil {
-		var ret uuid.UUID
-		return ret
-	}
-
-	return o.CompanyId
-}
-
-// GetCompanyIdOk returns a tuple with the CompanyId field value
-// and a boolean to check if the value has been set.
-func (o *EmployeeAttributes) GetCompanyIdOk() (*uuid.UUID, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.CompanyId, true
-}
-
-// SetCompanyId sets field value
-func (o *EmployeeAttributes) SetCompanyId(v uuid.UUID) {
-	o.CompanyId = v
 }
 
 // GetRole returns the Role field value
@@ -257,8 +202,6 @@ func (o EmployeeAttributes) MarshalJSON() ([]byte, error) {
 
 func (o EmployeeAttributes) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["user_id"] = o.UserId
-	toSerialize["company_id"] = o.CompanyId
 	toSerialize["role"] = o.Role
 	if !IsNil(o.Position) {
 		toSerialize["position"] = o.Position
@@ -276,8 +219,6 @@ func (o *EmployeeAttributes) UnmarshalJSON(data []byte) (err error) {
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
-		"user_id",
-		"company_id",
 		"role",
 		"created_at",
 		"updated_at",

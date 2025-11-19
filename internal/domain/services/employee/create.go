@@ -29,7 +29,7 @@ func (s Service) Create(ctx context.Context, params CreateParams) (models.Employ
 		)
 	}
 
-	emp, err := s.db.GetEmployeeUserInCompany(ctx, params.UserID, params.CompanyID)
+	emp, err := s.db.GetEmployee(ctx, params.UserID, params.CompanyID)
 	if err != nil {
 		return models.Employee{}, errx.ErrorInternal.Raise(
 			fmt.Errorf("falied to check existing employee, cause: %w", err),
@@ -50,7 +50,6 @@ func (s Service) Create(ctx context.Context, params CreateParams) (models.Employ
 	}
 
 	emp = models.Employee{
-		ID:        uuid.New(),
 		UserID:    params.UserID,
 		CompanyID: params.CompanyID,
 		Role:      params.Role,

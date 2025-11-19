@@ -29,16 +29,15 @@ type database interface {
 
 	CreateEmployee(ctx context.Context, input models.Employee) error
 
-	GetEmployee(ctx context.Context, ID uuid.UUID) (models.Employee, error)
-	GetEmployeeUserInCompany(ctx context.Context, userID, companyID uuid.UUID) (models.Employee, error)
+	GetEmployee(ctx context.Context, userID, companyID uuid.UUID) (models.Employee, error)
 	GetCompanyOwner(ctx context.Context, companyID uuid.UUID) (models.Employee, error)
 
 	FilterEmployees(ctx context.Context, filters FilterParams, page, size uint64) (models.EmployeesCollection, error)
 
 	GetCompanyEmployees(ctx context.Context, companyID uuid.UUID, roles ...string) (models.EmployeesCollection, error)
 
-	UpdateEmployee(ctx context.Context, userID uuid.UUID, params UpdateParams, updatedAt time.Time) error
-	DeleteEmployee(ctx context.Context, ID uuid.UUID) error
+	UpdateEmployee(ctx context.Context, userID, companyID uuid.UUID, params UpdateParams, updatedAt time.Time) error
+	DeleteEmployee(ctx context.Context, userID, companyID uuid.UUID) error
 }
 
 type EventPublisher interface {
@@ -70,7 +69,7 @@ func (s Service) validateInitiator(
 	companyID uuid.UUID,
 	roles ...string,
 ) (models.Employee, error) {
-	employee, err := s.db.GetEmployeeUserInCompany(ctx, userID, companyID)
+	employee, err := s.db.GetEmployee(ctx, userID, companyID)
 	if err != nil {
 		return models.Employee{}, errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to get employee by user EmployeeID, cause: %w", err),

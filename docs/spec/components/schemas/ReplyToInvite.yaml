@@ -19,9 +19,9 @@ properties:
       attributes:
         type: object
         required:
-          - answer
+          - reply
         properties:
-          answer:
+          reply:
             type: string
             enum: [ accept, decline ]
-            description: "The answer to the invite, either 'accept' or 'decline'"
+            description: "The reply to the invite, either 'accept' or 'decline'"

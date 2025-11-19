@@ -13,7 +13,7 @@ CREATE TABLE employees (
     updated_at TIMESTAMP      NOT NULL  DEFAULT (now() AT TIME ZONE 'UTC'),
     created_at TIMESTAMP      NOT NULL  DEFAULT (now() AT TIME ZONE 'UTC'),
 
-    CONSTRAINT employees_company_user_unique UNIQUE (company_id, user_id)
+    PRIMARY KEY (user_id, company_id)
 );
 
 CREATE Type invite_status AS ENUM (

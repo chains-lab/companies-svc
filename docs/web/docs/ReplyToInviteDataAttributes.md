@@ -1,4 +1,4 @@
-# ReplyInviteDataAttributes
+# ReplyToInviteDataAttributes
 
 ## Properties
 
@@ -8,39 +8,39 @@ Name | Type | Description | Notes
 
 ## Methods
 
-### NewReplyInviteDataAttributes
+### NewReplyToInviteDataAttributes
 
-`func NewReplyInviteDataAttributes(reply string, ) *ReplyInviteDataAttributes`
+`func NewReplyToInviteDataAttributes(reply string, ) *ReplyToInviteDataAttributes`
 
-NewReplyInviteDataAttributes instantiates a new ReplyInviteDataAttributes object
+NewReplyToInviteDataAttributes instantiates a new ReplyToInviteDataAttributes object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewReplyInviteDataAttributesWithDefaults
+### NewReplyToInviteDataAttributesWithDefaults
 
-`func NewReplyInviteDataAttributesWithDefaults() *ReplyInviteDataAttributes`
+`func NewReplyToInviteDataAttributesWithDefaults() *ReplyToInviteDataAttributes`
 
-NewReplyInviteDataAttributesWithDefaults instantiates a new ReplyInviteDataAttributes object
+NewReplyToInviteDataAttributesWithDefaults instantiates a new ReplyToInviteDataAttributes object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetReply
 
-`func (o *ReplyInviteDataAttributes) GetReply() string`
+`func (o *ReplyToInviteDataAttributes) GetReply() string`
 
 GetReply returns the Reply field if non-nil, zero value otherwise.
 
 ### GetReplyOk
 
-`func (o *ReplyInviteDataAttributes) GetReplyOk() (*string, bool)`
+`func (o *ReplyToInviteDataAttributes) GetReplyOk() (*string, bool)`
 
 GetReplyOk returns a tuple with the Reply field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetReply
 
-`func (o *ReplyInviteDataAttributes) SetReply(v string)`
+`func (o *ReplyToInviteDataAttributes) SetReply(v string)`
 
 SetReply sets Reply field to given value.
 

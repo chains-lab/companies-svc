@@ -1,6 +1,8 @@
 package responses
 
 import (
+	"fmt"
+
 	"github.com/chains-lab/companies-svc/internal/domain/models"
 	"github.com/chains-lab/companies-svc/resources"
 )
@@ -8,10 +10,9 @@ import (
 func Employee(m models.Employee) resources.Employee {
 	resp := resources.Employee{
 		Data: resources.EmployeeData{
-			Id:   m.UserID,
+			Id:   fmt.Sprintf("%s:%s", m.UserID.String(), m.CompanyID.String()),
 			Type: resources.EmployeeType,
 			Attributes: resources.EmployeeAttributes{
-				CompanyId: m.CompanyID,
 				Role:      m.Role,
 				Position:  m.Position,
 				Label:     m.Label,

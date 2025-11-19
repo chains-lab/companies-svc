@@ -13,7 +13,7 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
-func (s Service) AnswerInvite(w http.ResponseWriter, r *http.Request) {
+func (s Service) ReplyInvite(w http.ResponseWriter, r *http.Request) {
 	initiator, err := meta.User(r.Context())
 	if err != nil {
 		s.log.WithError(err).Error("failed to get user from context")
@@ -22,29 +22,29 @@ func (s Service) AnswerInvite(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req, err := requests.AnswerInvite(r)
+	req, err := requests.ReplyInvite(r)
 	if err != nil {
-		s.log.WithError(err).Error("invalid answer invite request")
+		s.log.WithError(err).Error("invalid reply invite request")
 		ape.RenderErr(w, problems.BadRequest(err)...)
 
 		return
 	}
 
-	invite, err := s.domain.invite.Answer(r.Context(), initiator.ID, req.Data.Id, req.Data.Attributes.Answer)
+	invite, err := s.domain.invite.Reply(r.Context(), initiator.ID, req.Data.Id, req.Data.Attributes.Reply)
 	if err != nil {
-		s.log.WithError(err).Error("failed to answer to invite")
+		s.log.WithError(err).Error("failed to reply to invite")
 		switch {
 		case errors.Is(err, errx.ErrorInvalidInviteStatus):
 			ape.RenderErr(w, problems.BadRequest(validation.Errors{
-				"data/attributes/answer": err,
+				"data/attributes/reply": err,
 			})...)
 
 		case errors.Is(err, errx.ErrorInviteNotFound):
 			ape.RenderErr(w, problems.NotFound("invite not found"))
 		case errors.Is(err, errx.ErrorInviteExpired):
 			ape.RenderErr(w, problems.Conflict("invite expired"))
-		case errors.Is(err, errx.ErrorInviteAlreadyAnswered):
-			ape.RenderErr(w, problems.Conflict("invite already answered"))
+		case errors.Is(err, errx.ErrorInviteAlreadyReplyed):
+			ape.RenderErr(w, problems.Conflict("invite already replyed"))
 		case errors.Is(err, errx.ErrorInviteNotForThisUser):
 			ape.RenderErr(w, problems.Unauthorized("invite not for user"))
 		case errors.Is(err, errx.ErrorCompanyIsNotActive):

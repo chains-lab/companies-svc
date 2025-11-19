@@ -32,7 +32,17 @@ func (s Service) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = s.domain.employee.DeleteByEmployee(r.Context(), initiator.ID, userID)
+	comapnyID, err := uuid.Parse(chi.URLParam(r, "company_id"))
+	if err != nil {
+		s.log.WithError(err).Errorf("invalid company EmployeeID format")
+		ape.RenderErr(w, problems.BadRequest(validation.Errors{
+			"company_id": err,
+		})...)
+
+		return
+	}
+
+	err = s.domain.employee.DeleteByEmployee(r.Context(), initiator.ID, userID, comapnyID)
 	if err != nil {
 		s.log.WithError(err).Errorf("failed to delete employee with user_id: %s", userID)
 		switch {

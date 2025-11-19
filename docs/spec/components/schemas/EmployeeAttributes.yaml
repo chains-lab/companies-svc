@@ -1,19 +1,9 @@
 type: object
 required:
-  - user_id
-  - company_id
   - role
   - created_at
   - updated_at
 properties:
-  user_id:
-    type: string
-    format: uuid
-    description: "The unique identifier for the user associated with the employee."
-  company_id:
-    type: string
-    format: uuid
-    description: "The unique identifier for the company associated with the employee."
   role:
     type: string
     description: "The role of the employee within the company's organization (e.g., manager, staff)."

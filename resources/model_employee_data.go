@@ -12,7 +12,6 @@ package resources
 
 import (
 	"encoding/json"
-	"github.com/google/uuid"
 	"bytes"
 	"fmt"
 )
@@ -22,8 +21,8 @@ var _ MappedNullable = &EmployeeData{}
 
 // EmployeeData struct for EmployeeData
 type EmployeeData struct {
-	// user id
-	Id uuid.UUID `json:"id"`
+	// user id + company id (UUID:UUID)
+	Id string `json:"id" validate:"regexp=^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"`
 	Type string `json:"type"`
 	Attributes EmployeeAttributes `json:"attributes"`
 }
@@ -34,7 +33,7 @@ type _EmployeeData EmployeeData
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewEmployeeData(id uuid.UUID, type_ string, attributes EmployeeAttributes) *EmployeeData {
+func NewEmployeeData(id string, type_ string, attributes EmployeeAttributes) *EmployeeData {
 	this := EmployeeData{}
 	this.Id = id
 	this.Type = type_
@@ -51,9 +50,9 @@ func NewEmployeeDataWithDefaults() *EmployeeData {
 }
 
 // GetId returns the Id field value
-func (o *EmployeeData) GetId() uuid.UUID {
+func (o *EmployeeData) GetId() string {
 	if o == nil {
-		var ret uuid.UUID
+		var ret string
 		return ret
 	}
 
@@ -62,7 +61,7 @@ func (o *EmployeeData) GetId() uuid.UUID {
 
 // GetIdOk returns a tuple with the Id field value
 // and a boolean to check if the value has been set.
-func (o *EmployeeData) GetIdOk() (*uuid.UUID, bool) {
+func (o *EmployeeData) GetIdOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -70,7 +69,7 @@ func (o *EmployeeData) GetIdOk() (*uuid.UUID, bool) {
 }
 
 // SetId sets field value
-func (o *EmployeeData) SetId(v uuid.UUID) {
+func (o *EmployeeData) SetId(v string) {
 	o.Id = v
 }
 

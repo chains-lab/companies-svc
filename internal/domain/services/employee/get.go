@@ -9,24 +9,8 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s Service) Get(ctx context.Context, ID uuid.UUID) (models.Employee, error) {
-	res, err := s.db.GetEmployee(ctx, ID)
-	if err != nil {
-		return models.Employee{}, errx.ErrorInternal.Raise(
-			fmt.Errorf("failed to get employee, cause: %w", err),
-		)
-	}
-	if res.IsNil() {
-		return models.Employee{}, errx.ErrorEmployeeNotFound.Raise(
-			fmt.Errorf("employee not found"),
-		)
-	}
-
-	return res, nil
-}
-
-func (s Service) GetByUserInCompany(ctx context.Context, companyID, userID uuid.UUID) (models.Employee, error) {
-	employee, err := s.db.GetEmployeeUserInCompany(ctx, userID, companyID)
+func (s Service) Get(ctx context.Context, companyID, userID uuid.UUID) (models.Employee, error) {
+	employee, err := s.db.GetEmployee(ctx, userID, companyID)
 	if err != nil {
 		return models.Employee{}, errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to get employee user %s in company %s, cause: %w", userID, companyID, err),

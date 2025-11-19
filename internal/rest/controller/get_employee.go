@@ -7,6 +7,7 @@ import (
 	"github.com/chains-lab/ape"
 	"github.com/chains-lab/ape/problems"
 	"github.com/chains-lab/companies-svc/internal/domain/errx"
+	"github.com/chains-lab/companies-svc/internal/rest/meta"
 	"github.com/chains-lab/companies-svc/internal/rest/responses"
 	"github.com/go-chi/chi/v5"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
@@ -14,9 +15,17 @@ import (
 )
 
 func (s Service) GetEmployee(w http.ResponseWriter, r *http.Request) {
-	employeeID, err := uuid.Parse(chi.URLParam(r, "employee_id"))
+	initiator, err := meta.User(r.Context())
 	if err != nil {
-		s.log.WithError(err).Errorf("invalid employee ID format")
+		s.log.WithError(err).Error("failed to get user from context")
+		ape.RenderErr(w, problems.BadRequest(err)...)
+
+		return
+	}
+
+	cityID, err := uuid.Parse(chi.URLParam(r, "employee_id"))
+	if err != nil {
+		s.log.WithError(err).Errorf("invalid employee EmployeeID format")
 		ape.RenderErr(w, problems.BadRequest(validation.Errors{
 			"employee_id": err,
 		})...)
@@ -24,7 +33,7 @@ func (s Service) GetEmployee(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	emp, err := s.domain.employee.Get(r.Context(), employeeID)
+	emp, err := s.domain.employee.Get(r.Context(), initiator.ID, cityID)
 	if err != nil {
 		s.log.WithError(err).Errorf("failed to get employee")
 		switch {

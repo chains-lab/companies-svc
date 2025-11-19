@@ -2,6 +2,7 @@ package publisher
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/chains-lab/companies-svc/internal/domain/models"
@@ -26,7 +27,7 @@ func (s Service) PublishEmployeeCreated(
 	return s.publish(
 		ctx,
 		contracts.TopicCompaniesV1,
-		employee.ID.String(),
+		fmt.Sprintf("%s:%s", employee.UserID.String(), company.ID.String()),
 		contracts.Envelope[EmployeeCreatedPayload]{
 			Event:     EmployeeCreatedEvent,
 			Version:   "1",

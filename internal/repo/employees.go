@@ -19,24 +19,9 @@ func (r *Repo) CreateEmployee(ctx context.Context, input models.Employee) error 
 
 func (r *Repo) GetEmployee(
 	ctx context.Context,
-	ID uuid.UUID,
-) (models.Employee, error) {
-	row, err := r.sql.employees.New().FilterID(ID).Get(ctx)
-	switch {
-	case errors.Is(err, sql.ErrNoRows):
-		return models.Employee{}, nil
-	case err != nil:
-		return models.Employee{}, err
-	}
-
-	return employeeSchemaToModel(row), nil
-}
-
-func (r *Repo) GetEmployeeUserInCompany(
-	ctx context.Context,
 	userID, companyID uuid.UUID,
 ) (models.Employee, error) {
-	row, err := r.sql.employees.New().FilterCompanyID(companyID).FilterUserID(userID).Get(ctx)
+	row, err := r.sql.employees.New().FilterUserID(userID).FilterCompanyID(companyID).Get(ctx)
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
 		return models.Employee{}, nil
@@ -59,6 +44,30 @@ func (r *Repo) GetCompanyOwner(ctx context.Context, companyID uuid.UUID) (models
 	return employeeSchemaToModel(row), nil
 }
 
+func (r *Repo) GetCompanyEmployees(ctx context.Context, companyID uuid.UUID, roles ...string) (models.EmployeesCollection, error) {
+	query := r.sql.employees.New().FilterCompanyID(companyID)
+	if len(roles) > 0 {
+		query = query.FilterRole(roles...)
+	}
+
+	rows, err := query.Select(ctx)
+	if err != nil {
+		return models.EmployeesCollection{}, err
+	}
+
+	collection := make([]models.Employee, 0, len(rows))
+	for _, row := range rows {
+		collection = append(collection, employeeSchemaToModel(row))
+	}
+
+	return models.EmployeesCollection{
+		Data:  collection,
+		Page:  1,
+		Size:  uint64(len(collection)),
+		Total: uint64(len(collection)),
+	}, nil
+}
+
 func (r *Repo) FilterEmployees(
 	ctx context.Context,
 	filter employee.FilterParams,
@@ -76,9 +85,6 @@ func (r *Repo) FilterEmployees(
 	}
 	if filter.Roles != nil && len(filter.Roles) > 0 {
 		query = query.FilterRole(filter.Roles...)
-	}
-	if filter.EmployeeID != nil && len(filter.EmployeeID) > 0 {
-		query = query.FilterID(filter.EmployeeID...)
 	}
 
 	total, err := query.Count(ctx)
@@ -106,11 +112,11 @@ func (r *Repo) FilterEmployees(
 
 func (r *Repo) UpdateEmployee(
 	ctx context.Context,
-	ID uuid.UUID,
+	userID, companyID uuid.UUID,
 	params employee.UpdateParams,
 	updatedAt time.Time,
 ) error {
-	q := r.sql.employees.New().FilterID(ID)
+	q := r.sql.employees.New().FilterUserID(userID).FilterCompanyID(companyID)
 	empty := true
 
 	if params.Position != nil {
@@ -143,30 +149,10 @@ func (r *Repo) UpdateEmployee(
 	return q.Update(ctx, updatedAt)
 }
 
-func (r *Repo) DeleteEmployee(ctx context.Context, ID uuid.UUID) error {
-	return r.sql.employees.New().FilterID(ID).Delete(ctx)
+func (r *Repo) DeleteEmployee(ctx context.Context, userID, companyID uuid.UUID) error {
+	return r.sql.employees.New().FilterUserID(userID).FilterCompanyID(companyID).Delete(ctx)
 }
 
-func (r *Repo) GetCompanyEmployees(ctx context.Context, companyID uuid.UUID, roles ...string) (models.EmployeesCollection, error) {
-	query := r.sql.employees.New().FilterCompanyID(companyID)
-	if len(roles) > 0 {
-		query = query.FilterRole(roles...)
-	}
-
-	rows, err := query.Select(ctx)
-	if err != nil {
-		return models.EmployeesCollection{}, err
-	}
-
-	collection := make([]models.Employee, 0, len(rows))
-	for _, row := range rows {
-		collection = append(collection, employeeSchemaToModel(row))
-	}
-
-	return models.EmployeesCollection{
-		Data:  collection,
-		Page:  1,
-		Size:  uint64(len(collection)),
-		Total: uint64(len(collection)),
-	}, nil
+func (r *Repo) DeleteEmployeesForCompany(ctx context.Context, companyID uuid.UUID) error {
+	return r.sql.employees.New().FilterCompanyID(companyID).Delete(ctx)
 }

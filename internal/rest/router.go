@@ -36,7 +36,7 @@ type Handlers interface {
 	RefuseMyEmployee(w http.ResponseWriter, r *http.Request)
 
 	CreateInvite(w http.ResponseWriter, r *http.Request)
-	AnswerInvite(w http.ResponseWriter, r *http.Request)
+	ReplyInvite(w http.ResponseWriter, r *http.Request)
 }
 
 type Middlewares interface {
@@ -97,7 +97,7 @@ func Run(ctx context.Context, cfg internal.Config, log logium.Logger, m Middlewa
 			r.Route("/invite", func(r chi.Router) {
 				r.Use(auth)
 				r.Post("/", h.CreateInvite)
-				r.Patch("/", h.AnswerInvite)
+				r.Patch("/", h.ReplyInvite)
 			})
 
 			r.Route("/blocks", func(r chi.Router) {

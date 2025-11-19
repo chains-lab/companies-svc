@@ -1,88 +1,88 @@
-# UpdateMyEmployeeData
+# ReplyToInviteData
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | **string** | user id + company id (UUID:UUID) | 
+**Id** | [**uuid.UUID**](uuid.UUID.md) | invite id | 
 **Type** | **string** |  | 
-**Attributes** | [**UpdateMyEmployeeDataAttributes**](UpdateMyEmployeeDataAttributes.md) |  | 
+**Attributes** | [**ReplyToInviteDataAttributes**](ReplyToInviteDataAttributes.md) |  | 
 
 ## Methods
 
-### NewUpdateMyEmployeeData
+### NewReplyToInviteData
 
-`func NewUpdateMyEmployeeData(id string, type_ string, attributes UpdateMyEmployeeDataAttributes, ) *UpdateMyEmployeeData`
+`func NewReplyToInviteData(id uuid.UUID, type_ string, attributes ReplyToInviteDataAttributes, ) *ReplyToInviteData`
 
-NewUpdateMyEmployeeData instantiates a new UpdateMyEmployeeData object
+NewReplyToInviteData instantiates a new ReplyToInviteData object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewUpdateMyEmployeeDataWithDefaults
+### NewReplyToInviteDataWithDefaults
 
-`func NewUpdateMyEmployeeDataWithDefaults() *UpdateMyEmployeeData`
+`func NewReplyToInviteDataWithDefaults() *ReplyToInviteData`
 
-NewUpdateMyEmployeeDataWithDefaults instantiates a new UpdateMyEmployeeData object
+NewReplyToInviteDataWithDefaults instantiates a new ReplyToInviteData object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetId
 
-`func (o *UpdateMyEmployeeData) GetId() string`
+`func (o *ReplyToInviteData) GetId() uuid.UUID`
 
 GetId returns the Id field if non-nil, zero value otherwise.
 
 ### GetIdOk
 
-`func (o *UpdateMyEmployeeData) GetIdOk() (*string, bool)`
+`func (o *ReplyToInviteData) GetIdOk() (*uuid.UUID, bool)`
 
 GetIdOk returns a tuple with the Id field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetId
 
-`func (o *UpdateMyEmployeeData) SetId(v string)`
+`func (o *ReplyToInviteData) SetId(v uuid.UUID)`
 
 SetId sets Id field to given value.
 
 
 ### GetType
 
-`func (o *UpdateMyEmployeeData) GetType() string`
+`func (o *ReplyToInviteData) GetType() string`
 
 GetType returns the Type field if non-nil, zero value otherwise.
 
 ### GetTypeOk
 
-`func (o *UpdateMyEmployeeData) GetTypeOk() (*string, bool)`
+`func (o *ReplyToInviteData) GetTypeOk() (*string, bool)`
 
 GetTypeOk returns a tuple with the Type field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetType
 
-`func (o *UpdateMyEmployeeData) SetType(v string)`
+`func (o *ReplyToInviteData) SetType(v string)`
 
 SetType sets Type field to given value.
 
 
 ### GetAttributes
 
-`func (o *UpdateMyEmployeeData) GetAttributes() UpdateMyEmployeeDataAttributes`
+`func (o *ReplyToInviteData) GetAttributes() ReplyToInviteDataAttributes`
 
 GetAttributes returns the Attributes field if non-nil, zero value otherwise.
 
 ### GetAttributesOk
 
-`func (o *UpdateMyEmployeeData) GetAttributesOk() (*UpdateMyEmployeeDataAttributes, bool)`
+`func (o *ReplyToInviteData) GetAttributesOk() (*ReplyToInviteDataAttributes, bool)`
 
 GetAttributesOk returns a tuple with the Attributes field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetAttributes
 
-`func (o *UpdateMyEmployeeData) SetAttributes(v UpdateMyEmployeeDataAttributes)`
+`func (o *ReplyToInviteData) SetAttributes(v ReplyToInviteDataAttributes)`
 
 SetAttributes sets Attributes field to given value.
 

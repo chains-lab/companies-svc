@@ -1,4 +1,4 @@
-# AnswerInviteData
+# ReplyInviteData
 
 ## Properties
 
@@ -6,83 +6,83 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Id** | [**uuid.UUID**](uuid.UUID.md) | invite id | 
 **Type** | **string** |  | 
-**Attributes** | [**AnswerInviteDataAttributes**](AnswerInviteDataAttributes.md) |  | 
+**Attributes** | [**ReplyInviteDataAttributes**](ReplyInviteDataAttributes.md) |  | 
 
 ## Methods
 
-### NewAnswerInviteData
+### NewReplyInviteData
 
-`func NewAnswerInviteData(id uuid.UUID, type_ string, attributes AnswerInviteDataAttributes, ) *AnswerInviteData`
+`func NewReplyInviteData(id uuid.UUID, type_ string, attributes ReplyInviteDataAttributes, ) *ReplyInviteData`
 
-NewAnswerInviteData instantiates a new AnswerInviteData object
+NewReplyInviteData instantiates a new ReplyInviteData object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewAnswerInviteDataWithDefaults
+### NewReplyInviteDataWithDefaults
 
-`func NewAnswerInviteDataWithDefaults() *AnswerInviteData`
+`func NewReplyInviteDataWithDefaults() *ReplyInviteData`
 
-NewAnswerInviteDataWithDefaults instantiates a new AnswerInviteData object
+NewReplyInviteDataWithDefaults instantiates a new ReplyInviteData object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetId
 
-`func (o *AnswerInviteData) GetId() uuid.UUID`
+`func (o *ReplyInviteData) GetId() uuid.UUID`
 
 GetId returns the Id field if non-nil, zero value otherwise.
 
 ### GetIdOk
 
-`func (o *AnswerInviteData) GetIdOk() (*uuid.UUID, bool)`
+`func (o *ReplyInviteData) GetIdOk() (*uuid.UUID, bool)`
 
 GetIdOk returns a tuple with the Id field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetId
 
-`func (o *AnswerInviteData) SetId(v uuid.UUID)`
+`func (o *ReplyInviteData) SetId(v uuid.UUID)`
 
 SetId sets Id field to given value.
 
 
 ### GetType
 
-`func (o *AnswerInviteData) GetType() string`
+`func (o *ReplyInviteData) GetType() string`
 
 GetType returns the Type field if non-nil, zero value otherwise.
 
 ### GetTypeOk
 
-`func (o *AnswerInviteData) GetTypeOk() (*string, bool)`
+`func (o *ReplyInviteData) GetTypeOk() (*string, bool)`
 
 GetTypeOk returns a tuple with the Type field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetType
 
-`func (o *AnswerInviteData) SetType(v string)`
+`func (o *ReplyInviteData) SetType(v string)`
 
 SetType sets Type field to given value.
 
 
 ### GetAttributes
 
-`func (o *AnswerInviteData) GetAttributes() AnswerInviteDataAttributes`
+`func (o *ReplyInviteData) GetAttributes() ReplyInviteDataAttributes`
 
 GetAttributes returns the Attributes field if non-nil, zero value otherwise.
 
 ### GetAttributesOk
 
-`func (o *AnswerInviteData) GetAttributesOk() (*AnswerInviteDataAttributes, bool)`
+`func (o *ReplyInviteData) GetAttributesOk() (*ReplyInviteDataAttributes, bool)`
 
 GetAttributesOk returns a tuple with the Attributes field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetAttributes
 
-`func (o *AnswerInviteData) SetAttributes(v AnswerInviteDataAttributes)`
+`func (o *ReplyInviteData) SetAttributes(v ReplyInviteDataAttributes)`
 
 SetAttributes sets Attributes field to given value.
 

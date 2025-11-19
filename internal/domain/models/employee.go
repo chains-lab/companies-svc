@@ -7,7 +7,6 @@ import (
 )
 
 type Employee struct {
-	ID        uuid.UUID `json:"id"`
 	UserID    uuid.UUID `json:"user_id"`
 	CompanyID uuid.UUID `json:"company_id"`
 	Role      string    `json:"role"`
@@ -32,14 +31,6 @@ func (c EmployeesCollection) GetUserIDs() []uuid.UUID {
 	ids := make([]uuid.UUID, 0, len(c.Data))
 	for _, admin := range c.Data {
 		ids = append(ids, admin.UserID)
-	}
-	return ids
-}
-
-func (c EmployeesCollection) GetEmployeeIDs() []uuid.UUID {
-	ids := make([]uuid.UUID, 0, len(c.Data))
-	for _, admin := range c.Data {
-		ids = append(ids, admin.ID)
 	}
 	return ids
 }

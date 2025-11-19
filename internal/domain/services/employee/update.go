@@ -19,17 +19,18 @@ type UpdateParams struct {
 
 func (s Service) UpdateByEmployee(
 	ctx context.Context,
-	employeeID uuid.UUID,
-	initiatorUserID uuid.UUID,
+	initiatorID uuid.UUID,
+	userID uuid.UUID,
+	companyID uuid.UUID,
 	params UpdateParams,
 ) (models.Employee, error) {
-	employee, err := s.Get(ctx, employeeID)
+	employee, err := s.Get(ctx, userID, companyID)
 	if err != nil {
 		return models.Employee{}, err
 	}
 
 	initiator, err := s.validateInitiator(
-		ctx, initiatorUserID, employee.CompanyID,
+		ctx, initiatorID, employee.CompanyID,
 		enum.EmployeeRoleOwner, enum.EmployeeRoleAdmin,
 	)
 	if err != nil {
@@ -72,7 +73,7 @@ func (s Service) UpdateByEmployee(
 		)
 	}
 
-	return s.update(ctx, employee, company, params, initiatorUserID)
+	return s.update(ctx, employee, company, params, companyID)
 }
 
 type UpdateMyParams struct {
@@ -131,7 +132,7 @@ func (s Service) update(
 	updatedAt := time.Now().UTC()
 	employee.UpdatedAt = updatedAt
 
-	if err := s.db.UpdateEmployee(ctx, employee.UserID, params, updatedAt); err != nil {
+	if err := s.db.UpdateEmployee(ctx, employee.UserID, company.ID, params, updatedAt); err != nil {
 		return models.Employee{}, errx.ErrorInternal.Raise(
 			fmt.Errorf("failed to update employee role, cause: %w", err),
 		)

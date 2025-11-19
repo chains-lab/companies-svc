@@ -6,7 +6,7 @@ import (
 
 var ErrorInviteNotFound = ape.DeclareError("INVITE_NOT_FOUND")
 
-var ErrorInviteAlreadyAnswered = ape.DeclareError("INVITE_ALREADY_ANSWERED")
+var ErrorInviteAlreadyReplyed = ape.DeclareError("INVITE_ALREADY_REPLYED")
 
 var ErrorInviteExpired = ape.DeclareError("INVITE_EXPIRED")
 
