@@ -1,0 +1,41 @@
+service:
+  name: "organizations-svc"
+
+profile:
+  url: "http://localhost:8002/profiles-svc/v1/profiles"
+
+rest:
+  port: ":8004"
+  timeouts:
+    read: 15s #seconds
+    read_header: 15s #seconds
+    write: 15s #seconds
+    idle: 60s #seconds
+
+log:
+  level: "debug"
+  format: "text"
+
+database:
+  sql:
+    url: "postgresql://postgres:postgres@localhost:7005/postgres?sslmode=disable"
+
+jwt:
+  user:
+    access_token:
+      secret_key: "UnG06MAU2i1Mvqf8"
+      token_lifetime: 900
+  employee-invites:
+    secret_key: "invitesuperkey"
+
+kafka:
+  broker: "localhost:19092"
+
+swagger:
+  enabled: true
+  url: "/swagger"
+  port: "XXXX"
+
+properties:
+  residence:
+    api_key: "apikey" #form https://rapidapi.com/wirefreethought/api/geodb-cities
