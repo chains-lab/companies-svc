@@ -4,7 +4,7 @@ vendor
 node_modules
 
 main
-cmd/companies-svc/main
+cmd/organizations-svc/main
 
 config_local.yaml
 config_docker.yaml

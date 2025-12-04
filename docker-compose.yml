@@ -1,23 +1,23 @@
 services:
-  companies-svc:
+  organizations-svc:
     build: .
-    container_name: companies-svc
+    container_name: organizations-svc
     environment:
       - KV_VIPER_FILE=./config_docker.yaml
     ports:
-      - "8004:8000"
+      - "8005:8000"
     networks:
       - chains-net
 
-  companies-svc-postgres:
+  organizations-svc-postgres:
     image: postgres:15
-    container_name:  companies-svc-postgres
+    container_name:  organizations-svc-postgres
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
     ports:
-      - "7004:5432"
+      - "7005:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:

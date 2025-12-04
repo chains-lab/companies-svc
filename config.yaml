@@ -1,5 +1,5 @@
 service:
-  name: "companies-svc"
+  name: "organizations-svc"
 
 profile:
   url: "http://localhost:8002/profiles-svc/v1/profiles"
@@ -18,7 +18,7 @@ log:
 
 database:
   sql:
-    url: "postgresql://postgres:postgres@localhost:7004/postgres?sslmode=disable"
+    url: "postgresql://postgres:postgres@localhost:7005/postgres?sslmode=disable"
 
 jwt:
   user:

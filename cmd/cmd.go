@@ -5,17 +5,8 @@ import (
 	"database/sql"
 	"sync"
 
-	"github.com/chains-lab/companies-svc/internal"
-	"github.com/chains-lab/companies-svc/internal/domain/services/block"
-	"github.com/chains-lab/companies-svc/internal/domain/services/company"
-	"github.com/chains-lab/companies-svc/internal/domain/services/employee"
-	"github.com/chains-lab/companies-svc/internal/domain/services/invite"
-	"github.com/chains-lab/companies-svc/internal/events/publisher"
-	"github.com/chains-lab/companies-svc/internal/repo"
-	"github.com/chains-lab/companies-svc/internal/rest"
-	"github.com/chains-lab/companies-svc/internal/rest/controller"
-	"github.com/chains-lab/companies-svc/internal/rest/middlewares"
 	"github.com/chains-lab/logium"
+	"github.com/chains-lab/organizations-svc/internal"
 )
 
 func Start(ctx context.Context, cfg internal.Config, log logium.Logger, wg *sync.WaitGroup) {
@@ -36,12 +27,12 @@ func Start(ctx context.Context, cfg internal.Config, log logium.Logger, wg *sync
 
 	eventPublisher := publisher.New(cfg.Kafka.Broker)
 
-	companiesSvc := company.NewService(database, eventPublisher)
+	organizationsSvc := company.NewService(database, eventPublisher)
 	employeeSvc := employee.NewService(database, eventPublisher)
 	inviteSvc := invite.NewService(database, eventPublisher)
 	blockSvc := block.NewService(database, eventPublisher)
 
-	ctrl := controller.New(log, companiesSvc, employeeSvc, inviteSvc, blockSvc)
+	ctrl := controller.New(log, organizationsSvc, employeeSvc, inviteSvc, blockSvc)
 	mdlv := middlewares.New(log)
 
 	run(func() { rest.Run(ctx, cfg, log, mdlv, ctrl) })
